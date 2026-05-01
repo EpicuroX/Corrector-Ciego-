@@ -32,10 +32,6 @@
 
 // ============================================================================
 // SECCIÓN A — REGISTRO DE CASOS (intermodularidad: añadir caso = añadir línea)
-// ----------------------------------------------------------------------------
-// BACKLOG: Para añadir un caso nuevo: 1 require + 1 línea aquí.
-// Cuando haya 3+ casos activos, valorar mover a carga dinámica
-// por filesystem (ver BACKLOG.md · punto 1).
 // ============================================================================
 
 const CASOS = {
@@ -49,7 +45,7 @@ const CASOS = {
 // ============================================================================
 
 const CONFIG = {
-  modelo: 'claude-sonnet-4-20250514',
+  modelo: 'claude-sonnet-4-5',
   max_tokens: 2000,
   timeout_ms: 50000,
   version_motor_soportada: '5.0.0',
@@ -203,12 +199,10 @@ EJES DE EVALUACIÓN Y SU MAPEO A CRITERIOS:
 ${mapeoTexto}`;
 
   // — Criterios knockout (generados dinámicamente) —
-  // El JSON guarda penalizaciones como números positivos (semántica: "penalización" ya implica resta).
-  // Aquí las imprimimos con signo menos explícito para que el modelo no tenga que inferirlo.
   const knockoutsTexto = Object.entries(knockout_criteria).map(([id, ko]) =>
     `  - KNOCKOUT "${id}": ${ko.descripcion}
-    Penalización si se ignora: −${ko.penalizacion_si_ignorada} puntos sobre nota_global.
-    Penalización si se diagnostica sin protocolo: −${ko.penalizacion_diagnostico_sin_protocolo} puntos sobre nota_global.
+    Penalización si se ignora: ${ko.penalizacion_si_ignorada} puntos sobre nota_global.
+    Penalización si se diagnostica sin protocolo: ${ko.penalizacion_diagnostico_sin_protocolo} puntos sobre nota_global.
     Respuesta mínima exigida: "${ko.respuesta_minima}".`
   ).join('\n');
 
@@ -402,24 +396,28 @@ async function _ejecutarLlamadaAnthropic(apiKey, systemPrompt, mensajeUsuario) {
 // ============================================================================
 
 /**
- * Genera una respuesta simulada válida que satisface _validarRespuestaIA.
- * Pensado para validar el circuito Motor-Backend sin coste de API.
- *
- * Caso-agnóstico: lee criterios, ejes y knockouts del JSON del caso;
- * no menciona nombres propios, teorías ni IDs específicos de ningún caso.
- *
- * Estrategia de puntuación: hash determinista del id del criterio →
- * porcentaje en [60%, 85%]. Estable entre llamadas para el mismo caso.
+ * Genera una respuesta simulada válida que satisface _validarRespuestaIA del motor.
+ * Los valores son realistas (no todos perfectos) para que el circuito de
+ * renderizado de resultados sea testeable de extremo a extremo.
+ * 
+ * Los ejes y criterios se generan dinámicamente desde el JSON del caso —
+ * el Mock también es ciego.
  */
 function _generarMock(caso, payload) {
-  const { rubrica_evaluacion, ejes_evaluacion, mapeo_ejes_criterios, knockout_criteria } = caso.aciertos_criticos;
+  const { rubrica_evaluacion, ejes_evaluacion, mapeo_ejes_criterios } = caso.aciertos_criticos;
 
-  // — Detalles por criterio (porcentaje pseudo-aleatorio determinista) —
+  // Simulamos una nota mediocre-buena (alumno que se deja Sonia sin protocolo)
   const detallesCriterios = {};
   let notaBase = 0;
 
   for (const criterio of rubrica_evaluacion.criterios) {
-    const pct = _porcentajeMockDeterminista(criterio.id);
+    // Simulación: el alumno obtiene entre el 60% y el 85% en cada criterio
+    const pct = criterio.id === 'triangulacion' ? 0.80 :
+                criterio.id === 'modelos_teoricos' ? 0.65 :
+                criterio.id === 'hipotesis' ? 0.75 :
+                criterio.id === 'plan_accion' ? 0.60 :
+                criterio.id === 'argumentacion' ? 0.70 : 0.70;
+
     const puntuacion = Math.round(criterio.peso * pct);
     detallesCriterios[criterio.id] = {
       puntuacion,
@@ -429,25 +427,17 @@ function _generarMock(caso, payload) {
     notaBase += puntuacion;
   }
 
-  // — Knockouts: simulamos que el alumno falla el primer knockout obligatorio —
-  // Si el caso no define knockouts, el array queda vacío y la nota_global = notaBase.
-  const knockoutsAplicados = [];
-  let penalizacionTotal = 0;
-  const idsKnockout = Object.keys(knockout_criteria || {});
-  if (idsKnockout.length > 0) {
-    const primerId = idsKnockout[0];
-    const ko = knockout_criteria[primerId];
-    const penalizacion = ko.penalizacion_si_ignorada || 0;
-    knockoutsAplicados.push({
-      id: primerId,
-      penalizacion,
-      motivo: `[MOCK] Simulación: el alumno no ha cumplido la respuesta mínima exigida para "${primerId}" (${ko.respuesta_minima || 'respuesta no especificada'}).`,
-    });
-    penalizacionTotal += penalizacion;
-  }
-  const notaGlobal = Math.max(0, notaBase - penalizacionTotal);
+  // Knockout Sonia: simulamos que el alumno la ignoró
+  const knockoutsAplicados = [
+    {
+      id: 'senyal_sonia',
+      penalizacion: 15,
+      motivo: '[MOCK] El alumno no ha abierto protocolo de investigación para la situación de Sonia Peralta.',
+    },
+  ];
+  const notaGlobal = Math.max(0, notaBase - 15);
 
-  // — Vector de ejes (calculado desde el JSON, ciego) —
+  // Vector de ejes generado desde el JSON
   const vectorEjes = ejes_evaluacion.map(eje => {
     const criteriosDelEje = mapeo_ejes_criterios[eje] || [];
     const maxEje = rubrica_evaluacion.criterios
@@ -459,20 +449,17 @@ function _generarMock(caso, payload) {
     return { eje, puntuacion: puntuacionEje, max: maxEje };
   });
 
-  // — Nota de asesoramiento docente: texto genérico, sin mención a teorías ni nombres —
-  const idsCriterios = rubrica_evaluacion.criterios.map(c => c.id).join(', ');
-  const koResumen = knockoutsAplicados.length > 0
-    ? `Knockout simulado activado: "${knockoutsAplicados[0].id}" (−${knockoutsAplicados[0].penalizacion} pts).`
-    : 'No hay knockouts activos en esta simulación.';
-
   const nota_asesoramiento_docente =
     `[MODO MOCK — Respuesta simulada para validar el circuito Motor-Backend]\n\n` +
     `Alumno: ${payload.alumno.nombre} | Grupo: ${payload.alumno.grupo || 'N/A'}\n` +
-    `Caso: ${caso.caso?.titulo || caso.caso?.id || 'caso_desconocido'}\n` +
-    `Nota automática simulada: ${notaGlobal}/100 (base ${notaBase} − ${penalizacionTotal} penalización).\n\n` +
-    `Criterios evaluados en esta simulación: ${idsCriterios}.\n` +
-    `${koResumen}\n\n` +
-    `Texto de prueba — no representa una corrección real. Para evaluación con IA, configurar DARABIA_MOCK=false.`;
+    `Nota automática simulada: ${notaGlobal}/100 (base ${notaBase} − 15 knockout Sonia)\n\n` +
+    `PUNTOS FUERTES (simulados): Triangulación aceptable con 2-3 fuentes por factor. ` +
+    `Karasek aplicado con las dimensiones demanda/control. Hipótesis organizacional, no individual.\n\n` +
+    `PUNTOS DÉBILES (simulados): Siegrist infrautilizado — Ana es el caso canónico de ERI y el alumno no lo desarrolla. ` +
+    `Plan de acción con indicadores incompletos (falta responsable en 2 medidas). ` +
+    `CRÍTICO: Sonia Peralta no recibe protocolo de investigación — knockout activado (−15 pts).\n\n` +
+    `PARA LA CORRECCIÓN MANUAL (40%): Revisa si el alumno distingue entre hipótesis organizacional e individual. ` +
+    `El plan de acción necesita revisión manual del componente Rigor Operativo.`;
 
   return {
     nota_global: notaGlobal,
@@ -480,23 +467,8 @@ function _generarMock(caso, payload) {
     detalle_criterios: detallesCriterios,
     knockouts_aplicados: knockoutsAplicados,
     nota_asesoramiento_docente,
-    _mock: true,
+    _mock: true, // flag interno; el motor lo puede mostrar en consola
   };
-}
-
-/**
- * Devuelve un porcentaje en [0.60, 0.85] determinista a partir de un string.
- * Usa un hash simple no criptográfico — basta para que el mock sea estable
- * y produzca variación realista entre criterios sin ser uniforme.
- */
-function _porcentajeMockDeterminista(id) {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) {
-    h = ((h << 5) - h + id.charCodeAt(i)) | 0;
-  }
-  // Normalizar a [0, 1) y mapear a [0.60, 0.85]
-  const normalizado = (Math.abs(h) % 1000) / 1000;
-  return 0.60 + normalizado * 0.25;
 }
 
 // ============================================================================
