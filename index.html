@@ -396,6 +396,213 @@ button.secondary {
   font-style: italic;
 }
 
+/* ── BLOQUE RA STATUS · Resultados de Aprendizaje ─────────────────── */
+.bloque.ra-status {
+  background: var(--bg-1);
+  border-color: var(--border-strong);
+}
+.bloque.ra-status .bloque-tag { background: var(--blue); color: var(--bg-0); }
+
+.ra-status-controles {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+.btn-detalle {
+  background: transparent;
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.15s;
+}
+.btn-detalle:hover {
+  background: var(--bg-2);
+  color: var(--text-0);
+  border-color: var(--border-strong);
+}
+
+.ra-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ra-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  border-left-width: 3px;
+  transition: border-color 0.15s;
+}
+.ra-item.estado-conseguido    { border-left-color: var(--green); }
+.ra-item.estado-parcial       { border-left-color: var(--amber); }
+.ra-item.estado-no_conseguido { border-left-color: var(--red); }
+
+.ra-icono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  width: 22px;
+  text-align: center;
+  line-height: 1;
+}
+.ra-item.estado-conseguido    .ra-icono { color: var(--green); }
+.ra-item.estado-parcial       .ra-icono { color: var(--amber); }
+.ra-item.estado-no_conseguido .ra-icono { color: var(--red); }
+
+.ra-label {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+.ra-codigo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-0);
+  letter-spacing: 0.03em;
+}
+.ra-titulo {
+  font-size: 13px;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ra-estado {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.ra-item.estado-conseguido    .ra-estado { background: var(--green-bg); color: var(--green); }
+.ra-item.estado-parcial       .ra-estado { background: var(--amber-bg); color: var(--amber); }
+.ra-item.estado-no_conseguido .ra-estado { background: var(--red-bg);   color: var(--red); }
+
+.ra-knockout-flag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  margin-left: 6px;
+  padding: 2px 5px;
+  border: 1px solid var(--red);
+  color: var(--red);
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+}
+
+/* — Detalle expandido — */
+.ra-detalle {
+  grid-column: 1 / -1;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  display: none;
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+.ra-status.expandido .ra-detalle { display: block; }
+
+.ra-detalle-titulo {
+  font-size: 12px;
+  color: var(--text-2);
+  font-style: italic;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.ra-cr-grupo {
+  margin-top: 10px;
+}
+.ra-cr-grupo-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  margin-bottom: 6px;
+}
+.ra-cr-list {
+  list-style: none;
+  padding-left: 14px;
+  margin: 0;
+}
+.ra-cr-list li {
+  position: relative;
+  font-size: 12px;
+  color: var(--text-2);
+  padding: 3px 0;
+  line-height: 1.5;
+}
+.ra-cr-list li::before {
+  position: absolute;
+  left: -14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+.ra-cr-list.demostrados li::before    { content: "+"; color: var(--green); }
+.ra-cr-list.no-demostrados li::before { content: "−"; color: var(--red); }
+
+.ra-justificacion {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--bg-1);
+  border-left: 2px solid var(--border-strong);
+  font-size: 12px;
+  color: var(--text-1);
+  font-style: italic;
+  line-height: 1.6;
+}
+.ra-justificacion-label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  margin-bottom: 4px;
+  font-style: normal;
+}
+
+.ra-no-cubiertos {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.ra-no-cubiertos strong {
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+/* — Print: forzar expandido al imprimir — */
+@media print {
+  .bloque.ra-status .ra-detalle { display: block !important; }
+  .ra-status-controles { display: none; }
+}
+
 /* ── ERRORES ──────────────────────────────────────────────────────── */
 .error-banner {
   background: var(--red-bg);
@@ -454,20 +661,13 @@ footer {
 }
 </style>
 </head>
-<!--
-  caso_id activo en este despliegue. Para cambiar de caso:
-  editar el atributo data-caso-id de la etiqueta <body> de aquí abajo.
-
-  BACKLOG: cuando haya 3+ rúbricas activas, sustituir por selector
-  visible al profesor (ver BACKLOG.md · punto 1).
--->
-<body data-caso-id="psicosocial_gestoria_v1">
+<body>
 <div class="container">
 
 <header>
   <div>
     <h1>Corrector Docente</h1>
-    <div class="subtitle">Darabia Engine V5</div>
+    <div class="subtitle">Darabia Engine V5 · Caso 05</div>
   </div>
   <span class="badge">USO INTERNO</span>
 </header>
@@ -569,6 +769,21 @@ footer {
     <div class="bloque-contenido" id="contenido-nota-docente"></div>
   </div>
 
+  <!-- Bloque RA · Resultados de Aprendizaje del Caso -->
+  <div class="bloque ra-status hidden" id="bloque-ra-status">
+    <div class="bloque-header">
+      <div>
+        <span class="bloque-tag">Resultados de Aprendizaje</span>
+        <div class="bloque-titulo">Cobertura del módulo en este caso</div>
+      </div>
+    </div>
+    <div class="ra-status-controles">
+      <button class="btn-detalle" id="btn-toggle-detalle-ra">Ver detalle de criterios ↓</button>
+    </div>
+    <div class="ra-list" id="ra-list"></div>
+    <div class="ra-no-cubiertos hidden" id="ra-no-cubiertos"></div>
+  </div>
+
   <!-- Bloque 3: Detalle técnico -->
   <div class="panel">
     <div class="panel-title">Detalle por criterio</div>
@@ -605,9 +820,7 @@ footer {
 // ============================================================================
 const CONFIG = {
   endpoint: '/api/subir-pdf',
-  // caso_id se lee desde <body data-caso-id="..."> para que el cambio
-  // de caso sea editable en un único punto visible del HTML.
-  caso_id: document.body.dataset.casoId,
+  caso_id: 'psicosocial_gestoria_v1',
   version_motor: '5.0.0',
   max_file_mb: 8,
 };
@@ -828,6 +1041,9 @@ function renderResultado(data) {
   // — Tabla criterios —
   renderTablaCriterios(data.detalle_criterios || {});
 
+  // — Bloque RA Status (Sesión 3) —
+  renderRAStatus(data.ra_status || []);
+
   mostrarEstado('estado-resultado');
 }
 
@@ -866,12 +1082,132 @@ function renderTablaCriterios(detalle) {
 }
 
 // ============================================================================
+// BLOQUE RA STATUS · Cobertura de Resultados de Aprendizaje del caso
+// (Sesión 3 · Mayo 2026)
+// ============================================================================
+function renderRAStatus(raStatus) {
+  const bloque = $('bloque-ra-status');
+  const lista  = $('ra-list');
+  const noCub  = $('ra-no-cubiertos');
+
+  // Si la respuesta no trae ra_status (caso sin ra_cubiertos) → ocultar bloque entero
+  if (!Array.isArray(raStatus) || raStatus.length === 0) {
+    bloque.classList.add('hidden');
+    return;
+  }
+
+  // Recuperar metadatos del JSON del caso vía CONFIG si lo expone, o usar defaults
+  // (En esta fase, los títulos vienen del propio ra_status que la IA devuelve;
+  //  los títulos cortos los conoce el frontend desde LABELS_RA por código de RA.)
+
+  lista.innerHTML = '';
+  raStatus.forEach(item => {
+    const ra      = String(item.ra || '').trim();
+    const estado  = String(item.estado || 'no_conseguido').trim();
+    const nivel   = String(item.nivel_evidencia || 'ausente').trim();
+    const tit     = LABELS_RA[ra] || 'Resultado de Aprendizaje';
+    const icono   = ICONOS_ESTADO[estado] || '○';
+    const etiq    = ETIQUETAS_ESTADO[estado] || estado;
+    const koFlag  = nivel === 'knockout_activado'
+      ? '<span class="ra-knockout-flag" title="Knockout activado">[K]</span>'
+      : '';
+
+    // Detalle expandible
+    const crDem  = Array.isArray(item.cr_demostrados)    ? item.cr_demostrados    : [];
+    const crNoD  = Array.isArray(item.cr_no_demostrados) ? item.cr_no_demostrados : [];
+
+    const renderCRList = (arr, clase) =>
+      arr.length === 0
+        ? `<div class="ra-cr-grupo-label" style="color:var(--text-3);font-style:italic;">Ninguno</div>`
+        : `<ul class="ra-cr-list ${clase}">${arr.map(cr => `<li>${escapeHTML(cr)}</li>`).join('')}</ul>`;
+
+    const justificacion = (item.justificacion || '').trim();
+    const justifBlock = justificacion
+      ? `<div class="ra-justificacion">
+           <span class="ra-justificacion-label">Justificación de la IA</span>
+           ${escapeHTML(justificacion)}
+         </div>`
+      : '';
+
+    const div = document.createElement('div');
+    div.className = `ra-item estado-${estado}`;
+    div.innerHTML = `
+      <div class="ra-icono">${icono}</div>
+      <div class="ra-label">
+        <span class="ra-codigo">${escapeHTML(ra)}</span>
+        <span class="ra-titulo">${escapeHTML(tit)}</span>
+      </div>
+      <div>
+        <span class="ra-estado">${escapeHTML(etiq)}</span>${koFlag}
+      </div>
+      <div class="ra-detalle">
+        <div class="ra-cr-grupo">
+          <div class="ra-cr-grupo-label">Criterios demostrados (${crDem.length})</div>
+          ${renderCRList(crDem, 'demostrados')}
+        </div>
+        <div class="ra-cr-grupo">
+          <div class="ra-cr-grupo-label">Criterios no demostrados (${crNoD.length})</div>
+          ${renderCRList(crNoD, 'no-demostrados')}
+        </div>
+        ${justifBlock}
+      </div>
+    `;
+    lista.appendChild(div);
+  });
+
+  // RA no cubiertos en el caso (si los conocemos por configuración)
+  // Cuando se publique el endpoint que devuelva ra_no_cubiertos, conectarlo aquí.
+  // Por ahora, lo mostramos solo si el motor lo añade a la respuesta.
+  // (El JSON del Caso 05 declara RA1 y RA6 como no cubiertos.)
+  const declarados = (window.RA_NO_CUBIERTOS_CASO || []);
+  if (declarados.length > 0) {
+    noCub.classList.remove('hidden');
+    noCub.innerHTML = `<strong>Fuera del alcance del caso:</strong> ${declarados.join(' · ')}`;
+  } else {
+    noCub.classList.add('hidden');
+  }
+
+  // Toggle de detalle (un solo botón para todos)
+  const btn = $('btn-toggle-detalle-ra');
+  if (btn && !btn._wired) {
+    btn._wired = true;
+    btn.addEventListener('click', () => {
+      const expandido = bloque.classList.toggle('expandido');
+      btn.textContent = expandido ? 'Ocultar detalle ↑' : 'Ver detalle de criterios ↓';
+    });
+  }
+  // Estado inicial: compacto
+  bloque.classList.remove('expandido');
+  if (btn) btn.textContent = 'Ver detalle de criterios ↓';
+
+  bloque.classList.remove('hidden');
+}
+
+// — Tablas de constantes para RA —
+const LABELS_RA = {
+  RA1: 'Riesgos ergonómicos',
+  RA2: 'Riesgos psicosociales',
+  RA3: 'Estrés laboral',
+  RA4: 'Burnout',
+  RA5: 'Violencia y acoso laboral',
+  RA6: 'Trabajo a turnos y nocturno',
+};
+const ICONOS_ESTADO = {
+  conseguido:    '●',
+  parcial:       '◐',
+  no_conseguido: '○',
+};
+const ETIQUETAS_ESTADO = {
+  conseguido:    'Conseguido',
+  parcial:       'Parcial',
+  no_conseguido: 'No conseguido',
+};
+// Caso 05 declara RA1 y RA6 como no cubiertos (informativo)
+window.RA_NO_CUBIERTOS_CASO = ['RA1 · Riesgos ergonómicos', 'RA6 · Trabajo a turnos y nocturno'];
+
+
+// ============================================================================
 // FORMATEADORES (id técnico → label legible)
-// ----------------------------------------------------------------------------
-// BACKLOG: si un caso futuro introduce IDs nuevos no contemplados aquí,
-// se mostrará el id técnico crudo en pantalla (fallback en formatearX).
-// Cuando ocurra: ampliar este bloque, o migrar a lectura desde JSON
-// (ver BACKLOG.md · punto 2).
 // ============================================================================
 const LABELS_CRITERIOS = {
   unidades_analisis: 'Unidades de análisis',
