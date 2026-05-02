@@ -52,7 +52,7 @@ const CASOS = {
 
 const CONFIG = {
   modelo: 'claude-sonnet-4-5',
-  max_tokens: 2000,
+  max_tokens: 4000,
   timeout_ms: 50000,
   version_motor_soportada: '5.0.0',
   cors_origins_permitidos: [
