@@ -227,6 +227,9 @@ EVIDENCIAS DESBLOQUEADAS POR EL ALUMNO DURANTE LAS ENTREVISTAS:
 (Usa esto para contextualizar el dictamen — el alumno tuvo acceso a estas evidencias.)`;
 
   // — Instrucciones de salida (JSON estricto) —
+  // Detección dinámica: solo añadimos ra_status al esquema si el caso tiene ra_cubiertos
+  const tieneRA = Array.isArray(caso.ra_cubiertos) && caso.ra_cubiertos.length > 0;
+
   const instruccionesSalida = `
 INSTRUCCIONES DE EVALUACIÓN:
 1. Lee el dictamen completo del alumno.
@@ -234,7 +237,8 @@ INSTRUCCIONES DE EVALUACIÓN:
 3. Aplica penalizaciones knockout si corresponde (restan de nota_global).
 4. Calcula nota_global como suma ponderada de criterios (0-100), con knockouts aplicados. Nunca por debajo de 0.
 5. Para cada eje de evaluación, calcula la puntuación obtenida sobre su máximo (suma de pesos de los criterios que componen ese eje).
-6. Redacta nota_asesoramiento_docente: texto para el profesor que explique los puntos fuertes, débiles y qué observar en la corrección manual (40%). Máximo 300 palabras. Sin florituras.
+6. Redacta nota_asesoramiento_docente: texto para el profesor que explique los puntos fuertes, débiles y qué observar en la corrección manual (40%). Máximo 300 palabras. Sin florituras.${tieneRA ? `
+7. Genera ra_status: para cada RA del bloque "ra_cubiertos" del JSON del caso, evalúa si el alumno lo ha demostrado en su dictamen (ver INSTRUCCIONES DE RA más abajo).` : ''}
 
 FORMATO DE SALIDA — RESPONDE ÚNICAMENTE CON ESTE JSON. SIN TEXTO ANTES NI DESPUÉS. SIN BACKTICKS. SIN MARKDOWN:
 {
@@ -256,8 +260,69 @@ FORMATO DE SALIDA — RESPONDE ÚNICAMENTE CON ESTE JSON. SIN TEXTO ANTES NI DES
   "knockouts_aplicados": [
     { "id": "<knockout_id>", "penalizacion": <número>, "motivo": "<texto breve>" }
   ],
-  "nota_asesoramiento_docente": "<texto para el profesor, máx 300 palabras>"
+  "nota_asesoramiento_docente": "<texto para el profesor, máx 300 palabras>"${tieneRA ? `,
+  "ra_status": [
+    ${caso.ra_cubiertos.map(ra => {
+      const todosCR = [
+        ...(ra.cr_cubiertos || []).map(cr => cr.id),
+        ...(ra.cr_parciales || []).map(cr => cr.id),
+      ];
+      return `{
+      "ra": "${ra.ra}",
+      "estado": "<conseguido | parcial | no_conseguido>",
+      "nivel_evidencia": "<claro | parcial | ausente | knockout_activado>",
+      "cr_demostrados": [<subconjunto de: ${todosCR.map(c => `"${c}"`).join(', ')}>],
+      "cr_no_demostrados": [<el resto de: ${todosCR.map(c => `"${c}"`).join(', ')}>],
+      "justificacion": "<1-2 frases anclando al dictamen, máx 200 caracteres>"
+    }`;
+    }).join(',\n    ')}
+  ]` : ''}
 }`;
+
+  // — Instrucciones específicas de evaluación de RA (solo si el caso los tiene) —
+  const instruccionesRA = tieneRA ? `
+================================================================================
+INSTRUCCIONES DE EVALUACIÓN DE RESULTADOS DE APRENDIZAJE (ra_status)
+================================================================================
+
+Para cada RA listado en "ra_cubiertos" del JSON del caso:
+
+  1. Lee la "evidencia_esperada" del RA — define qué debe demostrar el alumno.
+  2. Compara con el dictamen del alumno (no con la rúbrica numérica).
+  3. Determina qué CR concretos están demostrados y cuáles no.
+  4. Asigna estado y nivel_evidencia según las reglas siguientes.
+
+REGLAS DE ASIGNACIÓN DE ESTADO:
+
+  estado = "conseguido"
+    · Todos los CR del RA aparecen demostrados en el dictamen.
+    · La evidencia es robusta y específica (no genérica).
+    · Para RA con "vinculo_knockout": el alumno NO ha activado el knockout.
+
+  estado = "parcial"
+    · Al menos 1 CR demostrado pero no todos.
+    · O todos los CR aparecen pero con nivel superficial.
+
+  estado = "no_conseguido"
+    · Ningún CR demostrado, o solo de forma incidental.
+    · O bien hay un knockout activado vinculado a este RA.
+
+REGLAS DE NIVEL DE EVIDENCIA:
+
+  nivel_evidencia = "claro" → evidencia directa, específica, anclada a datos del expediente.
+  nivel_evidencia = "parcial" → evidencia genérica o no operativizada.
+  nivel_evidencia = "ausente" → el RA no aparece desarrollado en el dictamen.
+  nivel_evidencia = "knockout_activado" → SOLO si "vinculo_knockout" del RA coincide con un knockout aplicado. En este caso estado = "no_conseguido" obligatoriamente.
+
+CONSISTENCIA OBLIGATORIA:
+
+  · Si hay knockout_sonia activado → el RA con vinculo_knockout = "senyal_sonia" debe tener estado = "no_conseguido" y nivel_evidencia = "knockout_activado".
+  · cr_demostrados + cr_no_demostrados deben sumar TODOS los CR del RA (cr_cubiertos + cr_parciales si los hay).
+  · Si estado = "conseguido", entonces cr_no_demostrados debe estar vacío.
+  · Si estado = "no_conseguido", entonces cr_demostrados debe estar vacío.
+  · La justificacion debe ser específica al dictamen evaluado, no genérica.
+
+================================================================================` : '';
 
   // — JSON completo del caso (referencia literal para el Prompt Maestro) —
   // El modelo tiene acceso directo a aciertos_criticos, rubrica_evaluacion,
@@ -269,7 +334,7 @@ REFERENCIA TÉCNICA — JSON COMPLETO DEL CASO (fuente de verdad para la evaluac
 ${JSON.stringify(caso, null, 2)}
 ================================================================================`;
 
-  return [identidad, ctxCaso, rubrica, ejesTexto, knockouts, llaves, instruccionesSalida, jsonCasoCompleto].join('\n');
+  return [identidad, ctxCaso, rubrica, ejesTexto, knockouts, llaves, instruccionesSalida, instruccionesRA, jsonCasoCompleto].join('\n');
 }
 
 // ============================================================================
