@@ -1000,6 +1000,107 @@ section#estado-resultado.con-visor .visor-pdf {
   background: var(--blue); color: var(--bg-0); border-color: var(--blue);
 }
 .btn-visor.activo:hover { background: #93c5fd; }
+/* Botón "Generar PDF alumno" en la barra de edición */
+.btn-print {
+  background: var(--blue); color: var(--bg-0);
+  border: 1px solid var(--blue);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: all 0.15s;
+}
+.btn-print:hover { background: #93c5fd; }
+.btn-print.activo { background: var(--green); border-color: var(--green); }
+
+/* Panel de configuración del PDF */
+.print-config {
+  position: relative;
+  margin-bottom: 16px;
+  background: linear-gradient(180deg, rgba(31,41,55,0.92), rgba(17,24,39,0.92));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--blue);
+  border-radius: 10px;
+  padding: 16px 20px;
+}
+.print-config[hidden] { display: none; }
+.print-config-header {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13px; color: var(--text-0);
+  margin-bottom: 12px;
+}
+.print-config-cerrar {
+  background: transparent; color: var(--text-2);
+  border: 1px solid var(--border-strong);
+  width: 24px; height: 24px;
+  border-radius: 4px; cursor: pointer;
+  font-size: 12px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+}
+.print-config-cerrar:hover { background: var(--bg-1); color: var(--text-0); }
+.print-config-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px 20px;
+  margin-bottom: 14px;
+}
+.print-config-body label {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--text-1);
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.print-config-body label:hover { background: rgba(96,165,250,0.05); }
+.print-config-body input[type="checkbox"] {
+  width: 16px; height: 16px;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+.print-config-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.print-config-footer small {
+  color: var(--text-3); font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.btn-print-go {
+  background: var(--green); color: var(--bg-0);
+  border: 1px solid var(--green); border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: all 0.15s;
+}
+.btn-print-go:hover { background: #34d399; }
+
+/* Firma docente · oculta en pantalla, solo visible al imprimir */
+.print-only-block { display: none; }
+.firma-docente {
+  margin-top: 32px;
+  padding-top: 16px;
+}
+.firma-linea {
+  width: 240px;
+  border-top: 1px solid #333;
+  margin-bottom: 8px;
+}
+.firma-nombre {
+  font-weight: 700;
+  color: #1a1a1a;
+  font-size: 12pt;
+}
+.firma-rol, .firma-centro {
+  color: #555;
+  font-size: 10pt;
+  line-height: 1.3;
+}
+
 /* Si no hay PDF disponible, el botón se desactiva */
 .btn-visor[disabled] {
   opacity: 0.4; cursor: not-allowed;
@@ -1017,6 +1118,193 @@ section#estado-resultado.con-visor .visor-pdf {
     z-index: 50;
     height: auto;
   }
+}
+
+/* ============================================================================
+   IMPRESIÓN DEL PDF DEL ALUMNO · @media print
+   Filosofía: convertir el corrector oscuro en un informe blanco/limpio
+   sin tocar el DOM. Las clases .print-hide-X se aplican dinámicamente al
+   <body> antes de window.print() según los checkboxes marcados.
+   ============================================================================ */
+@media print {
+  /* — Reseteo general: fondo blanco, texto negro, sin sombras ni glassmorph */
+  body {
+    background: white !important;
+    color: #1a1a1a !important;
+    font-family: 'Helvetica', 'Arial', sans-serif !important;
+  }
+  .container { max-width: 100% !important; padding: 0 !important; }
+
+  /* — Ocultar todo lo que NO va al alumno por defecto — */
+  header,
+  #estado-formulario,
+  #estado-procesando,
+  #estado-error,
+  .barra-edicion,
+  .print-config,
+  .visor-pdf,
+  .acciones-pie,
+  .aviso-coherencia,
+  .bloque.nota-docente,            /* nota docente forense, NUNCA al alumno */
+  .ra-status-controles,
+  #ra-no-cubiertos,
+  .btn-copiar,
+  .btn-detalle {
+    display: none !important;
+  }
+
+  /* — El section de resultado deja de ser grid (vuelve a flujo normal) — */
+  section#estado-resultado.con-visor {
+    display: block !important;
+    grid-template-columns: none !important;
+  }
+  .resultado-main { min-width: 0 !important; max-width: 100% !important; }
+
+  /* — Secciones opcionales: ocultas si el checkbox correspondiente
+       NO está marcado. La clase la pone JS sobre <body>. — */
+  body.print-hide-cabecera     .nota-global,
+  body.print-hide-cabecera     .alumno-info,
+  body.print-hide-cabecera     .diagnostico { display: none !important; }
+  body.print-hide-semaforo     .panel:has(.semaforo) { display: none !important; }
+  body.print-hide-knockout     .diagnostico.alerta { display: none !important; }
+  body.print-hide-criterios    .panel:has(.tabla-criterios) { display: none !important; }
+  body.print-hide-ra           #bloque-ra-status { display: none !important; }
+  body.print-hide-competencias .ejes-titulo,
+  body.print-hide-competencias .ejes { display: none !important; }
+  body.print-hide-firma        .firma-docente { display: none !important; }
+
+  /* — Bloques sí visibles (override del default oculto) — */
+  .print-only-block { display: block !important; }
+
+  /* — Estilos claros/imprenta para los bloques que se mantienen — */
+  .panel, .bloque {
+    background: white !important;
+    border: 1px solid #d0d0d0 !important;
+    box-shadow: none !important;
+    border-radius: 8px !important;
+    margin-bottom: 14px !important;
+    page-break-inside: avoid;
+    padding: 14px 16px !important;
+  }
+  .panel-title, .bloque-titulo {
+    color: #1a1a1a !important;
+    font-size: 13pt !important;
+    margin-bottom: 10px !important;
+  }
+  .bloque-tag { display: none !important; }
+
+  /* Dashboard: nota global + competencias en una sola fila limpia */
+  .dashboard {
+    display: grid !important;
+    grid-template-columns: 130px 1fr !important;
+    gap: 18px !important;
+    align-items: start !important;
+  }
+  .nota-global {
+    border: 1px solid #d0d0d0 !important;
+    background: white !important;
+    padding: 14px !important;
+    border-radius: 8px !important;
+  }
+  .nota-global .num { color: #1a1a1a !important; font-size: 38pt !important; }
+  .nota-global .num.high { color: #0a8a4d !important; }
+  .nota-global .num.mid  { color: #b8730a !important; }
+  .nota-global .num.low  { color: #b03040 !important; }
+  .nota-global .label, .nota-global .max { color: #555 !important; }
+
+  .alumno-info { color: #1a1a1a !important; font-size: 11pt !important; }
+  .alumno-info strong { color: #000 !important; }
+  .alumno-info .sep { color: #aaa !important; }
+
+  .ejes-titulo {
+    color: #555 !important;
+    font-size: 9pt !important;
+    margin-top: 6px !important;
+    margin-bottom: 8px !important;
+  }
+  .eje-row { color: #1a1a1a !important; font-size: 10pt !important; }
+  .eje-row .eje-name { color: #1a1a1a !important; }
+  .eje-row .eje-bar  { background: #e5e5e5 !important; }
+  .eje-row .eje-fill.high { background: #0a8a4d !important; }
+  .eje-row .eje-fill.mid,
+  .eje-row .eje-fill { background: #b8730a !important; }
+  .eje-row .eje-fill.low { background: #b03040 !important; }
+
+  /* Diagnóstico (penalización crítica) */
+  .diagnostico {
+    background: #fdf2f4 !important;
+    border: 1px solid #b03040 !important;
+    border-left: 4px solid #b03040 !important;
+    color: #1a1a1a !important;
+    padding: 12px 14px !important;
+    border-radius: 6px !important;
+  }
+  .diagnostico .texto-principal { color: #b03040 !important; font-size: 12pt !important; }
+  .diagnostico .texto-secundario { color: #555 !important; }
+
+  /* Semáforo */
+  .semaforo {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 10px !important;
+  }
+  .semaforo-card {
+    background: white !important;
+    border: 1px solid #ddd !important;
+    border-left-width: 3px !important;
+    page-break-inside: avoid;
+  }
+  .semaforo-card.bien    { border-left-color: #0a8a4d !important; }
+  .semaforo-card.mejorar { border-left-color: #b8730a !important; }
+  .semaforo-card.cuidado { border-left-color: #b03040 !important; }
+  .semaforo-card.bien    .semaforo-titulo { color: #0a8a4d !important; }
+  .semaforo-card.mejorar .semaforo-titulo { color: #b8730a !important; }
+  .semaforo-card.cuidado .semaforo-titulo { color: #b03040 !important; }
+  .semaforo-contenido {
+    color: #1a1a1a !important;
+    background: white !important;
+    outline: none !important;
+    font-size: 10pt !important;
+    line-height: 1.5 !important;
+  }
+  .semaforo-contenido:empty { display: none; }
+
+  /* Tabla criterios */
+  .tabla-criterios { font-size: 9.5pt !important; }
+  .tabla-criterios th {
+    background: #f4f4f4 !important;
+    color: #1a1a1a !important;
+    border-bottom: 1px solid #999 !important;
+  }
+  .tabla-criterios td {
+    color: #1a1a1a !important;
+    border-bottom: 1px solid #e5e5e5 !important;
+  }
+
+  /* RA list */
+  .ra-item {
+    background: white !important;
+    color: #1a1a1a !important;
+    border: 1px solid #ddd !important;
+    page-break-inside: avoid;
+  }
+  .ra-justificacion { color: #555 !important; font-style: italic; }
+
+  /* Cabecera del documento impreso */
+  body::before {
+    content: "IES Virgen del Pilar · Zaragoza · Ciclo Formativo de Grado Superior en PRL";
+    display: block;
+    font-size: 8pt;
+    color: #777;
+    border-bottom: 0.5px solid #ccc;
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  /* Saltos de página */
+  .panel, .bloque, .firma-docente { page-break-inside: avoid; }
+  .firma-docente { page-break-before: avoid; margin-top: 40px; }
 }
 
 </style>
@@ -1106,6 +1394,28 @@ section#estado-resultado.con-visor .visor-pdf {
       <button class="btn-edit-off" id="btn-modo-guardar">✓ Volver a lectura</button>
       <button class="btn-descartar" id="btn-descartar">Descartar cambios</button>
       <button class="btn-restaurar" id="btn-restaurar">Restaurar IA original</button>
+      <button class="btn-print" id="btn-print">🖨 Generar PDF alumno</button>
+    </div>
+  </div>
+
+  <!-- Panel de configuración del PDF (oculto por defecto, se abre al pulsar el botón) -->
+  <div class="print-config" id="print-config" hidden>
+    <div class="print-config-header">
+      <strong>Secciones a incluir en el PDF del alumno</strong>
+      <button class="print-config-cerrar" id="btn-cerrar-print-config" title="Cerrar">✕</button>
+    </div>
+    <div class="print-config-body">
+      <label><input type="checkbox" id="cfg-pdf-cabecera" checked> Datos del alumno + nota global</label>
+      <label><input type="checkbox" id="cfg-pdf-semaforo" checked> Devolución para el alumno (semáforo)</label>
+      <label><input type="checkbox" id="cfg-pdf-knockout" checked> Penalización crítica (si la hay)</label>
+      <label><input type="checkbox" id="cfg-pdf-criterios"> Detalle por criterio</label>
+      <label><input type="checkbox" id="cfg-pdf-ra"> Cobertura de Resultados de Aprendizaje</label>
+      <label><input type="checkbox" id="cfg-pdf-competencias" checked> Competencias del módulo</label>
+      <label><input type="checkbox" id="cfg-pdf-firma" checked> Firma del docente</label>
+    </div>
+    <div class="print-config-footer">
+      <small>Tu última configuración se guarda automáticamente.</small>
+      <button class="btn-print-go" id="btn-print-go">Generar e imprimir</button>
     </div>
   </div>
 
@@ -1149,21 +1459,6 @@ section#estado-resultado.con-visor .visor-pdf {
       <div class="bloque-contenido" id="contenido-nota-docente"></div>
     </div>
 
-    <!-- Bloque RA · Resultados de Aprendizaje del Caso -->
-    <div class="bloque ra-status hidden" id="bloque-ra-status">
-      <div class="bloque-header">
-        <div>
-          <span class="bloque-tag">Resultados de Aprendizaje</span>
-          <div class="bloque-titulo">Cobertura del módulo en este caso</div>
-        </div>
-      </div>
-      <div class="ra-status-controles">
-        <button class="btn-detalle" id="btn-toggle-detalle-ra">Ver detalle por criterio (CR) ↓</button>
-      </div>
-      <div class="ra-list" id="ra-list"></div>
-      <div class="ra-no-cubiertos hidden" id="ra-no-cubiertos"></div>
-    </div>
-
     <!-- Bloque semáforo pedagógico (3 cards editables, para el alumno) -->
     <div class="panel">
       <div class="panel-title">Devolución para el alumno</div>
@@ -1201,6 +1496,21 @@ section#estado-resultado.con-visor .visor-pdf {
       </div>
     </div>
 
+    <!-- Bloque RA · Resultados de Aprendizaje del Caso -->
+    <div class="bloque ra-status hidden" id="bloque-ra-status">
+      <div class="bloque-header">
+        <div>
+          <span class="bloque-tag">Resultados de Aprendizaje</span>
+          <div class="bloque-titulo">Cobertura del módulo en este caso</div>
+        </div>
+      </div>
+      <div class="ra-status-controles">
+        <button class="btn-detalle" id="btn-toggle-detalle-ra">Ver detalle por criterio (CR) ↓</button>
+      </div>
+      <div class="ra-list" id="ra-list"></div>
+      <div class="ra-no-cubiertos hidden" id="ra-no-cubiertos"></div>
+    </div>
+
     <!-- Bloque 3: Detalle técnico -->
     <div class="panel">
       <div class="panel-title">Detalle por criterio</div>
@@ -1219,6 +1529,14 @@ section#estado-resultado.con-visor .visor-pdf {
     <!-- Acciones -->
     <div class="acciones-pie">
       <button id="btn-otro">Evaluar otro dictamen</button>
+    </div>
+
+    <!-- Bloque firma · solo visible en el PDF impreso -->
+    <div class="firma-docente print-only-block" id="firma-docente">
+      <div class="firma-linea"></div>
+      <div class="firma-nombre">Jonás Agudo Osuna</div>
+      <div class="firma-rol">Profesor del módulo de Psicosociología Aplicada</div>
+      <div class="firma-centro">IES Virgen del Pilar · Zaragoza</div>
     </div>
 
   </div><!-- /.resultado-main -->
@@ -2174,6 +2492,134 @@ const Semaforo = {
   },
 };
 Semaforo.inicializarListeners();
+
+// ============================================================================
+// IMPRESIÓN · Generador de PDF del alumno con checkboxes de selección
+// El PDF se construye desde el DOM actual aplicando @media print + clases
+// .print-hide-X que ocultan secciones según los checkboxes marcados.
+// La configuración se persiste en localStorage para no marcar cada vez.
+// ============================================================================
+const Print = {
+  STORAGE_KEY: 'darabia_print_config_v1',
+
+  CHECKBOXES: [
+    { id: 'cfg-pdf-cabecera',     clase: 'print-hide-cabecera',     defecto: true  },
+    { id: 'cfg-pdf-semaforo',     clase: 'print-hide-semaforo',     defecto: true  },
+    { id: 'cfg-pdf-knockout',     clase: 'print-hide-knockout',     defecto: true  },
+    { id: 'cfg-pdf-criterios',    clase: 'print-hide-criterios',    defecto: false },
+    { id: 'cfg-pdf-ra',           clase: 'print-hide-ra',           defecto: false },
+    { id: 'cfg-pdf-competencias', clase: 'print-hide-competencias', defecto: true  },
+    { id: 'cfg-pdf-firma',        clase: 'print-hide-firma',        defecto: true  },
+  ],
+
+  abrir() {
+    this._cargarConfig();
+    $('print-config').hidden = false;
+    $('btn-print').classList.add('activo');
+  },
+
+  cerrar() {
+    $('print-config').hidden = true;
+    $('btn-print').classList.remove('activo');
+  },
+
+  toggle() {
+    const oculto = $('print-config').hidden;
+    if (oculto) this.abrir(); else this.cerrar();
+  },
+
+  /** Lee la configuración guardada y aplica los checks. Si no hay nada
+   *  guardado, usa los valores por defecto. */
+  _cargarConfig() {
+    let cfg = {};
+    try {
+      const raw = localStorage.getItem(this.STORAGE_KEY);
+      if (raw) cfg = JSON.parse(raw);
+    } catch (e) { /* ignore */ }
+
+    this.CHECKBOXES.forEach(({ id, defecto }) => {
+      const el = $(id);
+      if (!el) return;
+      el.checked = (cfg[id] !== undefined) ? cfg[id] : defecto;
+    });
+  },
+
+  _guardarConfig() {
+    const cfg = {};
+    this.CHECKBOXES.forEach(({ id }) => {
+      const el = $(id);
+      if (el) cfg[id] = el.checked;
+    });
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(cfg));
+    } catch (e) { /* ignore */ }
+  },
+
+  /** Aplica las clases .print-hide-X al body según los checkboxes,
+   *  llama a window.print() y al volver limpia las clases. */
+  imprimir() {
+    this._guardarConfig();
+
+    // Si el visor PDF está abierto, lo cerramos para que no se intente
+    // imprimir el iframe lateral (no es lo que el alumno debe ver)
+    const visorAbierto = Visor.abierto;
+    if (visorAbierto) Visor.cerrar();
+
+    // Si estamos en modo edición, salimos para que el DOM esté limpio
+    const modoActual = Editor.modoActual;
+    if (modoActual === 'edicion') Editor.salirModoEdicion();
+
+    // Aplicamos las clases de ocultación según el checkbox
+    const body = document.body;
+    this.CHECKBOXES.forEach(({ id, clase }) => {
+      const el = $(id);
+      if (!el) return;
+      // Si el checkbox NO está marcado, ocultamos la sección
+      body.classList.toggle(clase, !el.checked);
+    });
+
+    // Caso especial del semáforo: si está marcado pero todos los bloques
+    // están vacíos, lo ocultamos igualmente (no tiene sentido un PDF con
+    // 3 cards vacías)
+    if ($('cfg-pdf-semaforo').checked) {
+      const sem = estado.editado?.semaforo || {};
+      const todoVacio = !sem.hizo_bien && !sem.puede_mejorar && !sem.cuidado;
+      if (todoVacio) {
+        body.classList.add('print-hide-semaforo');
+        console.info('[PRINT] Semáforo vacío → no se incluye en el PDF.');
+      }
+    }
+
+    // Caso especial del knockout: si no hay knockout aplicado, ocultamos
+    // el bloque diagnóstico aunque el checkbox esté marcado
+    const hayKO = (estado.editado?.knockouts_aplicados || [])
+      .some(k => k.penalizacion);
+    if (!hayKO) body.classList.add('print-hide-knockout');
+
+    // Llamamos a print y restauramos clases al volver
+    window.print();
+
+    // Limpiar las clases (ejecutado tanto si imprime como si cancela)
+    setTimeout(() => {
+      this.CHECKBOXES.forEach(({ clase }) => body.classList.remove(clase));
+      // Restauramos modo edición si estaba activo
+      if (modoActual === 'edicion') Editor.entrarModoEdicion();
+      // Restauramos visor si estaba abierto
+      if (visorAbierto) Visor.abrir();
+    }, 100);
+  },
+};
+
+$('btn-print').addEventListener('click', () => Print.toggle());
+$('btn-cerrar-print-config').addEventListener('click', () => Print.cerrar());
+$('btn-print-go').addEventListener('click', () => Print.imprimir());
+// Auto-guardar config cuando se cambia un checkbox
+Print.CHECKBOXES.forEach(({ id }) => {
+  const el = $(id);
+  if (el) el.addEventListener('change', () => Print._guardarConfig());
+});
+// Inicializar checkboxes con la última configuración guardada
+Print._cargarConfig();
 
 // ============================================================================
 // VISOR DEL PDF DEL ALUMNO · panel lateral plegable
