@@ -7,8 +7,7 @@
     "instrumento": "ISTAS21 version corta",
     "prompt_template": "prompt_evaluacion_psico.txt",
     "puntuacion_maxima_automatica": 60,
-    "puntuacion_profesor": 40,
-    "ra_evaluados": ["RA3", "RA4", "RA5_parcial"]
+    "puntuacion_profesor": 40
   },
   "contexto": {
     "empresa": "Gestoria Moreno & Asociados S.L.",
@@ -260,6 +259,109 @@
     "archivo": "prompt_evaluacion_psico.txt",
     "version": "2.0",
     "calibrado_con": "resolucion_modelo_caso05_v1.docx"
-  }
+  },
+  "ra_cubiertos": [
+    {
+      "ra": "RA2",
+      "titulo_oficial": "Identifica los riesgos psicosociales relacionados con el puesto de trabajo, evaluando las condiciones de trabajo y aplicando medidas preventivas y correctoras",
+      "modulo": "1415 - Riesgos Ergonomicos y Psicosociales",
+      "cr_cubiertos": [
+        {
+          "id": "RA2c",
+          "texto": "Se han identificado factores de riesgo relacionados con los riesgos psicosociales"
+        },
+        {
+          "id": "RA2d",
+          "texto": "Se han reconocido los metodos y tecnicas de evaluacion, tanto cualitativa como cuantitativa, de los riesgos psicosociales del puesto de trabajo"
+        },
+        {
+          "id": "RA2e",
+          "texto": "Se han aplicado metodos y tecnicas de analisis de riesgos psicosociales del puesto de trabajo a casos concretos"
+        },
+        {
+          "id": "RA2f",
+          "texto": "Se han aplicado medidas preventivas y correctoras ante riesgos psicosociales a casos concretos"
+        }
+      ],
+      "evidencia_esperada": "El alumno debe identificar los factores de riesgo psicosocial del caso (sobrecarga, control, apoyo, doble presencia, ERI), aplicar al menos un instrumento (ISTAS21) y proponer medidas preventivas estructurales coherentes con los modelos teoricos."
+    },
+    {
+      "ra": "RA3",
+      "titulo_oficial": "Evalua situaciones de estres en el entorno laboral identificando los agentes y situaciones generadores y proponiendo medidas preventivas y correctoras",
+      "modulo": "1415 - Riesgos Ergonomicos y Psicosociales",
+      "cr_cubiertos": [
+        {
+          "id": "RA3a",
+          "texto": "Se han identificado los agentes y situaciones generadores de estres laboral"
+        },
+        {
+          "id": "RA3e",
+          "texto": "Se han elaborado informes de evaluacion del riesgo de estres laboral en situaciones concretas"
+        },
+        {
+          "id": "RA3f",
+          "texto": "Se han propuesto acciones preventivas y correctoras ante el riesgo de estres en casos concretos"
+        }
+      ],
+      "evidencia_esperada": "El alumno debe identificar los generadores estructurales de estres (sobrecarga + sub-recompensa en Ana, ausencia de apoyo en Sonia), elaborar el dictamen como informe tecnico y proponer medidas correctoras organizativas, no individuales."
+    },
+    {
+      "ra": "RA4",
+      "titulo_oficial": "Evalua situaciones relacionadas con el riesgo de burnout en el entorno laboral, identificando los agentes y situaciones generadores y proponiendo medidas preventivas y correctoras",
+      "modulo": "1415 - Riesgos Ergonomicos y Psicosociales",
+      "cr_cubiertos": [
+        {
+          "id": "RA4b",
+          "texto": "Se han identificado los agentes y situaciones generadores del burnout laboral"
+        }
+      ],
+      "cr_parciales": [
+        {
+          "id": "RA4e",
+          "texto": "Se han aplicado los metodos y tecnicas de deteccion del burnout laboral mas idoneos para supuestos concretos",
+          "nota": "Solo si el alumno menciona burnout especificamente y aplica criterios diagnosticos"
+        },
+        {
+          "id": "RA4f",
+          "texto": "Se han elaborado informes de evaluacion del riesgo de burnout laboral en situaciones concretas",
+          "nota": "El dictamen funciona como informe si se identifica burnout explicitamente en Ana"
+        }
+      ],
+      "evidencia_esperada": "Caso 05 cubre RA4 de forma parcial: Ana cumple criterios de burnout incipiente (sobreimplicacion sostenida + sub-recompensa percibida). Se considera RA4 conseguido si el alumno identifica burnout explicitamente como entidad clinica diferenciada del estres; si solo habla de estres generico, RA4 queda como parcial."
+    },
+    {
+      "ra": "RA5",
+      "titulo_oficial": "Evalua riesgos de violencia y acoso laboral en entornos de trabajo, identificando los agentes y situaciones generadores y determinando medidas preventivas y correctoras",
+      "modulo": "1415 - Riesgos Ergonomicos y Psicosociales",
+      "cr_cubiertos": [
+        {
+          "id": "RA5a",
+          "texto": "Se han caracterizado los distintos tipos de violencia y acoso en el ambito laboral"
+        },
+        {
+          "id": "RA5d",
+          "texto": "Se han reconocido metodos y tecnicas de deteccion del acoso laboral"
+        },
+        {
+          "id": "RA5g",
+          "texto": "Se han propuesto acciones preventivas y correctoras ante el riesgo de acoso laboral en casos concretos"
+        }
+      ],
+      "evidencia_esperada": "La Senal Sonia exige que el alumno reconozca la conducta hostil de Rafael como indicio que requiere apertura de protocolo de investigacion conforme al RD 901/2020 y Art. 48 LO 3/2007. RA5 conseguido si el alumno propone protocolo formal sin diagnosticar acoso. RA5 fallado si lo ignora o si diagnostica acoso sin protocolo.",
+      "vinculo_knockout": "senyal_sonia"
+    }
+  ],
+  "ra_no_cubiertos": [
+    {
+      "ra": "RA1",
+      "titulo": "Riesgos ergonomicos",
+      "motivo": "Caso enfocado en psicosocial. RA1 corresponde a riesgos ergonomicos y queda fuera del alcance por diseno."
+    },
+    {
+      "ra": "RA6",
+      "titulo": "Trabajo a turnos y nocturno",
+      "motivo": "La Gestoria opera en horario diurno comercial. RA6 no aplica al sector elegido."
+    }
+  ],
+  "nota_cobertura_modular": "Caso 05 cubre los RA centrales del modulo 1415 (RA2, RA3, RA4 parcial, RA5). Para cobertura completa del modulo seria necesario un segundo caso que abordase RA1 (ergonomico) y RA6 (turnos/nocturno)."
 }
-
