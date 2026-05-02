@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Corrector · Darabia Engine V5</title>
+<title>Evaluador Darabia · Darabia Engine V5</title>
 <style>
 /* ============================================================================
    DARABIA ENGINE V5 · CORRECTOR DOCENTE
@@ -1342,8 +1342,8 @@ section#estado-resultado.con-visor .visor-pdf {
 
 <header>
   <div>
-    <h1>Corrector Docente</h1>
-    <div class="subtitle">Darabia Engine V5 · Caso 05</div>
+    <h1>Evaluador Darabia</h1>
+    <div class="subtitle" id="header-subtitle">Darabia Engine V5</div>
   </div>
   <span class="badge">USO INTERNO</span>
 </header>
@@ -1599,7 +1599,9 @@ section#estado-resultado.con-visor .visor-pdf {
 // ============================================================================
 const CONFIG = {
   endpoint: '/api/subir-pdf',
-  caso_id: 'psicosocial_gestoria_v1',
+  // caso_id leído de la URL (?caso=...) con fallback al Caso 05 para no romper
+  // las URLs existentes. Para corregir Casos 02/03 abrir corrector.html?caso=<id>.
+  caso_id: new URLSearchParams(location.search).get('caso') || 'psicosocial_gestoria_v1',
   version_motor: '5.0.0',
   max_file_mb: 8,
 };
@@ -1817,6 +1819,15 @@ function renderResultado(data, opciones = {}) {
   const { nombre, grupo } = estado.ultimoAlumno;
   const fecha = new Date().toISOString().slice(0, 10);
 
+  // — Metadatos del caso (vienen del backend, no hardcodeados) —
+  // Subtítulo de cabecera con el título del caso activo
+  if (fuente.caso_titulo) {
+    const sub = $('header-subtitle');
+    if (sub) sub.textContent = `Darabia Engine V5 · ${fuente.caso_titulo}`;
+  }
+  // Etiquetas legibles de los knockouts declarados por el caso
+  LABELS_KNOCKOUTS = fuente.etiquetas_knockouts || {};
+
   // — Nota global —
   const nota = Math.round(fuente.nota_global);
   const notaEl = $('nota-num');
@@ -1866,7 +1877,7 @@ function renderResultado(data, opciones = {}) {
   renderTablaCriterios(fuente.detalle_criterios || {});
 
   // — Bloque RA Status —
-  renderRAStatus(fuente.ra_status || []);
+  renderRAStatus(fuente.ra_status || [], fuente.ra_no_cubiertos || []);
 
   // — Semáforo pedagógico (devolución para el alumno) —
   Semaforo.render(fuente.semaforo || { hizo_bien:'', puede_mejorar:'', cuidado:'' });
@@ -1922,7 +1933,7 @@ function renderTablaCriterios(detalle) {
 // BLOQUE RA STATUS · Cobertura de Resultados de Aprendizaje del caso
 // (Sesión 3 · Mayo 2026)
 // ============================================================================
-function renderRAStatus(raStatus) {
+function renderRAStatus(raStatus, raNoCubiertos = []) {
   const bloque = $('bloque-ra-status');
   const lista  = $('ra-list');
   const noCub  = $('ra-no-cubiertos');
@@ -1992,14 +2003,14 @@ function renderRAStatus(raStatus) {
     lista.appendChild(div);
   });
 
-  // RA no cubiertos en el caso (si los conocemos por configuración)
-  // Cuando se publique el endpoint que devuelva ra_no_cubiertos, conectarlo aquí.
-  // Por ahora, lo mostramos solo si el motor lo añade a la respuesta.
-  // (El JSON del Caso 05 declara RA1 y RA6 como no cubiertos.)
-  const declarados = (window.RA_NO_CUBIERTOS_CASO || []);
-  if (declarados.length > 0) {
+  // RA no cubiertos: el backend los envía en la respuesta (formato del JSON del caso:
+  // [{ ra, titulo, motivo }, ...]). Si el caso no declara ninguno, el array viene vacío.
+  if (raNoCubiertos.length > 0) {
+    const items = raNoCubiertos
+      .map(rnc => `${rnc.ra} · ${rnc.titulo}`)
+      .join(' · ');
     noCub.classList.remove('hidden');
-    noCub.innerHTML = `<strong>Fuera del alcance del caso:</strong> ${declarados.join(' · ')}`;
+    noCub.innerHTML = `<strong>Fuera del alcance del caso:</strong> ${items}`;
   } else {
     noCub.classList.add('hidden');
   }
@@ -2039,8 +2050,6 @@ const ETIQUETAS_ESTADO = {
   parcial:       'Parcial',
   no_conseguido: 'No conseguido',
 };
-// Caso 05 declara RA1 y RA6 como no cubiertos (informativo)
-window.RA_NO_CUBIERTOS_CASO = ['RA1 · Riesgos ergonómicos', 'RA6 · Trabajo a turnos y nocturno'];
 
 
 // ============================================================================
@@ -2062,10 +2071,10 @@ const LABELS_EJES = {
   deteccion_riesgos_criticos: 'Detección de riesgos',
   argumentacion_profesional: 'Argumentación profesional',
 };
-const LABELS_KNOCKOUTS = {
-  senyal_sonia: 'Knockout Sonia',
-  medidas_terciarias_unicas: 'Medidas terciarias',
-};
+// LABELS_KNOCKOUTS se rellena dinámicamente desde la respuesta del backend
+// (campo etiquetas_knockouts). El backend deriva la etiqueta del id declarado
+// en el JSON del caso. Si un caso no declara knockouts, este map queda vacío.
+let LABELS_KNOCKOUTS = {};
 
 function formatearCriterio(id) { return LABELS_CRITERIOS[id] || id; }
 function formatearEje(id) { return LABELS_EJES[id] || id; }
