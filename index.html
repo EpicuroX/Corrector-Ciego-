@@ -263,6 +263,14 @@ button.secondary {
 .alumno-info strong { color: var(--text-0); font-weight: 600; }
 .alumno-info .sep { color: var(--text-3); margin: 0 8px; }
 
+.ejes-titulo {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  margin-bottom: 8px;
+}
 .ejes { display: flex; flex-direction: column; gap: 6px; }
 .eje-row {
   display: grid;
@@ -752,6 +760,7 @@ footer {
       </div>
       <div>
         <div class="alumno-info" id="alumno-info"></div>
+        <div class="ejes-titulo" id="ejes-titulo">Competencias del módulo · Psicosociología Aplicada</div>
         <div class="ejes" id="ejes-container"></div>
       </div>
     </div>
@@ -778,7 +787,7 @@ footer {
       </div>
     </div>
     <div class="ra-status-controles">
-      <button class="btn-detalle" id="btn-toggle-detalle-ra">Ver detalle de criterios ↓</button>
+      <button class="btn-detalle" id="btn-toggle-detalle-ra">Ver detalle por criterio (CR) ↓</button>
     </div>
     <div class="ra-list" id="ra-list"></div>
     <div class="ra-no-cubiertos hidden" id="ra-no-cubiertos"></div>
@@ -1173,12 +1182,12 @@ function renderRAStatus(raStatus) {
     btn._wired = true;
     btn.addEventListener('click', () => {
       const expandido = bloque.classList.toggle('expandido');
-      btn.textContent = expandido ? 'Ocultar detalle ↑' : 'Ver detalle de criterios ↓';
+      btn.textContent = expandido ? 'Ocultar detalle ↑' : 'Ver detalle por criterio (CR) ↓';
     });
   }
   // Estado inicial: compacto
   bloque.classList.remove('expandido');
-  if (btn) btn.textContent = 'Ver detalle de criterios ↓';
+  if (btn) btn.textContent = 'Ver detalle por criterio (CR) ↓';
 
   bloque.classList.remove('hidden');
 }
