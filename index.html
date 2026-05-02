@@ -1186,6 +1186,12 @@ section#estado-resultado.con-visor .visor-pdf {
   body.print-hide-cabecera     .nota-global,
   body.print-hide-cabecera     .alumno-info,
   body.print-hide-cabecera     .diagnostico { display: none !important; }
+  /* Por defecto el desglose 60+40 NO se muestra al alumno (cfg-pdf-desglose: false).
+     Cuando print-hide-desglose está activo, ocultamos los bloques extra y dejamos
+     visible solo la nota del evaluador. Si el usuario marca el checkbox, la clase
+     desaparece y los bloques se imprimen. */
+  body.print-hide-desglose     #nota-simulador-bloque,
+  body.print-hide-desglose     #nota-total-bloque { display: none !important; }
   body.print-hide-semaforo     .panel:has(.semaforo) { display: none !important; }
   body.print-hide-knockout     #diagnostico-rapido { display: none !important; }
   body.print-hide-criterios    .panel:has(.tabla-criterios) { display: none !important; }
@@ -1434,6 +1440,7 @@ section#estado-resultado.con-visor .visor-pdf {
     </div>
     <div class="print-config-body">
       <label><input type="checkbox" id="cfg-pdf-cabecera" checked> Datos del alumno + nota global</label>
+      <label><input type="checkbox" id="cfg-pdf-desglose"> Mostrar desglose 60+40 al alumno</label>
       <label><input type="checkbox" id="cfg-pdf-semaforo" checked> Devolución para el alumno (semáforo)</label>
       <label><input type="checkbox" id="cfg-pdf-knockout" checked> Penalización crítica (si la hay)</label>
       <label><input type="checkbox" id="cfg-pdf-criterios"> Detalle por criterio</label>
@@ -1461,10 +1468,22 @@ section#estado-resultado.con-visor .visor-pdf {
     <!-- Dashboard -->
     <div class="panel">
       <div class="dashboard">
-        <div class="nota-global">
+        <div class="nota-global" id="nota-evaluador">
           <div class="num" id="nota-num">--</div>
+          <div class="max" id="nota-max">/ 100</div>
+          <div class="label" id="nota-label">Nota auto</div>
+        </div>
+        <!-- Notas adicionales para casos con simulador previo (Caso 02, Caso 03).
+             Ocultas por defecto: solo se muestran si la respuesta trae nota_simulador. -->
+        <div class="nota-global hidden" id="nota-simulador-bloque">
+          <div class="num" id="nota-simulador-num">--</div>
+          <div class="max">/ 60</div>
+          <div class="label">Simulador</div>
+        </div>
+        <div class="nota-global hidden" id="nota-total-bloque">
+          <div class="num" id="nota-total-num">--</div>
           <div class="max">/ 100</div>
-          <div class="label">Nota auto</div>
+          <div class="label">Nota final</div>
         </div>
         <div>
           <div class="alumno-info" id="alumno-info"></div>
@@ -1732,6 +1751,66 @@ async function procesar() {
 // ============================================================================
 // DIAGNÓSTICO RÁPIDO
 // ============================================================================
+// ─────────────────────────────────────────────────────────────────────────
+// Pinta el desglose de notas (simulador + evaluador + total) cuando el caso
+// tiene flujo dual. Si no, oculta los bloques extra y deja la nota global
+// del evaluador como nota única (comportamiento idéntico al Caso 05).
+//
+// Inputs:
+//   fuente.nota_global                → puntos sobre 100 (siempre)
+//   fuente.nota_simulador             → { puntos, maximo } o null
+//   fuente.peso_nota_evaluador        → 40 en Caso 02/03, 100 en Caso 05
+//   fuente.peso_nota_simulador        → 60 en Caso 02/03, 0 en Caso 05
+// ─────────────────────────────────────────────────────────────────────────
+function renderNotasDuales(fuente) {
+  const bloqueSim   = $('nota-simulador-bloque');
+  const bloqueTotal = $('nota-total-bloque');
+  const notaMaxEl   = $('nota-max');
+  const notaLabelEl = $('nota-label');
+
+  const tieneSimulador = fuente.nota_simulador
+    && typeof fuente.nota_simulador.puntos === 'number'
+    && (fuente.peso_nota_simulador || 0) > 0;
+
+  if (!tieneSimulador) {
+    // Caso 05 y similares: una sola nota /100, comportamiento clásico
+    bloqueSim.classList.add('hidden');
+    bloqueTotal.classList.add('hidden');
+    notaMaxEl.textContent = '/ 100';
+    notaLabelEl.textContent = 'Nota auto';
+    return;
+  }
+
+  // Caso 02/03: flujo dual
+  const pesoEv   = fuente.peso_nota_evaluador || 40;
+  const pesoSim  = fuente.peso_nota_simulador || 60;
+  const ptosSim  = fuente.nota_simulador.puntos;
+  const maxSim   = fuente.nota_simulador.maximo || pesoSim;
+
+  // 1. Re-etiquetar la nota del evaluador para que se entienda como /pesoEv
+  //    (la nota_global interna sigue siendo /100, pero la mostramos /40).
+  const notaEvNormalizada = Math.round((fuente.nota_global / 100) * pesoEv);
+  $('nota-num').textContent = notaEvNormalizada;
+  notaMaxEl.textContent = `/ ${pesoEv}`;
+  notaLabelEl.textContent = 'Evaluador';
+
+  // 2. Mostrar nota del simulador
+  bloqueSim.classList.remove('hidden');
+  $('nota-simulador-num').textContent = ptosSim;
+  // El span "/60" del bloque simulador ya está fijo en el HTML; si algún día
+  // el simulador cambiase su escala lo leeríamos del payload.
+
+  // 3. Calcular y mostrar nota total = simulador + evaluador (ambos en /100)
+  bloqueTotal.classList.remove('hidden');
+  const notaTotal = Math.round(ptosSim + notaEvNormalizada);
+  const totalEl = $('nota-total-num');
+  totalEl.textContent = notaTotal;
+  totalEl.classList.remove('high', 'mid', 'low');
+  if (notaTotal >= 75) totalEl.classList.add('high');
+  else if (notaTotal >= 50) totalEl.classList.add('mid');
+  else totalEl.classList.add('low');
+}
+
 function renderDiagnostico(nota, knockouts) {
   const el = $('diagnostico-rapido');
   const icono = $('diagnostico-icono');
@@ -1836,6 +1915,15 @@ function renderResultado(data, opciones = {}) {
   if (nota >= 75) notaEl.classList.add('high');
   else if (nota >= 50) notaEl.classList.add('mid');
   else notaEl.classList.add('low');
+
+  // — Notas duales (Caso 02, Caso 03 y futuros con simulador previo) —
+  // Si la respuesta trae nota_simulador, el caso usa el flujo dual:
+  //   · Simulador SCORM → puntos/60 (ya en Aeducar)
+  //   · Evaluador Darabia → nota_global/100 (lo que la IA acaba de calcular)
+  //   · Nota final = simulador + evaluador * (peso_evaluador/100)
+  // El evaluador sigue puntuando internamente sobre 100 (longitudinalidad sana)
+  // pero se muestra normalizado al peso que aporta este caso (ej: 40).
+  renderNotasDuales(fuente);
 
   // — Diagnóstico rápido (incluye knockouts si los hay) —
   const knockouts = (fuente.knockouts_aplicados || []).filter(k => k.penalizacion);
@@ -2541,6 +2629,7 @@ const Print = {
 
   CHECKBOXES: [
     { id: 'cfg-pdf-cabecera',     clase: 'print-hide-cabecera',     defecto: true  },
+    { id: 'cfg-pdf-desglose',     clase: 'print-hide-desglose',     defecto: false },
     { id: 'cfg-pdf-semaforo',     clase: 'print-hide-semaforo',     defecto: true  },
     { id: 'cfg-pdf-knockout',     clase: 'print-hide-knockout',     defecto: true  },
     { id: 'cfg-pdf-criterios',    clase: 'print-hide-criterios',    defecto: false },
