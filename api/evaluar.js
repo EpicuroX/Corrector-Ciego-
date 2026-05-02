@@ -51,7 +51,7 @@ const CASOS = {
 // ============================================================================
 
 const CONFIG = {
-  modelo: 'claude-sonnet-4-20250514',
+  modelo: 'claude-sonnet-4-5',
   max_tokens: 2000,
   timeout_ms: 50000,
   version_motor_soportada: '5.0.0',
