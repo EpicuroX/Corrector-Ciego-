@@ -339,6 +339,77 @@ button.secondary {
   margin-top: 8px;
 }
 
+/* ============================================================================
+   SEMÁFORO PEDAGÓGICO · 3 bloques para el alumno (editables siempre)
+   ============================================================================ */
+.semaforo {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 16px 0;
+}
+@media (max-width: 900px) {
+  .semaforo { grid-template-columns: 1fr; }
+}
+.semaforo-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  border-left-width: 4px;
+}
+.semaforo-card.bien    { border-left-color: var(--green); }
+.semaforo-card.mejorar { border-left-color: var(--amber); }
+.semaforo-card.cuidado { border-left-color: var(--red); }
+
+.semaforo-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.semaforo-card.bien    .semaforo-titulo { color: var(--green); }
+.semaforo-card.mejorar .semaforo-titulo { color: var(--amber); }
+.semaforo-card.cuidado .semaforo-titulo { color: var(--red); }
+
+.semaforo-icono {
+  width: 10px; height: 10px; border-radius: 50%;
+  display: inline-block;
+}
+.semaforo-card.bien    .semaforo-icono { background: var(--green); }
+.semaforo-card.mejorar .semaforo-icono { background: var(--amber); }
+.semaforo-card.cuidado .semaforo-icono { background: var(--red); }
+
+.semaforo-contenido {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-1);
+  outline: 1px dashed transparent;
+  outline-offset: 4px;
+  border-radius: 4px;
+  cursor: text;
+  transition: outline-color 0.15s, background 0.15s;
+  min-height: 60px;
+}
+.semaforo-contenido:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text-3);
+  font-style: italic;
+}
+.semaforo-contenido:hover { outline-color: rgba(245,158,11,0.3); }
+.semaforo-contenido:focus {
+  outline: 2px solid var(--amber);
+  background: rgba(245,158,11,0.05);
+}
+
 .btn-copiar {
   background: var(--bg-2);
   color: var(--text-1);
@@ -1093,6 +1164,43 @@ section#estado-resultado.con-visor .visor-pdf {
       <div class="ra-no-cubiertos hidden" id="ra-no-cubiertos"></div>
     </div>
 
+    <!-- Bloque semáforo pedagógico (3 cards editables, para el alumno) -->
+    <div class="panel">
+      <div class="panel-title">Devolución para el alumno</div>
+      <div class="semaforo">
+        <div class="semaforo-card bien">
+          <div class="semaforo-titulo">
+            <span class="semaforo-icono"></span>
+            Lo que hiciste bien
+          </div>
+          <div class="semaforo-contenido"
+               id="semaforo-bien"
+               contenteditable="true"
+               data-placeholder="Escribe aquí lo que el alumno ha hecho bien…"></div>
+        </div>
+        <div class="semaforo-card mejorar">
+          <div class="semaforo-titulo">
+            <span class="semaforo-icono"></span>
+            Lo que puedes mejorar
+          </div>
+          <div class="semaforo-contenido"
+               id="semaforo-mejorar"
+               contenteditable="true"
+               data-placeholder="Áreas de mejora con margen razonable…"></div>
+        </div>
+        <div class="semaforo-card cuidado">
+          <div class="semaforo-titulo">
+            <span class="semaforo-icono"></span>
+            Cuidado con esto
+          </div>
+          <div class="semaforo-contenido"
+               id="semaforo-cuidado"
+               contenteditable="true"
+               data-placeholder="Aspectos críticos que el alumno debe revisar…"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Bloque 3: Detalle técnico -->
     <div class="panel">
       <div class="panel-title">Detalle por criterio</div>
@@ -1339,6 +1447,14 @@ function renderResultado(data, opciones = {}) {
 
     estado.original = JSON.parse(JSON.stringify(data));
     estado.editado  = JSON.parse(JSON.stringify(data));
+
+    // Garantizamos que el campo semáforo existe (lo escribirás tú a mano hoy;
+    // mañana lo propondrá la IA y vendrá ya rellenado en data)
+    if (!estado.editado.semaforo) {
+      estado.editado.semaforo = { hizo_bien: '', puede_mejorar: '', cuidado: '' };
+      estado.original.semaforo = { hizo_bien: '', puede_mejorar: '', cuidado: '' };
+    }
+
     estado.conCambios = false;
     Editor.salirModoEdicion();   // siempre arrancar en modo lectura
 
@@ -1405,6 +1521,9 @@ function renderResultado(data, opciones = {}) {
 
   // — Bloque RA Status —
   renderRAStatus(fuente.ra_status || []);
+
+  // — Semáforo pedagógico (devolución para el alumno) —
+  Semaforo.render(fuente.semaforo || { hizo_bien:'', puede_mejorar:'', cuidado:'' });
 
   // Si estamos en modo edición, transformar campos en editables
   if (Editor.modoActual === 'edicion') {
@@ -2005,6 +2124,58 @@ $('btn-descartar').addEventListener('click', () => Editor.descartarCambios());
 $('btn-restaurar').addEventListener('click', () => Editor.restaurarOriginal());
 
 // ============================================================================
+// SEMÁFORO PEDAGÓGICO · 3 bloques editables siempre, integrados con Editor
+// Estructura: estado.editado.semaforo = { hizo_bien, puede_mejorar, cuidado }
+// ============================================================================
+const Semaforo = {
+  CAMPOS: [
+    { key: 'hizo_bien',     id: 'semaforo-bien' },
+    { key: 'puede_mejorar', id: 'semaforo-mejorar' },
+    { key: 'cuidado',       id: 'semaforo-cuidado' },
+  ],
+
+  /** Vuelca el contenido guardado a los 3 divs editables */
+  render(semaforo) {
+    this.CAMPOS.forEach(({ key, id }) => {
+      const el = $(id);
+      if (!el) return;
+      // Solo escribimos si el contenido difiere, para no romper la posición
+      // del cursor mientras el profesor está escribiendo
+      const valor = semaforo?.[key] || '';
+      if (el.textContent !== valor) {
+        el.textContent = valor;
+      }
+    });
+  },
+
+  /** Listeners para los 3 contenteditable. Al escribir, guardan en estado y
+   *  marcan cambio para que el editor lo persista en localStorage */
+  inicializarListeners() {
+    this.CAMPOS.forEach(({ key, id }) => {
+      const el = $(id);
+      if (!el) return;
+      el.addEventListener('input', () => {
+        if (!estado.editado) return;
+        if (!estado.editado.semaforo) {
+          estado.editado.semaforo = { hizo_bien:'', puede_mejorar:'', cuidado:'' };
+        }
+        estado.editado.semaforo[key] = el.textContent;
+        Editor._marcarCambio();
+      });
+    });
+  },
+
+  /** Limpia el contenido cuando se reinicia el flujo (btn-otro) */
+  limpiar() {
+    this.CAMPOS.forEach(({ id }) => {
+      const el = $(id);
+      if (el) el.textContent = '';
+    });
+  },
+};
+Semaforo.inicializarListeners();
+
+// ============================================================================
 // VISOR DEL PDF DEL ALUMNO · panel lateral plegable
 // ============================================================================
 const Visor = {
@@ -2090,6 +2261,7 @@ $('btn-otro').addEventListener('click', () => {
   };
   Editor.salirModoEdicion();
   Visor.resetear();
+  Semaforo.limpiar();
   mostrarEstado('estado-formulario');
 });
 
