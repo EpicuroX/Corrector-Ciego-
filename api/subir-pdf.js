@@ -100,15 +100,7 @@ module.exports = async function handler(req, res) {
     // 7. Delegar en evaluar.js usando req/res falsos
     const respuestaEvaluacion = await _delegarAEvaluar(payloadEvaluacion, req);
 
-    // 8. Adjuntar el PDF original en base64 para que el frontend pueda
-    //    mostrarlo al profesor como referencia durante la corrección.
-    //    No afecta a la evaluación: solo viaja en el response.
-    if (respuestaEvaluacion && typeof respuestaEvaluacion === 'object' && !respuestaEvaluacion.error) {
-      respuestaEvaluacion.pdf_alumno_base64 = pdfBuffer.toString('base64');
-      respuestaEvaluacion.pdf_alumno_filename = pdfFilename;
-    }
-
-    // 9. Devolver al cliente
+    // 8. Devolver al cliente
     return res.status(200).json(respuestaEvaluacion);
 
   } catch (err) {
@@ -301,8 +293,35 @@ function _construirPayloadEvaluacion(fields, textoLimpio, pdfFilename) {
       origen: 'pdf_subido',
       pdf_filename: pdfFilename,
     },
+    // Nota del simulador SCORM extraída del propio PDF (si existe).
+    // Solo se rellena en casos con simulador previo (Caso 02, Caso 03).
+    // En Caso 05 y siguientes "evaluador puro" será null y el frontend lo ignora.
+    nota_simulador: _extraerNotaSimulador(textoLimpio),
     llaves_desbloqueadas: [], // No aplica en flujo de subida PDF
   };
+}
+
+/**
+ * Extrae la puntuación automática del simulador desde el texto del PDF.
+ * El simulador imprime la nota dos veces ("Puntuación automática: X / 60"
+ * en la cabecera y "Puntuación automática enviada a Aeducar: X/60" al final).
+ * Cualquiera de las dos formas vale.
+ *
+ * Devuelve { puntos, maximo } o null si el PDF no tiene nota del simulador
+ * (ej: dictamen del Caso 05, que no usa SCORM previo).
+ *
+ * No rompe el flujo si falla: simplemente devuelve null.
+ */
+function _extraerNotaSimulador(texto) {
+  if (!texto) return null;
+  const re = /Puntuaci[oó]n autom[aá]tica[^:\n]*:\s*(\d+)\s*\/\s*(\d+)/i;
+  const match = texto.match(re);
+  if (!match) return null;
+  const puntos = parseInt(match[1], 10);
+  const maximo = parseInt(match[2], 10);
+  if (isNaN(puntos) || isNaN(maximo) || maximo === 0) return null;
+  if (puntos < 0 || puntos > maximo) return null; // saneado
+  return { puntos, maximo };
 }
 
 // ============================================================================
