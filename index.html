@@ -1132,6 +1132,8 @@ section#estado-resultado.con-visor .visor-pdf {
     background: white !important;
     color: #1a1a1a !important;
     font-family: 'Helvetica', 'Arial', sans-serif !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   .container { max-width: 100% !important; padding: 0 !important; }
 
@@ -1158,7 +1160,26 @@ section#estado-resultado.con-visor .visor-pdf {
     display: block !important;
     grid-template-columns: none !important;
   }
-  .resultado-main { min-width: 0 !important; max-width: 100% !important; }
+
+  /* En impresión, resultado-main es flex column con order para reorganizar
+     el orden de los bloques sin tocar el DOM. Esto coloca:
+       1. Dashboard (nota + competencias)
+       2. Semáforo (devolución pedagógica)
+       3. Knockout (penalización si la hay)
+       4. Resto (RA, criterios)
+       5. Firma al final */
+  .resultado-main {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .resultado-main > .diagnostico         { order: 3; }
+  .resultado-main > .panel:has(.dashboard) { order: 1; }
+  .resultado-main > .panel:has(.semaforo)  { order: 2; }
+  .resultado-main > #bloque-ra-status      { order: 4; }
+  .resultado-main > .panel:has(.tabla-criterios) { order: 5; }
+  .resultado-main > .firma-docente         { order: 99; }
 
   /* — Secciones opcionales: ocultas si el checkbox correspondiente
        NO está marcado. La clase la pone JS sobre <body>. — */
@@ -1166,7 +1187,7 @@ section#estado-resultado.con-visor .visor-pdf {
   body.print-hide-cabecera     .alumno-info,
   body.print-hide-cabecera     .diagnostico { display: none !important; }
   body.print-hide-semaforo     .panel:has(.semaforo) { display: none !important; }
-  body.print-hide-knockout     .diagnostico.alerta { display: none !important; }
+  body.print-hide-knockout     #diagnostico-rapido { display: none !important; }
   body.print-hide-criterios    .panel:has(.tabla-criterios) { display: none !important; }
   body.print-hide-ra           #bloque-ra-status { display: none !important; }
   body.print-hide-competencias .ejes-titulo,
@@ -1224,11 +1245,18 @@ section#estado-resultado.con-visor .visor-pdf {
   }
   .eje-row { color: #1a1a1a !important; font-size: 10pt !important; }
   .eje-row .eje-name { color: #1a1a1a !important; }
-  .eje-row .eje-bar  { background: #e5e5e5 !important; }
+  .eje-row .eje-bar  {
+    background: #e5e5e5 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .eje-row .eje-fill {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
   .eje-row .eje-fill.high { background: #0a8a4d !important; }
-  .eje-row .eje-fill.mid,
-  .eje-row .eje-fill { background: #b8730a !important; }
-  .eje-row .eje-fill.low { background: #b03040 !important; }
+  .eje-row .eje-fill.mid  { background: #b8730a !important; }
+  .eje-row .eje-fill.low  { background: #b03040 !important; }
 
   /* Diagnóstico (penalización crítica) */
   .diagnostico {
