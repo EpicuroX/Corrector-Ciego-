@@ -2,7 +2,7 @@
  * ============================================================================
  * DARABIA ENGINE V5 — ENDPOINT SUBIDA PDF
  * api/subir-pdf.js · Vercel Serverless Function (Node.js 18+)
- * v1.0
+ * v1.1
  *
  * Autor: Honás Darabia (Jonás Agudo Osuna) · IES Virgen del Pilar, Zaragoza
  *
@@ -11,7 +11,9 @@
  *   2. Extraer el texto del PDF en memoria (sin tocar disco).
  *   3. Limpiar artefactos típicos de extracción PDF.
  *   4. Construir el payload que evaluar.js espera y delegar la evaluación.
- *   5. Devolver al cliente la respuesta de evaluar.js sin mutarla.
+ *   5. Adjuntar el PDF original en base64 al response (para visor lateral).
+ *   6. Extraer la nota automática del simulador SCORM si existe (Caso 02/03).
+ *   7. Devolver al cliente la respuesta de evaluar.js sin mutarla.
  *
  * NO HACE:
  *   - No llama a Anthropic directamente. Eso es trabajo de evaluar.js.
@@ -24,6 +26,13 @@
  *
  * VARIABLES DE ENTORNO:
  *   Las mismas que usa evaluar.js. Este endpoint solo delega.
+ *
+ * CHANGELOG:
+ *   v1.0 — Versión inicial con extracción de texto PDF.
+ *   v1.1 — Consolida dos features:
+ *          · Devolución del PDF en base64 al cliente (visor lateral).
+ *          · Extracción de la nota del simulador SCORM desde el texto
+ *            del PDF (para casos con flujo dual: Caso 02, Caso 03...).
  * ============================================================================
  */
 
@@ -100,7 +109,15 @@ module.exports = async function handler(req, res) {
     // 7. Delegar en evaluar.js usando req/res falsos
     const respuestaEvaluacion = await _delegarAEvaluar(payloadEvaluacion, req);
 
-    // 8. Devolver al cliente
+    // 8. Adjuntar el PDF original en base64 para que el frontend pueda
+    //    mostrarlo al profesor como referencia durante la corrección.
+    //    No afecta a la evaluación: solo viaja en el response.
+    if (respuestaEvaluacion && typeof respuestaEvaluacion === 'object' && !respuestaEvaluacion.error) {
+      respuestaEvaluacion.pdf_alumno_base64 = pdfBuffer.toString('base64');
+      respuestaEvaluacion.pdf_alumno_filename = pdfFilename;
+    }
+
+    // 9. Devolver al cliente
     return res.status(200).json(respuestaEvaluacion);
 
   } catch (err) {
