@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * DARABIA ENGINE V5 — BACKEND PROXY
+ * DARABIA ENGINE V5.1 — BACKEND PROXY
  * api/evaluar.js · Vercel Serverless Function (Node.js 18+)
  *
  * Autor: Honás Darabia (Jonás Agudo Osuna) · IES Virgen del Pilar, Zaragoza
@@ -12,6 +12,12 @@
  *   3. Construir el system prompt dinámicamente desde la rúbrica del JSON
  *   4. Llamar a la API de Anthropic (o devolver Mock si DARABIA_MOCK=true)
  *   5. Validar y reenviar la respuesta estructurada al motor
+ *
+ * NOVEDADES V5.1 (Sesión 2 · Mayo 2026):
+ *   · Soporte de ra_status: la IA evalúa el estado de los Resultados de
+ *     Aprendizaje (RA) declarados en el bloque ra_cubiertos del JSON del caso.
+ *   · Compatibilidad total: si el caso no tiene ra_cubiertos, ra_status = [].
+ *   · Modo Mock genera ra_status simulado para testing sin coste de API.
  *
  * SEGURIDAD:
  *   - La API key NUNCA sale del servidor. Vive en variables de entorno Vercel.
@@ -45,7 +51,7 @@ const CASOS = {
 // ============================================================================
 
 const CONFIG = {
-  modelo: 'claude-sonnet-4-5',
+  modelo: 'claude-sonnet-4-20250514',
   max_tokens: 2000,
   timeout_ms: 50000,
   version_motor_soportada: '5.0.0',
@@ -461,12 +467,59 @@ function _generarMock(caso, payload) {
     `PARA LA CORRECCIÓN MANUAL (40%): Revisa si el alumno distingue entre hipótesis organizacional e individual. ` +
     `El plan de acción necesita revisión manual del componente Rigor Operativo.`;
 
+  // ra_status simulado (Sesión 2 V5.1)
+  // Genera estados realistas coherentes con el escenario simulado:
+  // alumno mediocre que ignora la Señal Sonia (knockout) pero cubre parcialmente el resto.
+  const ra_status = (Array.isArray(caso.ra_cubiertos) ? caso.ra_cubiertos : []).map(raDef => {
+    // Simulación por RA según el escenario del Mock
+    if (raDef.ra === 'RA5' && raDef.vinculo_knockout === 'senyal_sonia') {
+      return {
+        ra: 'RA5',
+        estado: 'no_conseguido',
+        nivel_evidencia: 'knockout_activado',
+        cr_demostrados: [],
+        cr_no_demostrados: (raDef.cr_cubiertos || []).map(cr => cr.id),
+        justificacion: '[MOCK] Knockout Sonia activado: el alumno no abre protocolo de investigación.',
+      };
+    }
+    if (raDef.ra === 'RA4') {
+      return {
+        ra: 'RA4',
+        estado: 'parcial',
+        nivel_evidencia: 'parcial',
+        cr_demostrados: [],
+        cr_no_demostrados: (raDef.cr_cubiertos || []).map(cr => cr.id),
+        justificacion: '[MOCK] El alumno menciona estrés genérico pero no diagnostica burnout en Ana como entidad clínica diferenciada.',
+      };
+    }
+    if (raDef.ra === 'RA2') {
+      return {
+        ra: 'RA2',
+        estado: 'conseguido',
+        nivel_evidencia: 'claro',
+        cr_demostrados: (raDef.cr_cubiertos || []).map(cr => cr.id),
+        cr_no_demostrados: [],
+        justificacion: '[MOCK] Identifica los factores psicosociales del caso, aplica ISTAS21 y propone medidas estructurales.',
+      };
+    }
+    // RA3 y otros: parcial por defecto
+    return {
+      ra: raDef.ra,
+      estado: 'parcial',
+      nivel_evidencia: 'parcial',
+      cr_demostrados: (raDef.cr_cubiertos || []).slice(0, 1).map(cr => cr.id),
+      cr_no_demostrados: (raDef.cr_cubiertos || []).slice(1).map(cr => cr.id),
+      justificacion: `[MOCK] ${raDef.ra} demostrado parcialmente — mencionado pero sin desarrollar operativamente.`,
+    };
+  });
+
   return {
     nota_global: notaGlobal,
     vector_ejes: vectorEjes,
     detalle_criterios: detallesCriterios,
     knockouts_aplicados: knockoutsAplicados,
     nota_asesoramiento_docente,
+    ra_status, // ← Sesión 2 V5.1
     _mock: true, // flag interno; el motor lo puede mostrar en consola
   };
 }
@@ -505,6 +558,44 @@ function _validarRespuestaIA(data, caso) {
 
   if (typeof data.nota_asesoramiento_docente !== 'string' || data.nota_asesoramiento_docente.trim().length < 10) {
     throw _crearError('RESPUESTA_IA_INVALIDA', 502, 'nota_asesoramiento_docente ausente o demasiado corta.');
+  }
+
+  // — Validación opcional de ra_status (Sesión 2 V5.1) —
+  // Si el JSON del caso tiene ra_cubiertos, exigimos que la IA devuelva ra_status.
+  // Si el JSON NO tiene ra_cubiertos (casos heredados), aceptamos que ra_status no exista.
+  // Cuando ra_status existe, validamos su estructura mínima.
+  const casoTieneRA = Array.isArray(caso.ra_cubiertos) && caso.ra_cubiertos.length > 0;
+
+  if (casoTieneRA) {
+    if (!Array.isArray(data.ra_status)) {
+      // Si la IA olvidó devolverlo, lo tratamos como array vacío en vez de romper.
+      // Logueamos la advertencia para detectarlo en producción.
+      console.warn('[EVALUAR] ra_status ausente en respuesta de IA pese a que el caso tiene ra_cubiertos. Se inicializa como []');
+      data.ra_status = [];
+    } else {
+      // Validar estructura de cada item
+      const estadosValidos = ['conseguido', 'parcial', 'no_conseguido'];
+      const nivelesValidos = ['claro', 'parcial', 'ausente', 'knockout_activado'];
+      const rasEsperados = caso.ra_cubiertos.map(r => r.ra);
+
+      for (const item of data.ra_status) {
+        if (!item.ra || !rasEsperados.includes(item.ra)) {
+          console.warn(`[EVALUAR] ra_status contiene RA no esperado: "${item.ra}". RAs válidos: ${rasEsperados.join(', ')}`);
+        }
+        if (!estadosValidos.includes(item.estado)) {
+          console.warn(`[EVALUAR] ra_status: estado inválido "${item.estado}" en ${item.ra}. Esperados: ${estadosValidos.join(', ')}`);
+        }
+        if (!nivelesValidos.includes(item.nivel_evidencia)) {
+          console.warn(`[EVALUAR] ra_status: nivel_evidencia inválido "${item.nivel_evidencia}" en ${item.ra}.`);
+        }
+      }
+    }
+  } else {
+    // Si el caso NO tiene ra_cubiertos, normalizamos ra_status a [] para que
+    // el frontend siempre reciba el campo (aunque sea vacío) y no haya undefined.
+    if (!Array.isArray(data.ra_status)) {
+      data.ra_status = [];
+    }
   }
 }
 
