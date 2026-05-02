@@ -42,8 +42,6 @@
 
 const CASOS = {
   'psicosocial_gestoria_v1': require('../data/psicosocial_gestoria.json'),
-  'estres_nexobank_v1':      require('../data/estres_nexobank.json'),
-  // 'burnout_huella_v1':    require('../data/burnout_huella.json'),    ← Caso 03 (próximo)
   // 'psicosocial_hospital_v1': require('../data/psicosocial_hospital.json'),  ← Caso 06
   // 'psicosocial_logistica_v1': require('../data/psicosocial_logistica.json'), ← Caso 07
 };
@@ -100,21 +98,13 @@ module.exports = async function handler(req, res) {
     _logAuditoria(payload, respuesta, esMock);
 
     // 6. Enriquecer con metadatos del caso para que el frontend sea caso-agnóstico.
-    //    Los 4 campos siguientes son aditivos: no afectan a _validarRespuestaIA
+    //    Los 3 campos siguientes son aditivos: no afectan a _validarRespuestaIA
     //    (ya pasó) ni al motor cliente si decide ignorarlos.
     return res.status(200).json({
       ...respuesta,
       caso_titulo: caso.caso.titulo,
       ra_no_cubiertos: caso.ra_no_cubiertos || [],
       etiquetas_knockouts: _construirEtiquetasKnockouts(caso),
-      // Nota del simulador (Caso 02/03). null si el caso no la usa (Caso 05).
-      // El frontend pinta el desglose 60+40 si está presente.
-      nota_simulador: payload.nota_simulador || null,
-      // Configuración de visualización de notas: el evaluador puntúa internamente
-      // sobre 100 (calibrado, comparable longitudinal), pero algunos casos aportan
-      // solo X% del total. El frontend muestra la nota normalizada según este peso.
-      peso_nota_evaluador: caso.caso.puntuacion_maxima_automatica || 100,
-      peso_nota_simulador: caso.caso.puntuacion_simulador || 0,
     });
 
   } catch (err) {
@@ -195,11 +185,6 @@ Tu función es evaluar el dictamen de un alumno de CFGS Prevención de Riesgos P
 Tono: directo, técnico, preciso. Sin condescendencia. Sin relleno. Los comentarios al profesor son útiles o no son.`;
 
   // — Contexto del caso —
-  // datos_objetivos se serializa genéricamente: cada caso declara sus propios
-  // campos (Caso 05: absentismo/horas_extra/...; Caso 02: AHT/rotación/...).
-  // El motor no conoce los nombres por adelantado.
-  const datosObjTexto = _serializarDatosObjetivos(caso.contexto.datos_objetivos);
-
   const ctxCaso = `
 CASO: ${caso.caso.titulo}
 SECTOR: ${caso.caso.sector}
@@ -207,7 +192,7 @@ MODELOS TEÓRICOS DEL CASO: ${caso.caso.modelos_teoricos.join(', ')}
 INSTRUMENTO: ${caso.caso.instrumento}
 EMPRESA: ${caso.contexto.empresa}
 PLANTILLA: ${caso.contexto.plantilla} personas
-DATOS OBJETIVOS: ${datosObjTexto}`;
+DATOS OBJETIVOS: Absentismo ${caso.contexto.datos_objetivos.absentismo} (sector: ${caso.contexto.datos_objetivos.referencia_sector}), ${caso.contexto.datos_objetivos.bajas_psicologicas_12m} bajas psicológicas en 12 meses (${caso.contexto.datos_objetivos.dias_baja_total} días), horas extra media marzo: ${caso.contexto.datos_objetivos.horas_extra_media_marzo}, última evaluación psicosocial: ${caso.contexto.datos_objetivos.ultima_evaluacion_psicosocial}.`;
 
   // — Rúbrica completa (generada dinámicamente desde el JSON) —
   const rubricaTexto = rubrica_evaluacion.criterios.map(c =>
@@ -790,30 +775,4 @@ function _construirEtiquetasKnockouts(caso) {
     etiquetas[id] = nombre ? `Knockout ${nombre}` : 'Knockout';
   }
   return etiquetas;
-}
-
-/**
- * Serializa el bloque datos_objetivos del JSON del caso a una línea de texto
- * legible para Claude. Cada caso declara sus propios campos (snake_case).
- * Ejemplo:
- *   { absentismo: "21.3%", referencia_sector: "9.8%" }
- *   →  "absentismo: 21.3% · referencia sector: 9.8%"
- *
- * Acepta valores anidados (objeto) y los serializa también, para casos en que
- * un dato objetivo lleve sub-campos (ej: { AHT: { objetivo: "3:48", real: "4:12" } }).
- */
-function _serializarDatosObjetivos(datos) {
-  if (!datos || typeof datos !== 'object') return '(sin datos objetivos)';
-  const partes = [];
-  for (const [k, v] of Object.entries(datos)) {
-    const etiqueta = k.replace(/_/g, ' ');
-    if (v && typeof v === 'object' && !Array.isArray(v)) {
-      // Objeto anidado: serializar también
-      const sub = Object.entries(v).map(([sk, sv]) => `${sk.replace(/_/g, ' ')}: ${sv}`).join(', ');
-      partes.push(`${etiqueta} (${sub})`);
-    } else {
-      partes.push(`${etiqueta}: ${v}`);
-    }
-  }
-  return partes.join(' · ');
 }
