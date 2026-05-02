@@ -2,7 +2,7 @@
  * ============================================================================
  * DARABIA ENGINE V5 — ENDPOINT SUBIDA PDF
  * api/subir-pdf.js · Vercel Serverless Function (Node.js 18+)
- * v1.0
+ * v1.1
  *
  * Autor: Honás Darabia (Jonás Agudo Osuna) · IES Virgen del Pilar, Zaragoza
  *
@@ -11,7 +11,9 @@
  *   2. Extraer el texto del PDF en memoria (sin tocar disco).
  *   3. Limpiar artefactos típicos de extracción PDF.
  *   4. Construir el payload que evaluar.js espera y delegar la evaluación.
- *   5. Devolver al cliente la respuesta de evaluar.js sin mutarla.
+ *   5. Adjuntar el PDF original en base64 al response (para visor lateral).
+ *   6. Extraer la nota automática del simulador SCORM si existe (Caso 02/03).
+ *   7. Devolver al cliente la respuesta de evaluar.js sin mutarla.
  *
  * NO HACE:
  *   - No llama a Anthropic directamente. Eso es trabajo de evaluar.js.
@@ -24,6 +26,13 @@
  *
  * VARIABLES DE ENTORNO:
  *   Las mismas que usa evaluar.js. Este endpoint solo delega.
+ *
+ * CHANGELOG:
+ *   v1.0 — Versión inicial con extracción de texto PDF.
+ *   v1.1 — Consolida dos features:
+ *          · Devolución del PDF en base64 al cliente (visor lateral).
+ *          · Extracción de la nota del simulador SCORM desde el texto
+ *            del PDF (para casos con flujo dual: Caso 02, Caso 03...).
  * ============================================================================
  */
 
@@ -301,8 +310,35 @@ function _construirPayloadEvaluacion(fields, textoLimpio, pdfFilename) {
       origen: 'pdf_subido',
       pdf_filename: pdfFilename,
     },
+    // Nota del simulador SCORM extraída del propio PDF (si existe).
+    // Solo se rellena en casos con simulador previo (Caso 02, Caso 03).
+    // En Caso 05 y siguientes "evaluador puro" será null y el frontend lo ignora.
+    nota_simulador: _extraerNotaSimulador(textoLimpio),
     llaves_desbloqueadas: [], // No aplica en flujo de subida PDF
   };
+}
+
+/**
+ * Extrae la puntuación automática del simulador desde el texto del PDF.
+ * El simulador imprime la nota dos veces ("Puntuación automática: X / 60"
+ * en la cabecera y "Puntuación automática enviada a Aeducar: X/60" al final).
+ * Cualquiera de las dos formas vale.
+ *
+ * Devuelve { puntos, maximo } o null si el PDF no tiene nota del simulador
+ * (ej: dictamen del Caso 05, que no usa SCORM previo).
+ *
+ * No rompe el flujo si falla: simplemente devuelve null.
+ */
+function _extraerNotaSimulador(texto) {
+  if (!texto) return null;
+  const re = /Puntuaci[oó]n autom[aá]tica[^:\n]*:\s*(\d+)\s*\/\s*(\d+)/i;
+  const match = texto.match(re);
+  if (!match) return null;
+  const puntos = parseInt(match[1], 10);
+  const maximo = parseInt(match[2], 10);
+  if (isNaN(puntos) || isNaN(maximo) || maximo === 0) return null;
+  if (puntos < 0 || puntos > maximo) return null; // saneado
+  return { puntos, maximo };
 }
 
 // ============================================================================
