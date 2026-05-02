@@ -100,7 +100,15 @@ module.exports = async function handler(req, res) {
     // 7. Delegar en evaluar.js usando req/res falsos
     const respuestaEvaluacion = await _delegarAEvaluar(payloadEvaluacion, req);
 
-    // 8. Devolver al cliente
+    // 8. Adjuntar el PDF original en base64 para que el frontend pueda
+    //    mostrarlo al profesor como referencia durante la corrección.
+    //    No afecta a la evaluación: solo viaja en el response.
+    if (respuestaEvaluacion && typeof respuestaEvaluacion === 'object' && !respuestaEvaluacion.error) {
+      respuestaEvaluacion.pdf_alumno_base64 = pdfBuffer.toString('base64');
+      respuestaEvaluacion.pdf_alumno_filename = pdfFilename;
+    }
+
+    // 9. Devolver al cliente
     return res.status(200).json(respuestaEvaluacion);
 
   } catch (err) {
