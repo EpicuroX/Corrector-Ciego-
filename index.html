@@ -1535,11 +1535,19 @@ const Editor = {
   },
 
   salirModoEdicion() {
+    const eraEdicion = (this.modoActual === 'edicion');
     this.modoActual = 'lectura';
     const s = this.seccion();
     s.classList.remove('modo-edicion');
     s.classList.add('modo-lectura');
     $('modo-label').textContent = 'Modo lectura · ' + (estado.conCambios ? 'datos editados' : 'salida IA');
+
+    // Re-render desde el editado para que el DOM vuelva a ser HTML inerte.
+    // Sin esto, los inputs y contenteditable que activamos quedarían vivos.
+    // Solo si veníamos de edición y hay datos cargados (evita bucles al inicio).
+    if (eraEdicion && estado.editado) {
+      renderResultado(estado.editado, { preservarEstado: true });
+    }
   },
 
   /* ── Activar campos editables sobre el render actual ───────────── */
