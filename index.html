@@ -824,6 +824,130 @@ section.modo-edicion .aviso-coherencia.visible { display: block; }
   font-size: 11px; cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
 }
+
+/* ============================================================================
+   VISOR DEL PDF DEL ALUMNO · Panel lateral plegable
+   ============================================================================ */
+
+/* El section de resultado por defecto NO es grid: layout original intacto */
+section#estado-resultado.con-visor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr);
+  grid-template-rows: auto 1fr;
+  gap: 16px;
+  align-items: start;
+}
+/* La barra de edición ocupa toda la anchura del grid */
+section#estado-resultado.con-visor > .barra-edicion {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
+/* La columna izquierda (todo el contenido actual) */
+.resultado-main {
+  min-width: 0;  /* permite que el grid no se desborde */
+}
+
+/* Panel del visor PDF (oculto por defecto) */
+.visor-pdf {
+  display: none;
+  position: sticky;
+  top: 16px;
+  background: linear-gradient(180deg, rgba(31,41,55,0.6), rgba(17,24,39,0.6));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  height: calc(100vh - 32px);
+  flex-direction: column;
+}
+section#estado-resultado.con-visor .visor-pdf {
+  display: flex;
+}
+
+.visor-pdf-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border);
+}
+.visor-pdf-titulo {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-2);
+}
+.visor-pdf-titulo strong { color: var(--text-0); }
+.visor-pdf-cerrar {
+  background: transparent; color: var(--text-2);
+  border: 1px solid var(--border-strong);
+  width: 26px; height: 26px;
+  border-radius: 5px; cursor: pointer;
+  font-family: inherit; font-size: 14px;
+  line-height: 1; display: flex;
+  align-items: center; justify-content: center;
+  padding: 0;
+}
+.visor-pdf-cerrar:hover { background: var(--bg-1); color: var(--text-0); }
+.visor-pdf-frame {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: white;
+}
+.visor-pdf-vacio {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  color: var(--text-3);
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-style: normal;
+}
+
+/* Botón "Ver dictamen" en la barra de edición */
+.btn-visor {
+  background: var(--bg-2); color: var(--text-1);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 12px; font-weight: 500;
+  cursor: pointer; font-family: inherit;
+  transition: all 0.15s;
+}
+.btn-visor:hover {
+  background: var(--border-strong); color: var(--text-0);
+}
+.btn-visor.activo {
+  background: var(--blue); color: var(--bg-0); border-color: var(--blue);
+}
+.btn-visor.activo:hover { background: #93c5fd; }
+/* Si no hay PDF disponible, el botón se desactiva */
+.btn-visor[disabled] {
+  opacity: 0.4; cursor: not-allowed;
+}
+
+/* Responsive: en pantallas pequeñas el grid colapsa a una columna y
+   el visor pasa a fixed full-screen modal-like */
+@media (max-width: 1100px) {
+  section#estado-resultado.con-visor {
+    grid-template-columns: 1fr;
+  }
+  .visor-pdf {
+    position: fixed;
+    top: 16px; left: 16px; right: 16px; bottom: 16px;
+    z-index: 50;
+    height: auto;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -906,6 +1030,7 @@ section.modo-edicion .aviso-coherencia.visible { display: block; }
       <span class="badge-modificado">Modificado</span>
     </div>
     <div class="barra-edicion-acciones">
+      <button class="btn-visor" id="btn-visor" disabled>📄 Ver dictamen</button>
       <button class="btn-edit-on" id="btn-modo-edicion">✎ Editar</button>
       <button class="btn-edit-off" id="btn-modo-guardar">✓ Volver a lectura</button>
       <button class="btn-descartar" id="btn-descartar">Descartar cambios</button>
@@ -913,78 +1038,96 @@ section.modo-edicion .aviso-coherencia.visible { display: block; }
     </div>
   </div>
 
-  <!-- Diagnóstico rápido -->
-  <div class="diagnostico" id="diagnostico-rapido">
-    <span class="icono" id="diagnostico-icono"></span>
-    <div>
-      <div class="texto-principal" id="diagnostico-texto"></div>
-      <div class="texto-secundario" id="diagnostico-detalle"></div>
-    </div>
-  </div>
+  <div class="resultado-main">
 
-  <!-- Dashboard -->
-  <div class="panel">
-    <div class="dashboard">
-      <div class="nota-global">
-        <div class="num" id="nota-num">--</div>
-        <div class="max">/ 100</div>
-        <div class="label">Nota auto</div>
-      </div>
+    <!-- Diagnóstico rápido -->
+    <div class="diagnostico" id="diagnostico-rapido">
+      <span class="icono" id="diagnostico-icono"></span>
       <div>
-        <div class="alumno-info" id="alumno-info"></div>
-        <div class="ejes-titulo" id="ejes-titulo">Competencias del módulo · Psicosociología Aplicada</div>
-        <div class="ejes" id="ejes-container"></div>
+        <div class="texto-principal" id="diagnostico-texto"></div>
+        <div class="texto-secundario" id="diagnostico-detalle"></div>
       </div>
     </div>
-    <div class="aviso-coherencia" id="aviso-coherencia"></div>
-  </div>
 
-  <!-- Bloque único: Análisis del dictamen -->
-  <div class="bloque nota-docente">
-    <div class="bloque-header">
-      <div>
-        <span class="bloque-tag">Solo profesor</span>
-        <div class="bloque-titulo">Análisis del dictamen · margen docente 40%</div>
+    <!-- Dashboard -->
+    <div class="panel">
+      <div class="dashboard">
+        <div class="nota-global">
+          <div class="num" id="nota-num">--</div>
+          <div class="max">/ 100</div>
+          <div class="label">Nota auto</div>
+        </div>
+        <div>
+          <div class="alumno-info" id="alumno-info"></div>
+          <div class="ejes-titulo" id="ejes-titulo">Competencias del módulo · Psicosociología Aplicada</div>
+          <div class="ejes" id="ejes-container"></div>
+        </div>
       </div>
-      <button class="btn-copiar" data-target="nota-docente">📋 Copiar</button>
+      <div class="aviso-coherencia" id="aviso-coherencia"></div>
     </div>
-    <div class="bloque-contenido" id="contenido-nota-docente"></div>
-  </div>
 
-  <!-- Bloque RA · Resultados de Aprendizaje del Caso -->
-  <div class="bloque ra-status hidden" id="bloque-ra-status">
-    <div class="bloque-header">
-      <div>
-        <span class="bloque-tag">Resultados de Aprendizaje</span>
-        <div class="bloque-titulo">Cobertura del módulo en este caso</div>
+    <!-- Bloque único: Análisis del dictamen -->
+    <div class="bloque nota-docente">
+      <div class="bloque-header">
+        <div>
+          <span class="bloque-tag">Solo profesor</span>
+          <div class="bloque-titulo">Análisis del dictamen · margen docente 40%</div>
+        </div>
+        <button class="btn-copiar" data-target="nota-docente">📋 Copiar</button>
       </div>
+      <div class="bloque-contenido" id="contenido-nota-docente"></div>
     </div>
-    <div class="ra-status-controles">
-      <button class="btn-detalle" id="btn-toggle-detalle-ra">Ver detalle por criterio (CR) ↓</button>
+
+    <!-- Bloque RA · Resultados de Aprendizaje del Caso -->
+    <div class="bloque ra-status hidden" id="bloque-ra-status">
+      <div class="bloque-header">
+        <div>
+          <span class="bloque-tag">Resultados de Aprendizaje</span>
+          <div class="bloque-titulo">Cobertura del módulo en este caso</div>
+        </div>
+      </div>
+      <div class="ra-status-controles">
+        <button class="btn-detalle" id="btn-toggle-detalle-ra">Ver detalle por criterio (CR) ↓</button>
+      </div>
+      <div class="ra-list" id="ra-list"></div>
+      <div class="ra-no-cubiertos hidden" id="ra-no-cubiertos"></div>
     </div>
-    <div class="ra-list" id="ra-list"></div>
-    <div class="ra-no-cubiertos hidden" id="ra-no-cubiertos"></div>
-  </div>
 
-  <!-- Bloque 3: Detalle técnico -->
-  <div class="panel">
-    <div class="panel-title">Detalle por criterio</div>
-    <table class="tabla-criterios">
-      <thead>
-        <tr>
-          <th>Criterio</th>
-          <th class="num">Obtenido</th>
-          <th>Observación</th>
-        </tr>
-      </thead>
-      <tbody id="tabla-criterios-body"></tbody>
-    </table>
-  </div>
+    <!-- Bloque 3: Detalle técnico -->
+    <div class="panel">
+      <div class="panel-title">Detalle por criterio</div>
+      <table class="tabla-criterios">
+        <thead>
+          <tr>
+            <th>Criterio</th>
+            <th class="num">Obtenido</th>
+            <th>Observación</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-criterios-body"></tbody>
+      </table>
+    </div>
 
-  <!-- Acciones -->
-  <div class="acciones-pie">
-    <button id="btn-otro">Evaluar otro dictamen</button>
-  </div>
+    <!-- Acciones -->
+    <div class="acciones-pie">
+      <button id="btn-otro">Evaluar otro dictamen</button>
+    </div>
+
+  </div><!-- /.resultado-main -->
+
+  <!-- Visor lateral del PDF del alumno -->
+  <aside class="visor-pdf" id="visor-pdf">
+    <div class="visor-pdf-header">
+      <div class="visor-pdf-titulo">
+        <strong>Dictamen del alumno</strong> · <span id="visor-pdf-filename">—</span>
+      </div>
+      <button class="visor-pdf-cerrar" id="btn-cerrar-visor" title="Cerrar visor">✕</button>
+    </div>
+    <iframe class="visor-pdf-frame hidden" id="visor-pdf-frame" title="Dictamen del alumno"></iframe>
+    <div class="visor-pdf-vacio" id="visor-pdf-vacio">
+      No hay PDF disponible en esta sesión.
+    </div>
+  </aside>
 
 </section>
 
@@ -1017,6 +1160,8 @@ let estado = {
   original: null,          // copia inmutable de la respuesta IA
   editado: null,           // copia mutable que el profesor edita
   conCambios: false,       // si hay diferencias respecto al original
+  pdfAlumnoB64: null,      // PDF del alumno en base64 para el visor lateral
+  pdfAlumnoFilename: null, // nombre del archivo original
 };
 
 // ============================================================================
@@ -1179,6 +1324,19 @@ function renderResultado(data, opciones = {}) {
   // Primera llamada desde IA: clonamos a original y editado.
   // Llamadas posteriores (re-render tras edición o restaurar): no reinicializamos.
   if (!opciones.preservarEstado) {
+    // Extraemos el PDF del alumno antes de clonar para no duplicar 1MB de base64
+    // ni persistirlo en localStorage. El PDF vive solo en estado, no en editado.
+    if (data && data.pdf_alumno_base64) {
+      estado.pdfAlumnoB64 = data.pdf_alumno_base64;
+      estado.pdfAlumnoFilename = data.pdf_alumno_filename || estado.ultimoPDFName || 'dictamen.pdf';
+      // Limpiamos los campos del data clonado para no duplicar
+      delete data.pdf_alumno_base64;
+      delete data.pdf_alumno_filename;
+    } else {
+      estado.pdfAlumnoB64 = null;
+      estado.pdfAlumnoFilename = null;
+    }
+
     estado.original = JSON.parse(JSON.stringify(data));
     estado.editado  = JSON.parse(JSON.stringify(data));
     estado.conCambios = false;
@@ -1190,6 +1348,7 @@ function renderResultado(data, opciones = {}) {
       console.info('[EDITOR] Edición previa recuperada de localStorage.');
     }
     Editor.actualizarBadge();
+    Visor.actualizarDisponibilidad();   // habilita/deshabilita botón "Ver dictamen"
   }
 
   const fuente = estado.editado || data;
@@ -1846,6 +2005,75 @@ $('btn-descartar').addEventListener('click', () => Editor.descartarCambios());
 $('btn-restaurar').addEventListener('click', () => Editor.restaurarOriginal());
 
 // ============================================================================
+// VISOR DEL PDF DEL ALUMNO · panel lateral plegable
+// ============================================================================
+const Visor = {
+  abierto: false,
+
+  /**
+   * Habilita o deshabilita el botón "Ver dictamen" según haya o no PDF
+   * disponible en el estado actual. Se llama tras cada respuesta IA.
+   */
+  actualizarDisponibilidad() {
+    const btn = $('btn-visor');
+    if (!btn) return;
+    const hayPdf = !!estado.pdfAlumnoB64;
+    btn.disabled = !hayPdf;
+    btn.title = hayPdf
+      ? 'Ver el dictamen original del alumno'
+      : 'No hay PDF disponible (modo mock o respuesta sin archivo)';
+  },
+
+  abrir() {
+    if (!estado.pdfAlumnoB64) {
+      console.warn('[VISOR] Sin PDF disponible.');
+      return;
+    }
+    const seccion = $('estado-resultado');
+    const frame = $('visor-pdf-frame');
+    const vacio = $('visor-pdf-vacio');
+    const filename = $('visor-pdf-filename');
+    const btn = $('btn-visor');
+
+    // Cargamos el PDF en el iframe (data URL)
+    // El navegador renderiza nativamente, sin librerías
+    frame.src = `data:application/pdf;base64,${estado.pdfAlumnoB64}`;
+    frame.classList.remove('hidden');
+    vacio.classList.add('hidden');
+    filename.textContent = estado.pdfAlumnoFilename || 'dictamen.pdf';
+
+    seccion.classList.add('con-visor');
+    btn.classList.add('activo');
+    this.abierto = true;
+  },
+
+  cerrar() {
+    const seccion = $('estado-resultado');
+    const frame = $('visor-pdf-frame');
+    const btn = $('btn-visor');
+
+    seccion.classList.remove('con-visor');
+    btn.classList.remove('activo');
+    // Liberamos el iframe para que el navegador suelte memoria del PDF embebido
+    frame.src = 'about:blank';
+    frame.classList.add('hidden');
+    this.abierto = false;
+  },
+
+  toggle() {
+    this.abierto ? this.cerrar() : this.abrir();
+  },
+
+  resetear() {
+    this.cerrar();
+    this.actualizarDisponibilidad();
+  },
+};
+
+$('btn-visor').addEventListener('click', () => Visor.toggle());
+$('btn-cerrar-visor').addEventListener('click', () => Visor.cerrar());
+
+// ============================================================================
 // ACCIONES DE PIE
 // ============================================================================
 $('btn-otro').addEventListener('click', () => {
@@ -1857,8 +2085,11 @@ $('btn-otro').addEventListener('click', () => {
     original: null,
     editado: null,
     conCambios: false,
+    pdfAlumnoB64: null,
+    pdfAlumnoFilename: null,
   };
   Editor.salirModoEdicion();
+  Visor.resetear();
   mostrarEstado('estado-formulario');
 });
 
