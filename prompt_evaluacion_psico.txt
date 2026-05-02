@@ -477,7 +477,18 @@ MAPA EXPLÍCITO criterios → ejes longitudinales:
                    real ha leído su dictamen, no una plantilla genérica.
                    Máximo 200 palabras. Tono técnico directo. Sin halagos.>",
 
-  "nota_asesoramiento_docente": "<idéntico a nota_docente — alias motor v5.0>"
+  "nota_asesoramiento_docente": "<idéntico a nota_docente — alias motor v5.0>",
+
+  "ra_status": [
+    {
+      "ra": "<código del RA, ej: RA2>",
+      "estado": "<conseguido | parcial | no_conseguido>",
+      "nivel_evidencia": "<claro | parcial | ausente | knockout_activado>",
+      "cr_demostrados": ["<lista de IDs de CR demostrados, ej: RA2c, RA2d>"],
+      "cr_no_demostrados": ["<lista de IDs de CR no demostrados>"],
+      "justificacion": "<1–2 frases explicando el estado, anclada al dictamen>"
+    }
+  ]
 }
 
 REGLAS DE FORMATO:
@@ -492,6 +503,82 @@ REGLAS DE FORMATO:
   · errores_clave: mínimo 1, máximo 4.
   · pistas_entrenamiento: [] si modo evaluacion; 1–2 strings si modo entrenamiento.
   · nota_docente y nota_asesoramiento_docente: mismo contenido textual.
+  · ra_status: ver BLOQUE 6.bis para reglas detalladas. Si el JSON del caso
+    no contiene ra_cubiertos, este campo debe ser un array vacío [].
+
+
+================================================================================
+## BLOQUE 6.bis · EVALUACIÓN DE RESULTADOS DE APRENDIZAJE (ra_status)
+================================================================================
+
+Este bloque genera el campo "ra_status" del JSON de salida.
+Se aplica DESPUÉS de calcular la puntuación de criterios y los knockouts.
+No afecta a la nota numérica — es metadato pedagógico para el profesor.
+
+LÓGICA:
+  El JSON del caso contiene "ra_cubiertos" (lista de RA con sus CR y evidencia
+  esperada) y "ra_no_cubiertos" (RA fuera del alcance del caso).
+
+  Para cada RA en ra_cubiertos:
+    1. Lee la "evidencia_esperada" del RA — define qué debe demostrar el alumno.
+    2. Compara con el dictamen del alumno (no con la rúbrica numérica).
+    3. Determina qué CR concretos están demostrados y cuáles no.
+    4. Asigna estado y nivel_evidencia según las reglas siguientes.
+
+  Los RA listados en ra_no_cubiertos NO se evalúan. No aparecen en ra_status.
+
+REGLAS DE ASIGNACIÓN DE ESTADO:
+
+  estado = "conseguido"
+    · Todos los CR del RA aparecen demostrados en el dictamen.
+    · La evidencia es robusta y específica (no genérica).
+    · Se cumple la "evidencia_esperada" del RA en el JSON.
+    · Para RA con knockout asociado: el alumno NO ha activado el knockout.
+
+  estado = "parcial"
+    · Al menos 1 CR está demostrado pero no todos.
+    · O bien todos los CR aparecen pero con nivel superficial.
+    · El alumno reconoce el problema pero no lo desarrolla.
+
+  estado = "no_conseguido"
+    · Ningún CR está demostrado, o solo de forma genérica/incidental.
+    · El alumno no aborda el área que cubre el RA.
+    · Para RA con knockout asociado: el alumno ha activado el knockout.
+
+REGLAS DE NIVEL DE EVIDENCIA:
+
+  nivel_evidencia = "claro"
+    · La evidencia en el dictamen es directa, específica y vinculada a datos
+      del expediente.
+    · El alumno cita modelos, datos, evidencias del caso explícitamente.
+
+  nivel_evidencia = "parcial"
+    · La evidencia existe pero es genérica o no se ancla en el caso concreto.
+    · El alumno menciona el concepto pero sin operativizar.
+
+  nivel_evidencia = "ausente"
+    · El RA no aparece desarrollado en el dictamen.
+    · El alumno no ha entrado en ese terreno.
+
+  nivel_evidencia = "knockout_activado"
+    · USAR SOLO en RA cuyo campo "vinculo_knockout" coincide con un knockout
+      aplicado en penalizaciones_aplicadas.
+    · En este caso, estado = "no_conseguido" obligatoriamente.
+
+CONSISTENCIA OBLIGATORIA:
+
+  · Si hay knockout_sonia activado → el RA con vinculo_knockout = "senyal_sonia"
+    debe tener estado = "no_conseguido" y nivel_evidencia = "knockout_activado".
+  · cr_demostrados + cr_no_demostrados deben sumar TODOS los CR del RA.
+  · Si estado = "conseguido", entonces cr_no_demostrados debe estar vacío.
+  · Si estado = "no_conseguido", entonces cr_demostrados debe estar vacío.
+  · La justificacion debe ser específica al dictamen evaluado, no genérica.
+
+REGLA DE COMPATIBILIDAD:
+
+  Si el JSON del caso NO contiene el nodo "ra_cubiertos" (caso heredado o caso
+  futuro sin mapeo de RA), devuelve "ra_status": [] en la salida.
+  No inventes RA que no estén en el JSON. La intermodularidad es innegociable.
 
 
 ================================================================================
