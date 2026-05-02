@@ -97,7 +97,15 @@ module.exports = async function handler(req, res) {
     // 5. Log de auditoría (sin datos personales sensibles)
     _logAuditoria(payload, respuesta, esMock);
 
-    return res.status(200).json(respuesta);
+    // 6. Enriquecer con metadatos del caso para que el frontend sea caso-agnóstico.
+    //    Los 3 campos siguientes son aditivos: no afectan a _validarRespuestaIA
+    //    (ya pasó) ni al motor cliente si decide ignorarlos.
+    return res.status(200).json({
+      ...respuesta,
+      caso_titulo: caso.caso.titulo,
+      ra_no_cubiertos: caso.ra_no_cubiertos || [],
+      etiquetas_knockouts: _construirEtiquetasKnockouts(caso),
+    });
 
   } catch (err) {
     return _manejarError(res, err);
@@ -738,4 +746,33 @@ function _hash(str) {
     h = ((h << 5) - h + str.charCodeAt(i)) | 0;
   }
   return Math.abs(h).toString(36).toUpperCase();
+}
+
+// ============================================================================
+// SECCIÓN K — METADATOS DEL CASO PARA FRONTEND AGNÓSTICO
+// ============================================================================
+
+/**
+ * Genera un map { knockout_id → "Knockout Nombre" } a partir de los IDs
+ * declarados en el JSON del caso. Permite que el frontend pinte etiquetas
+ * legibles sin tener nada hardcodeado por caso.
+ *
+ * Reglas:
+ *   - "senyal_sonia"          → "Knockout Sonia"
+ *   - "medidas_terciarias"    → "Knockout Medidas Terciarias"
+ *   - "knockout_violencia"    → "Knockout Violencia"
+ *
+ * Si un caso no declara knockouts, devuelve {} (no rompe nada en el cliente).
+ */
+function _construirEtiquetasKnockouts(caso) {
+  const knockouts = caso?.aciertos_criticos?.knockout_criteria || {};
+  const etiquetas = {};
+  for (const id of Object.keys(knockouts)) {
+    const palabras = id.split('_').filter(p => p !== 'senyal' && p !== 'knockout');
+    const nombre = palabras
+      .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+      .join(' ');
+    etiquetas[id] = nombre ? `Knockout ${nombre}` : 'Knockout';
+  }
+  return etiquetas;
 }
