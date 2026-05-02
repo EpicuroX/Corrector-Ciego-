@@ -667,6 +667,163 @@ footer {
   }
   .eje-row { grid-template-columns: 140px 1fr 50px; }
 }
+
+/* ============================================================================
+   MODO EDICIÓN DOCENTE · todo manual, sin recálculos (Modelo C)
+   ============================================================================ */
+
+/* Barra de control de edición fija arriba del estado-resultado */
+.barra-edicion {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  margin-bottom: 16px;
+  background: linear-gradient(180deg, rgba(31,41,55,0.92), rgba(17,24,39,0.92));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.barra-edicion-info {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px; color: var(--text-2);
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.barra-edicion-info .punto {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--text-3);
+}
+section.modo-edicion .barra-edicion-info .punto { background: var(--amber); }
+section.modo-edicion .barra-edicion-info { color: var(--amber); }
+
+.badge-modificado {
+  display: none;
+  font-size: 10px; font-family: 'JetBrains Mono', monospace;
+  padding: 3px 8px; border-radius: 4px;
+  background: var(--amber); color: var(--bg-0);
+  font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+section.con-cambios .badge-modificado { display: inline-block; }
+
+.barra-edicion-acciones { display: flex; gap: 8px; }
+.barra-edicion-acciones button {
+  font-size: 12px; padding: 8px 14px;
+  background: var(--bg-2); color: var(--text-1);
+  border: 1px solid var(--border-strong); border-radius: 6px;
+  cursor: pointer; font-family: inherit; font-weight: 500;
+  transition: all 0.15s;
+}
+.barra-edicion-acciones button:hover {
+  background: var(--border-strong); color: var(--text-0);
+}
+.barra-edicion-acciones .btn-edit-on {
+  background: var(--amber); color: var(--bg-0); border-color: var(--amber);
+}
+.barra-edicion-acciones .btn-edit-on:hover {
+  background: #fbbf24;
+}
+.barra-edicion-acciones .btn-restaurar {
+  color: var(--red); border-color: rgba(255,77,106,0.3);
+}
+.barra-edicion-acciones .btn-restaurar:hover {
+  background: var(--red-bg); color: var(--red);
+}
+section.modo-lectura .btn-edit-off,
+section.modo-lectura .btn-descartar { display: none; }
+section.modo-edicion .btn-edit-on { display: none; }
+section:not(.con-cambios) .btn-restaurar,
+section:not(.con-cambios) .btn-descartar { display: none; }
+
+/* — Marcadores visuales en modo edición — */
+section.modo-edicion .editable {
+  outline: 1px dashed rgba(245,158,11,0.4);
+  outline-offset: 3px;
+  border-radius: 3px;
+  cursor: text;
+  transition: outline-color 0.15s, background 0.15s;
+}
+section.modo-edicion .editable:hover {
+  outline-color: var(--amber);
+  background: rgba(245,158,11,0.06);
+}
+section.modo-edicion .editable:focus {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+  background: rgba(245,158,11,0.08);
+}
+
+/* — Inputs numéricos editables (nota global, ejes, criterios) — */
+.num-edit {
+  display: inline-block;
+  width: 4ch;
+  background: transparent;
+  color: inherit;
+  border: 1px dashed rgba(245,158,11,0.4);
+  border-radius: 4px;
+  padding: 1px 4px;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+.num-edit::-webkit-outer-spin-button,
+.num-edit::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.num-edit:hover { border-color: var(--amber); background: rgba(245,158,11,0.08); }
+.num-edit:focus {
+  outline: none;
+  border-color: var(--amber);
+  background: rgba(245,158,11,0.12);
+}
+.nota-global .num-edit { width: 4ch; font-size: 64px; }
+
+/* Selector de estado en RA (modo edición) */
+.ra-estado-select {
+  background: var(--bg-2); color: var(--text-1);
+  border: 1px dashed rgba(245,158,11,0.4); border-radius: 4px;
+  padding: 2px 6px; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; cursor: pointer;
+}
+.ra-estado-select:focus { outline: 1px solid var(--amber); }
+
+/* Selector de penalización knockout */
+.ko-pen-select {
+  background: var(--bg-2); color: var(--text-1);
+  border: 1px dashed rgba(245,158,11,0.4); border-radius: 4px;
+  padding: 2px 6px; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; margin-left: 8px; cursor: pointer;
+}
+
+/* Aviso de incoherencia (footer-style) */
+.aviso-coherencia {
+  display: none;
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--amber);
+  background: var(--amber-bg);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+section.modo-edicion .aviso-coherencia.visible { display: block; }
+
+/* En modo edición, el botón ✎ junto al diagnóstico */
+.diagnostico .btn-edit-inline {
+  margin-left: auto;
+  background: transparent; color: var(--text-2);
+  border: 1px solid var(--border-strong);
+  padding: 4px 10px; border-radius: 6px;
+  font-size: 11px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+}
 </style>
 </head>
 <body>
@@ -739,7 +896,22 @@ footer {
 </section>
 
 <!-- ═══ ESTADO 4 · RESULTADO ════════════════════════════════════════ -->
-<section id="estado-resultado" class="hidden">
+<section id="estado-resultado" class="hidden modo-lectura">
+
+  <!-- Barra de control de edición docente (sticky) -->
+  <div class="barra-edicion">
+    <div class="barra-edicion-info">
+      <span class="punto"></span>
+      <span id="modo-label">Modo lectura · salida IA</span>
+      <span class="badge-modificado">Modificado</span>
+    </div>
+    <div class="barra-edicion-acciones">
+      <button class="btn-edit-on" id="btn-modo-edicion">✎ Editar</button>
+      <button class="btn-edit-off" id="btn-modo-guardar">✓ Volver a lectura</button>
+      <button class="btn-descartar" id="btn-descartar">Descartar cambios</button>
+      <button class="btn-restaurar" id="btn-restaurar">Restaurar IA original</button>
+    </div>
+  </div>
 
   <!-- Diagnóstico rápido -->
   <div class="diagnostico" id="diagnostico-rapido">
@@ -764,6 +936,7 @@ footer {
         <div class="ejes" id="ejes-container"></div>
       </div>
     </div>
+    <div class="aviso-coherencia" id="aviso-coherencia"></div>
   </div>
 
   <!-- Bloque único: Análisis del dictamen -->
@@ -841,6 +1014,9 @@ let estado = {
   ultimoFormData: null,    // FormData listo para reenviar
   ultimoAlumno: null,      // {nombre, grupo}
   ultimoPDFName: null,     // para mostrar
+  original: null,          // copia inmutable de la respuesta IA
+  editado: null,           // copia mutable que el profesor edita
+  conCambios: false,       // si hay diferencias respecto al original
 };
 
 // ============================================================================
@@ -999,12 +1175,29 @@ function renderDiagnostico(nota, knockouts) {
 // ============================================================================
 // RENDER DEL RESULTADO
 // ============================================================================
-function renderResultado(data) {
+function renderResultado(data, opciones = {}) {
+  // Primera llamada desde IA: clonamos a original y editado.
+  // Llamadas posteriores (re-render tras edición o restaurar): no reinicializamos.
+  if (!opciones.preservarEstado) {
+    estado.original = JSON.parse(JSON.stringify(data));
+    estado.editado  = JSON.parse(JSON.stringify(data));
+    estado.conCambios = false;
+    Editor.salirModoEdicion();   // siempre arrancar en modo lectura
+
+    // Si había una edición previa pendiente para este alumno+caso, la recuperamos
+    const recuperado = Editor.recuperarSiExiste();
+    if (recuperado) {
+      console.info('[EDITOR] Edición previa recuperada de localStorage.');
+    }
+    Editor.actualizarBadge();
+  }
+
+  const fuente = estado.editado || data;
   const { nombre, grupo } = estado.ultimoAlumno;
   const fecha = new Date().toISOString().slice(0, 10);
 
   // — Nota global —
-  const nota = Math.round(data.nota_global);
+  const nota = Math.round(fuente.nota_global);
   const notaEl = $('nota-num');
   notaEl.textContent = nota;
   notaEl.classList.remove('high', 'mid', 'low');
@@ -1013,7 +1206,7 @@ function renderResultado(data) {
   else notaEl.classList.add('low');
 
   // — Diagnóstico rápido (incluye knockouts si los hay) —
-  const knockouts = (data.knockouts_aplicados || []).filter(k => k.penalizacion);
+  const knockouts = (fuente.knockouts_aplicados || []).filter(k => k.penalizacion);
   renderDiagnostico(nota, knockouts);
 
   // — Info alumno —
@@ -1030,30 +1223,41 @@ function renderResultado(data) {
   // — Vector ejes (mini-gráfico de barras) —
   const ejesContainer = $('ejes-container');
   ejesContainer.innerHTML = '';
-  (data.vector_ejes || []).forEach(eje => {
+  (fuente.vector_ejes || []).forEach((eje, idx) => {
     const pct = eje.max > 0 ? (eje.puntuacion / eje.max) * 100 : 0;
     const cls = pct >= 75 ? 'high' : pct >= 50 ? 'mid' : 'low';
     const row = document.createElement('div');
     row.className = 'eje-row';
+    row.dataset.ejeIdx = idx;
     row.innerHTML = `
       <div class="eje-name">${formatearEje(eje.eje)}</div>
       <div class="eje-bar"><div class="eje-fill ${cls}" style="width:${pct}%"></div></div>
-      <div class="eje-val">${eje.puntuacion}/${eje.max}</div>
+      <div class="eje-val"><span class="eje-puntuacion">${eje.puntuacion}</span>/${eje.max}</div>
     `;
     ejesContainer.appendChild(row);
   });
 
   // — Bloque único: Análisis del dictamen —
-  const notaDocenteTexto = construirNotaDocente(data, nombre, grupo, fecha, knockouts);
+  const notaDocenteTexto = construirNotaDocente(fuente, nombre, grupo, fecha, knockouts);
   $('contenido-nota-docente').textContent = notaDocenteTexto;
 
   // — Tabla criterios —
-  renderTablaCriterios(data.detalle_criterios || {});
+  renderTablaCriterios(fuente.detalle_criterios || {});
 
-  // — Bloque RA Status (Sesión 3) —
-  renderRAStatus(data.ra_status || []);
+  // — Bloque RA Status —
+  renderRAStatus(fuente.ra_status || []);
 
-  mostrarEstado('estado-resultado');
+  // Si estamos en modo edición, transformar campos en editables
+  if (Editor.modoActual === 'edicion') {
+    Editor.activarCamposEditables();
+  }
+
+  // Aviso de coherencia (solo visible en modo edición)
+  Editor.actualizarAvisoCoherencia();
+
+  if (!opciones.preservarEstado) {
+    mostrarEstado('estado-resultado');
+  }
 }
 
 // ============================================================================
@@ -1311,11 +1515,342 @@ $('btn-reintentar').addEventListener('click', () => procesar());
 $('btn-volver').addEventListener('click', () => mostrarEstado('estado-formulario'));
 
 // ============================================================================
+// EDITOR DOCENTE · Modelo C: todo manual, sin recálculos automáticos.
+// La IA propone, el profesor dispone. La coherencia matemática se avisa,
+// no se fuerza.
+// ============================================================================
+const Editor = {
+  modoActual: 'lectura',                 // 'lectura' | 'edicion'
+  seccion: () => $('estado-resultado'),
+
+  /* ── Entrada / salida del modo edición ─────────────────────────── */
+  entrarModoEdicion() {
+    this.modoActual = 'edicion';
+    const s = this.seccion();
+    s.classList.remove('modo-lectura');
+    s.classList.add('modo-edicion');
+    $('modo-label').textContent = 'Modo edición · juicio del profesor';
+    this.activarCamposEditables();
+    this.actualizarAvisoCoherencia();
+  },
+
+  salirModoEdicion() {
+    this.modoActual = 'lectura';
+    const s = this.seccion();
+    s.classList.remove('modo-edicion');
+    s.classList.add('modo-lectura');
+    $('modo-label').textContent = 'Modo lectura · ' + (estado.conCambios ? 'datos editados' : 'salida IA');
+  },
+
+  /* ── Activar campos editables sobre el render actual ───────────── */
+  activarCamposEditables() {
+    if (!estado.editado) return;
+
+    // 1. Nota global → input numérico inline
+    this._wrapNotaGlobal();
+
+    // 2. Cada eje (puntuación) → input numérico
+    this._wrapEjes();
+
+    // 3. Cada criterio (puntuación + observación)
+    this._wrapCriterios();
+
+    // 4. Knockouts (penalización + motivo)
+    this._wrapKnockouts();
+
+    // 5. Nota docente → editable como bloque entero
+    this._wrapNotaDocente();
+
+    // 6. RA: estado + justificación
+    this._wrapRA();
+  },
+
+  _wrapNotaGlobal() {
+    const el = $('nota-num');
+    if (el.querySelector('.num-edit')) return;
+    const valor = parseInt(el.textContent, 10) || 0;
+    el.innerHTML = `<input type="number" class="num-edit" min="0" max="100" value="${valor}" data-edit="nota_global">`;
+    el.querySelector('input').addEventListener('input', e => {
+      const v = this._clampInt(e.target.value, 0, 100);
+      estado.editado.nota_global = v;
+      this._marcarCambio();
+      this.actualizarAvisoCoherencia();
+    });
+  },
+
+  _wrapEjes() {
+    document.querySelectorAll('#ejes-container .eje-row').forEach(row => {
+      const idx = parseInt(row.dataset.ejeIdx, 10);
+      const eje = estado.editado.vector_ejes[idx];
+      const span = row.querySelector('.eje-puntuacion');
+      if (!span || span.querySelector('input')) return;
+      span.innerHTML = `<input type="number" class="num-edit" min="0" max="${eje.max}" step="0.5" value="${eje.puntuacion}" data-edit-eje="${idx}">`;
+      span.querySelector('input').addEventListener('input', e => {
+        const v = this._clampNum(e.target.value, 0, eje.max);
+        estado.editado.vector_ejes[idx].puntuacion = v;
+        this._marcarCambio();
+        // Re-render solo de la barra para que se actualice anchura y color
+        const pct = eje.max > 0 ? (v / eje.max) * 100 : 0;
+        const fill = row.querySelector('.eje-fill');
+        fill.style.width = pct + '%';
+        fill.classList.remove('high', 'mid', 'low');
+        fill.classList.add(pct >= 75 ? 'high' : pct >= 50 ? 'mid' : 'low');
+      });
+    });
+  },
+
+  _wrapCriterios() {
+    const tbody = $('tabla-criterios-body');
+    tbody.querySelectorAll('tr').forEach((tr, idx) => {
+      // Asociamos por id leído del label original. Reconstruimos a partir del editado.
+      const id = Object.keys(estado.editado.detalle_criterios || {})[idx];
+      if (!id) return;
+      const crit = estado.editado.detalle_criterios[id];
+      const tdNum = tr.querySelector('td.num');
+      const tdObs = tr.querySelector('td.observacion');
+      if (!tdNum || !tdObs) return;
+
+      // Puntuación → input numérico
+      if (!tdNum.querySelector('input')) {
+        tdNum.innerHTML = `<input type="number" class="num-edit" min="0" max="${crit.max}" step="0.5" value="${crit.puntuacion}" data-edit-crit="${id}"><span class="max">/${crit.max}</span>`;
+        tdNum.querySelector('input').addEventListener('input', e => {
+          const v = this._clampNum(e.target.value, 0, crit.max);
+          estado.editado.detalle_criterios[id].puntuacion = v;
+          this._marcarCambio();
+          this.actualizarAvisoCoherencia();
+        });
+      }
+
+      // Observación → contenteditable
+      if (!tdObs.classList.contains('editable')) {
+        tdObs.classList.add('editable');
+        tdObs.contentEditable = 'true';
+        tdObs.addEventListener('input', () => {
+          estado.editado.detalle_criterios[id].observacion = tdObs.textContent;
+          this._marcarCambio();
+        });
+      }
+    });
+  },
+
+  _wrapKnockouts() {
+    // Los knockouts se visualizan en el diagnóstico-rapido y en la nota docente.
+    // Editamos la lista entera con un selector de penalización por knockout.
+    const detalle = $('diagnostico-detalle');
+    const kos = (estado.editado.knockouts_aplicados || []);
+    if (kos.length === 0) return;
+    if (detalle.querySelector('.ko-pen-select')) return;
+
+    detalle.innerHTML = '';
+    kos.forEach((ko, idx) => {
+      const wrap = document.createElement('span');
+      wrap.innerHTML = `${formatearKnockout(ko.id)}
+        <select class="ko-pen-select" data-ko-idx="${idx}">
+          <option value="0" ${ko.penalizacion === 0 ? 'selected' : ''}>0</option>
+          <option value="-10" ${ko.penalizacion === -10 ? 'selected' : ''}>−10</option>
+          <option value="-15" ${ko.penalizacion === -15 ? 'selected' : ''}>−15</option>
+        </select>`;
+      detalle.appendChild(wrap);
+      if (idx < kos.length - 1) detalle.appendChild(document.createTextNode(' · '));
+    });
+    detalle.querySelectorAll('.ko-pen-select').forEach(sel => {
+      sel.addEventListener('change', e => {
+        const idx = parseInt(e.target.dataset.koIdx, 10);
+        estado.editado.knockouts_aplicados[idx].penalizacion = parseInt(e.target.value, 10);
+        this._marcarCambio();
+        this.actualizarAvisoCoherencia();
+      });
+    });
+  },
+
+  _wrapNotaDocente() {
+    const el = $('contenido-nota-docente');
+    if (el.classList.contains('editable')) return;
+    el.classList.add('editable');
+    el.contentEditable = 'true';
+    el.addEventListener('input', () => {
+      // Guardamos solo el cuerpo editado (la cabecera la reconstruye construirNotaDocente
+      // si re-renderiza, pero aquí la respetamos tal cual el profesor la deje)
+      estado.editado.nota_asesoramiento_docente = el.textContent;
+      this._marcarCambio();
+    });
+  },
+
+  _wrapRA() {
+    const ra = estado.editado.ra_status || [];
+    document.querySelectorAll('#ra-list .ra-item').forEach((item, idx) => {
+      const raItem = ra[idx];
+      if (!raItem) return;
+
+      // Estado → select
+      const estadoEl = item.querySelector('.ra-estado');
+      if (estadoEl && !estadoEl.querySelector('select')) {
+        const opciones = ['conseguido', 'parcial', 'no_conseguido'];
+        estadoEl.innerHTML = `
+          <select class="ra-estado-select" data-edit-ra="${idx}">
+            ${opciones.map(o => `<option value="${o}" ${raItem.estado === o ? 'selected' : ''}>${ETIQUETAS_ESTADO[o]}</option>`).join('')}
+          </select>`;
+        estadoEl.querySelector('select').addEventListener('change', e => {
+          estado.editado.ra_status[idx].estado = e.target.value;
+          this._marcarCambio();
+        });
+      }
+
+      // Justificación → contenteditable
+      const justifEl = item.querySelector('.ra-justificacion');
+      if (justifEl && !justifEl.classList.contains('editable')) {
+        // Aislamos el texto, dejando el label aparte
+        const labelHtml = justifEl.querySelector('.ra-justificacion-label')?.outerHTML || '';
+        const textoActual = (raItem.justificacion || '').trim();
+        justifEl.innerHTML = labelHtml + `<span class="editable" contenteditable="true" data-edit-justif="${idx}">${escapeHTML(textoActual)}</span>`;
+        const span = justifEl.querySelector('span.editable');
+        span.addEventListener('input', () => {
+          estado.editado.ra_status[idx].justificacion = span.textContent;
+          this._marcarCambio();
+        });
+      }
+    });
+  },
+
+  /* ── Acciones de la barra superior ─────────────────────────────── */
+  descartarCambios() {
+    if (!confirm('¿Descartar todos los cambios y volver al estado anterior?')) return;
+    estado.editado = JSON.parse(JSON.stringify(estado.original));
+    estado.conCambios = false;
+    this.actualizarBadge();
+    renderResultado(estado.editado, { preservarEstado: true });
+    this.salirModoEdicion();
+  },
+
+  restaurarOriginal() {
+    if (!confirm('¿Restaurar la salida original de la IA? Se perderán todas las ediciones.')) return;
+    estado.editado = JSON.parse(JSON.stringify(estado.original));
+    estado.conCambios = false;
+    this.actualizarBadge();
+    renderResultado(estado.editado, { preservarEstado: true });
+    this.salirModoEdicion();
+  },
+
+  /* ── Helpers internos ──────────────────────────────────────────── */
+  _marcarCambio() {
+    estado.conCambios = true;
+    this.actualizarBadge();
+    this.persistir();
+  },
+
+  actualizarBadge() {
+    const s = this.seccion();
+    s.classList.toggle('con-cambios', estado.conCambios);
+  },
+
+  /* ── Aviso de coherencia (no fuerza nada, solo informa) ────────── */
+  actualizarAvisoCoherencia() {
+    const aviso = $('aviso-coherencia');
+    if (!aviso || !estado.editado) return;
+
+    const ed = estado.editado;
+    const nota = parseFloat(ed.nota_global) || 0;
+    const sumaCriterios = Object.values(ed.detalle_criterios || {})
+      .reduce((s, c) => s + (parseFloat(c.puntuacion) || 0), 0);
+    const sumaKO = (ed.knockouts_aplicados || [])
+      .reduce((s, k) => s + (parseFloat(k.penalizacion) || 0), 0);
+    const calculado = Math.max(0, sumaCriterios + sumaKO);
+    const diff = Math.abs(nota - calculado);
+
+    if (diff >= 1) {
+      aviso.classList.add('visible');
+      aviso.textContent =
+        `⚠ Nota global (${nota}) y suma de criterios + knockouts (${calculado.toFixed(1)}) no coinciden. ` +
+        `Diferencia: ${diff.toFixed(1)} pts. Es informativo — tu juicio prevalece.`;
+    } else {
+      aviso.classList.remove('visible');
+    }
+  },
+
+  _clampInt(v, min, max) {
+    const n = parseInt(v, 10);
+    if (isNaN(n)) return min;
+    return Math.max(min, Math.min(max, n));
+  },
+  _clampNum(v, min, max) {
+    const n = parseFloat(v);
+    if (isNaN(n)) return min;
+    return Math.max(min, Math.min(max, n));
+  },
+
+  /* ── Persistencia local (sobrevive a recarga del navegador) ────── */
+  _claveStorage() {
+    if (!estado.ultimoAlumno) return null;
+    const { nombre, grupo } = estado.ultimoAlumno;
+    const slug = (nombre + '_' + (grupo || '')).toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    return 'darabia_editado_' + (CONFIG.caso_id || 'caso') + '_' + slug;
+  },
+
+  persistir() {
+    const k = this._claveStorage();
+    if (!k) return;
+    try {
+      localStorage.setItem(k, JSON.stringify({
+        editado: estado.editado,
+        original: estado.original,
+        ts: Date.now(),
+      }));
+    } catch (e) {
+      console.warn('[EDITOR] No se pudo persistir en localStorage:', e);
+    }
+  },
+
+  recuperarSiExiste() {
+    const k = this._claveStorage();
+    if (!k) return false;
+    try {
+      const raw = localStorage.getItem(k);
+      if (!raw) return false;
+      const obj = JSON.parse(raw);
+      // Solo recuperamos si el original coincide con la respuesta IA actual
+      // (evita pisar una IA nueva con un editado de hace tres semanas)
+      if (JSON.stringify(obj.original) !== JSON.stringify(estado.original)) {
+        localStorage.removeItem(k);
+        return false;
+      }
+      estado.editado = obj.editado;
+      estado.conCambios = JSON.stringify(obj.editado) !== JSON.stringify(obj.original);
+      this.actualizarBadge();
+      return true;
+    } catch (e) {
+      console.warn('[EDITOR] No se pudo recuperar de localStorage:', e);
+      return false;
+    }
+  },
+
+  limpiarStorage() {
+    const k = this._claveStorage();
+    if (k) localStorage.removeItem(k);
+  },
+};
+
+// — Listeners de la barra de edición —
+$('btn-modo-edicion').addEventListener('click', () => Editor.entrarModoEdicion());
+$('btn-modo-guardar').addEventListener('click', () => Editor.salirModoEdicion());
+$('btn-descartar').addEventListener('click', () => Editor.descartarCambios());
+$('btn-restaurar').addEventListener('click', () => Editor.restaurarOriginal());
+
+// ============================================================================
 // ACCIONES DE PIE
 // ============================================================================
 $('btn-otro').addEventListener('click', () => {
   $('form-subir').reset();
-  estado = { ultimoFormData: null, ultimoAlumno: null, ultimoPDFName: null };
+  estado = {
+    ultimoFormData: null,
+    ultimoAlumno: null,
+    ultimoPDFName: null,
+    original: null,
+    editado: null,
+    conCambios: false,
+  };
+  Editor.salirModoEdicion();
   mostrarEstado('estado-formulario');
 });
 
