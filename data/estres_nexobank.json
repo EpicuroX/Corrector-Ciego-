@@ -1,0 +1,250 @@
+{
+  "caso": {
+    "id": "estres_nexobank_v1",
+    "titulo": "Caso 02 - NexoBank Contact Center",
+    "sector": "Call Center bancario - Servicios financieros externalizados",
+    "modelos_teoricos": ["Karasek-DCA", "Siegrist-ERI", "SGA-Selye"],
+    "instrumento": "PYMES-INSHT (metodo idoneo para 22 trabajadores)",
+    "prompt_template": "prompt_evaluacion_estres.txt",
+    "puntuacion_maxima_automatica": 40,
+    "puntuacion_simulador": 60,
+    "puntuacion_total_caso": 100,
+    "ra_evaluados": ["RA3a", "RA3b", "RA3c", "RA3d", "RA3e", "RA3f"],
+    "nota_arquitectura": "Caso 02 con scaffolding alto: el simulador SCORM evalua decisiones de proceso (60 pts, ya entregados a Aeducar). El evaluador Darabia evalua la calidad del texto del dictamen (40 pts) sobre los 4 apartados estructurados que entrega el simulador en PDF."
+  },
+  "contexto": {
+    "empresa": "NexoBank Contact Center S.L.",
+    "sector": "Call Center bancario - gestion externalizada de reclamaciones",
+    "direccion": "Zaragoza",
+    "plantilla": "22 agentes (78% mujeres, edad media 31 anos) + 3 team leaders + 1 director de operaciones. Temporalidad 62%. Sin representacion sindical activa.",
+    "datos_objetivos": {
+      "AHT_objetivo": "3 min 48 seg por llamada",
+      "volumen_llamadas_dia": 480,
+      "FCR_objetivo": "72% resolucion en primera llamada",
+      "CSAT_objetivo": "7.8 sobre 10",
+      "absentismo_actual": "9.2%",
+      "referencia_sector": "4.1%",
+      "bajas_ansiedad_estres_12m": 18,
+      "bajas_trastornos_sueno_12m": 8,
+      "duracion_media_baja_psicologica": "52 dias",
+      "referencia_baja_sector": "18 dias",
+      "rotacion_anual": "47%",
+      "coste_absentismo_anual": "84.200 EUR",
+      "ultima_evaluacion_psicosocial": "2024 (F-PSICO sin plan de accion posterior)",
+      "antecedente_2025": "Mutua emitio alerta por incremento de bajas psicologicas. Respuesta empresa: pausas activas voluntarias los miercoles."
+    }
+  },
+  "estructura_dictamen_esperada": {
+    "nota_tecnica": "El alumno entrega un PDF generado por el simulador con esta estructura fija. El evaluador puntua SOLO los 4 apartados textuales. Las decisiones de proceso (metodo, hipotesis, preguntas, medidas elegidas) ya fueron evaluadas por el simulador.",
+    "apartados_evaluables": [
+      {
+        "id": "ap1_analisis",
+        "titulo": "01 - Analisis e interpretacion de factores de riesgo",
+        "criterio_id": "analisis",
+        "ra_principales": ["RA3a", "RA3b"],
+        "minimo_caracteres": 120,
+        "expectativa": "Aplicacion operativa de modelo teorico (Karasek y/o Siegrist) a los datos del caso. No definicion memoristica."
+      },
+      {
+        "id": "ap2_triangulacion",
+        "titulo": "02 - Triangulacion de evidencias",
+        "criterio_id": "triangulacion",
+        "ra_principales": ["RA3d", "RA3e"],
+        "estructura": "Tabla 3x2: Evaluacion / Mutua / Entrevista x Dato concreto / Conclusion",
+        "expectativa": "Las tres fuentes deben converger en el mismo factor de riesgo. Datos concretos, no genericos."
+      },
+      {
+        "id": "ap3_impacto",
+        "titulo": "03 - Impacto en salud",
+        "criterio_id": "impacto",
+        "ra_principales": ["RA3b"],
+        "minimo_caracteres": 120,
+        "expectativa": "Conexion entre factores identificados y dano documentado. Uso del SGA de Selye (alarma-resistencia-agotamiento) o equivalente. Cuantificacion con datos de mutua."
+      },
+      {
+        "id": "ap4_plan",
+        "titulo": "04 - Plan de accion",
+        "criterio_id": "plan_accion",
+        "ra_principales": ["RA3f"],
+        "estructura": "Tabla con medidas elegidas + nivel de prevencion + plazo + indicador proceso + indicador resultado",
+        "expectativa": "Jerarquia preventiva (primaria > secundaria > terciaria). Indicadores SMART. La medida es eficaz solo si los 4 ejes (nivel/plazo/proceso/resultado) son coherentes."
+      }
+    ]
+  },
+  "aciertos_criticos": {
+    "factores_riesgo_esperados": {
+      "carga_mental_alta": {
+        "evidencias_clave": ["AHT 3min48s", "480 llamadas dia", "carga emocional reclamaciones"],
+        "modelo": "Karasek_alta_demanda",
+        "puntos": 5
+      },
+      "autonomia_temporal_muy_baja": {
+        "evidencias_clave": ["AHT cronometrado", "pausas 10min cada 4h vs convenio 10min cada 2h", "ranking publico semanal"],
+        "modelo": "Karasek_bajo_control",
+        "puntos": 5
+      },
+      "supervision_punitiva": {
+        "evidencias_clave": ["monitorizacion sin aviso", "ranking publico", "evaluacion trimestral con bonus condicionado"],
+        "modelo": "Karasek_bajo_apoyo_organizacional",
+        "puntos": 4
+      },
+      "desequilibrio_esfuerzo_recompensa": {
+        "evidencias_clave": ["Carmen 4 anos sin baja", "temporalidad 62%", "bonus condicionado a Top 10"],
+        "modelo": "Siegrist_ERI",
+        "puntos": 4,
+        "bonus": "+2 pts si identifica explicitamente el componente de inseguridad contractual como factor ERI"
+      },
+      "interes_bajo_por_trabajador": {
+        "evidencias_clave": ["F-PSICO 2024 sin plan de accion", "respuesta unica: pausas voluntarias miercoles", "temporalidad 62%"],
+        "modelo": "Karasek_bajo_apoyo_organizacional",
+        "puntos": 3
+      }
+    },
+    "triangulacion": {
+      "fuentes_validas": [
+        "PYMES-INSHT_carga_mental_alto",
+        "PYMES-INSHT_autonomia_muy_bajo",
+        "PYMES-INSHT_supervision_muy_bajo",
+        "PYMES-INSHT_interes_bajo",
+        "informe_mutua_18_bajas_ansiedad",
+        "informe_mutua_8_bajas_sueno",
+        "informe_mutua_52_dias_media_vs_18_sector",
+        "informe_mutua_rotacion_47_pct",
+        "informe_mutua_coste_84200",
+        "absentismo_9_2_vs_4_1_sector",
+        "transcripcion_carmen_pregunta_dardo_volumen_llamadas",
+        "transcripcion_carmen_pregunta_dardo_protocolo_clientes_agresivos",
+        "transcripcion_carmen_pregunta_dardo_evaluacion_trimestral",
+        "F_PSICO_2024_sin_plan_accion"
+      ],
+      "minimo_requerido": 3,
+      "penalizacion_fuente_generica": -2,
+      "nota_tecnica": "Las preguntas dardo del simulador son las unicas con valor probatorio. Las preguntas tibia/basura no constituyen evidencia valida en triangulacion."
+    },
+    "jerarquia_preventiva": {
+      "medidas_primarias_correctas": [
+        "rediseno_sistema_evaluacion_eliminar_ranking",
+        "protocolo_recuperacion_llamadas_alto_impacto",
+        "rediseno_rol_team_leader_de_punitivo_a_formativo",
+        "evaluacion_psicosocial_anual_con_devolucion"
+      ],
+      "medidas_penalizadas_como_principal": [
+        "psicologo_individual_voluntario",
+        "formacion_asertividad_aislada",
+        "mindfulness_voluntario",
+        "app_bienestar_check_in",
+        "agente_del_mes_competitivo"
+      ],
+      "penalizacion_solo_terciarias": -10,
+      "nota_tecnica": "El psicologo individual y la formacion en asertividad son utiles SOLO como complemento de medidas primarias. Si aparecen como medida principal sin tocar el sistema (ranking, AHT, evaluacion), penalizar como diagnostico de despacho."
+    },
+    "indicadores_validos": {
+      "formato_requerido": "Indicador con metrica + unidad + plazo + responsable. Distincion clara entre proceso (se ejecuta?) y resultado (ha funcionado?).",
+      "regla_rigor_operativo": "Cada medida debe llevar nivel de prevencion correcto + plazo realista + indicador de proceso valido + indicador de resultado valido. La validacion cruzada de los 4 ejes es lo que distingue un plan operativo de un plan de despacho.",
+      "ejemplos_validos": [
+        "Reduccion absentismo de 9.2% a 5% en 12 meses - responsable: Direccion Operaciones",
+        "Mejora dimension Autonomia Temporal en PYMES (de Muy Bajo a Adecuado) en 6 meses - responsable: Servicio Prevencion",
+        "100% de llamadas de alto impacto registradas con tiempo de recuperacion aplicado - responsable: Team Leaders"
+      ],
+      "ejemplos_invalidos": [
+        "Mejorar el clima laboral",
+        "Reducir el estres",
+        "Aumentar la motivacion",
+        "Reduccion del AHT (esto NO es indicador valido: el AHT es el problema, no la solucion)"
+      ]
+    },
+    "ejes_evaluacion": [
+      "capacidad_analisis",
+      "uso_marcos_teoricos",
+      "criterio_intervencion",
+      "deteccion_riesgos_criticos",
+      "argumentacion_profesional"
+    ],
+    "rubrica_evaluacion": {
+      "total_sumando": 100,
+      "nota_visualizacion": "El evaluador puntua sobre 100 internamente. El frontend muestra la nota normalizada a /40 porque este caso aporta el 40% de la nota final. Esto NO afecta a la longitudinalidad del eje: el vector_ejes se calcula sobre 100 puro.",
+      "criterios": [
+        {
+          "id": "analisis",
+          "nombre": "Analisis e interpretacion",
+          "peso": 25,
+          "descripcion": "Aplicacion operativa de Karasek y/o Siegrist a los datos del caso. Identificacion del cuadrante de Alta Tension. Conexion entre factores PYMES y datos de mutua. No definicion memoristica."
+        },
+        {
+          "id": "triangulacion",
+          "nombre": "Triangulacion de evidencias",
+          "peso": 25,
+          "descripcion": "Cruce convergente de PYMES-INSHT + Informe mutua + Entrevista Carmen. Datos concretos, no genericos. Las tres fuentes deben apuntar al mismo factor de riesgo."
+        },
+        {
+          "id": "impacto",
+          "nombre": "Impacto en salud",
+          "peso": 25,
+          "descripcion": "Conexion entre factores identificados y dano documentado. Uso del SGA de Selye u otro modelo de respuesta de estres. Cuantificacion con bajas, dias y coste de la mutua. Conexion fisiopatologica si procede (eje HSP, cortisol)."
+        },
+        {
+          "id": "plan_accion",
+          "nombre": "Plan de accion",
+          "peso": 25,
+          "descripcion": "Jerarquia preventiva (primarias > secundarias/terciarias). Coherencia entre medida + nivel de prevencion + plazo + indicador proceso + indicador resultado. Ataque a causa raiz, no a sintomas.",
+          "componentes": ["jerarquia_preventiva", "rigor_operativo"]
+        }
+      ]
+    },
+    "mapeo_ejes_criterios": {
+      "capacidad_analisis": ["analisis", "triangulacion"],
+      "uso_marcos_teoricos": ["analisis"],
+      "deteccion_riesgos_criticos": ["impacto"],
+      "criterio_intervencion": ["plan_accion"],
+      "argumentacion_profesional": ["plan_accion"]
+    },
+    "knockout_criteria": {}
+  },
+  "prompt_evaluacion": {
+    "archivo": "prompt_evaluacion_estres.txt",
+    "version": "1.0",
+    "calibrado_con": "PDF de muestra del simulador NexoBank entregado por Jonas Agudo, mayo 2026"
+  },
+  "ra_cubiertos": [
+    {
+      "ra": "RA3",
+      "titulo_oficial": "Evalua situaciones de estres en el entorno laboral identificando los agentes y situaciones generadores y proponiendo medidas preventivas y correctoras",
+      "cr_cubiertos": [
+        { "id": "RA3a", "descripcion": "Identificar agentes y situaciones generadores de estres laboral." },
+        { "id": "RA3b", "descripcion": "Valorar las consecuencias del estres laboral sobre la salud." },
+        { "id": "RA3c", "descripcion": "Reconocer metodos y tecnicas de deteccion del estres laboral." },
+        { "id": "RA3d", "descripcion": "Aplicar los metodos y tecnicas de deteccion del estres laboral mas idoneos para supuestos concretos." },
+        { "id": "RA3e", "descripcion": "Elaborar informes de evaluacion del riesgo de estres laboral." },
+        { "id": "RA3f", "descripcion": "Proponer acciones preventivas y correctoras ante el riesgo de estres." }
+      ]
+    }
+  ],
+  "ra_no_cubiertos": [
+    {
+      "ra": "RA1",
+      "titulo": "Riesgos ergonomicos",
+      "motivo": "Caso enfocado en estres psicosocial. RA1 (ergonomico) queda fuera del alcance."
+    },
+    {
+      "ra": "RA2",
+      "titulo": "Riesgos psicosociales generales",
+      "motivo": "Cubierto integralmente por el Caso 05 (Gestoria Moreno)."
+    },
+    {
+      "ra": "RA4",
+      "titulo": "Burnout",
+      "motivo": "Cubierto especificamente por el Caso 03 (Centro de Salud Virgen de la Huella)."
+    },
+    {
+      "ra": "RA5",
+      "titulo": "Violencia y acoso laboral",
+      "motivo": "Cubierto por el Caso 05. NexoBank no presenta indicios de acoso."
+    },
+    {
+      "ra": "RA6",
+      "titulo": "Trabajo a turnos y nocturno",
+      "motivo": "NexoBank opera en horario diurno comercial (8:00-22:00). RA6 no aplica."
+    }
+  ],
+  "nota_cobertura_modular": "Caso 02 cubre integralmente RA3 (Estres Laboral) en el contexto de un call center. Es el caso de scaffolding alto: introduce al alumno en el modelo Karasek-Siegrist y la jerarquia preventiva con un simulador guiado. El evaluador Darabia complementa esa formacion guiada con la evaluacion del dictamen escrito (40 pts sobre 100)."
+}
