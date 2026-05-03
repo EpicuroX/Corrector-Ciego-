@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Evaluador Darabia · Darabia Engine V5</title>
+
+<!-- Tipografías Darabia · Inter Tight (display) + Inter (cuerpo) + JetBrains Mono (metadatos) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
 /* ============================================================================
    DARABIA ENGINE V5 · CORRECTOR DOCENTE
@@ -57,18 +63,95 @@ header {
   margin-bottom: 32px;
   padding-bottom: 20px;
   border-bottom: 1px solid var(--border);
+  gap: 16px;
 }
-header h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+header .header-titulo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+header h1 {
+  font-family: 'Inter Tight', 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--text-0);
+}
 header .subtitle {
   font-family: 'JetBrains Mono', 'Courier New', monospace;
-  font-size: 11px; color: var(--text-3); margin-top: 4px;
+  font-size: 11px; color: var(--text-3); margin-top: 2px;
   text-transform: uppercase; letter-spacing: 0.08em;
+}
+header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 header .badge {
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px; padding: 4px 10px;
   border: 1px solid var(--border-strong); border-radius: 6px;
   color: var(--text-2); background: var(--bg-2);
+}
+
+/* ── MARCA DARABIA · mark, wordmark, eyebrow, pill, cofirma ───────── */
+.darabia-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--green);
+  color: var(--bg-0);
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.darabia-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.darabia-name {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-0);
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 /* ── PANELES (glassmorphism) ──────────────────────────────────────── */
@@ -333,8 +416,10 @@ button.secondary {
 }
 .bloque.nota-docente .bloque-tag { background: var(--amber); color: var(--bg-0); }
 .bloque-titulo {
+  font-family: 'Inter Tight', 'Inter', sans-serif;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--text-0);
   margin-top: 8px;
 }
@@ -715,14 +800,48 @@ button.secondary {
 /* ── UTILIDADES ───────────────────────────────────────────────────── */
 .hidden { display: none !important; }
 
+/* ── FOOTER · cofirma institucional ───────────────────────────────── */
 footer {
   margin-top: 48px;
-  padding-top: 24px;
+  padding: 18px 24px;
   border-top: 1px solid var(--border);
-  text-align: center;
-  font-size: 11px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--text-1);
+}
+footer .cofirma-darabia {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+  color: var(--text-1);
+  font-size: 13px;
+}
+footer .cofirma-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+}
+footer .cofirma-divider {
   color: var(--text-3);
   font-family: 'JetBrains Mono', monospace;
+}
+footer .cofirma-cliente {
+  color: var(--text-2);
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.04em;
+}
+@media (max-width: 600px) {
+  footer { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
 
 /* ── RESPONSIVE ───────────────────────────────────────────────────── */
@@ -1139,6 +1258,7 @@ section#estado-resultado.con-visor .visor-pdf {
 
   /* — Ocultar todo lo que NO va al alumno por defecto — */
   header,
+  footer,
   #estado-formulario,
   #estado-procesando,
   #estado-error,
@@ -1347,11 +1467,17 @@ section#estado-resultado.con-visor .visor-pdf {
 <div class="container">
 
 <header>
-  <div>
-    <h1>Evaluador Darabia</h1>
-    <div class="subtitle" id="header-subtitle">Darabia Engine V5</div>
+  <div class="header-left">
+    <span class="darabia-mark" aria-hidden="true">D</span>
+    <div class="header-titulo">
+      <h1>Evaluador Darabia</h1>
+      <div class="subtitle" id="header-subtitle">Darabia Engine V5</div>
+    </div>
   </div>
-  <span class="badge">USO INTERNO</span>
+  <div class="header-right">
+    <span class="eyebrow">Evaluador · Corrección docente</span>
+    <span class="badge pill">Uso interno</span>
+  </div>
 </header>
 
 <!-- ═══ ESTADO 1 · FORMULARIO ═══════════════════════════════════════ -->
@@ -1423,12 +1549,12 @@ section#estado-resultado.con-visor .visor-pdf {
       <span class="badge-modificado">Modificado</span>
     </div>
     <div class="barra-edicion-acciones">
-      <button class="btn-visor" id="btn-visor" disabled>📄 Ver dictamen</button>
-      <button class="btn-edit-on" id="btn-modo-edicion">✎ Editar</button>
-      <button class="btn-edit-off" id="btn-modo-guardar">✓ Volver a lectura</button>
+      <button class="btn-visor" id="btn-visor" disabled>Ver dictamen</button>
+      <button class="btn-edit-on" id="btn-modo-edicion">Editar</button>
+      <button class="btn-edit-off" id="btn-modo-guardar">Volver a lectura</button>
       <button class="btn-descartar" id="btn-descartar">Descartar cambios</button>
       <button class="btn-restaurar" id="btn-restaurar">Restaurar IA original</button>
-      <button class="btn-print" id="btn-print">🖨 Generar PDF alumno</button>
+      <button class="btn-print" id="btn-print">Generar PDF alumno</button>
     </div>
   </div>
 
@@ -1501,7 +1627,7 @@ section#estado-resultado.con-visor .visor-pdf {
           <span class="bloque-tag">Solo profesor</span>
           <div class="bloque-titulo">Análisis del dictamen · margen docente 40%</div>
         </div>
-        <button class="btn-copiar" data-target="nota-docente">📋 Copiar</button>
+        <button class="btn-copiar" data-target="nota-docente">Copiar</button>
       </div>
       <div class="bloque-contenido" id="contenido-nota-docente"></div>
     </div>
@@ -1605,7 +1731,12 @@ section#estado-resultado.con-visor .visor-pdf {
 </section>
 
 <footer>
-  Darabia Engine V5 · IES Virgen del Pilar · Zaragoza
+  <span class="cofirma-darabia">
+    <span class="cofirma-dot" aria-hidden="true"></span>
+    Darabia
+  </span>
+  <span class="cofirma-divider">·</span>
+  <span class="cofirma-cliente">IES Virgen del Pilar · Zaragoza · Curso 2025–2026</span>
 </footer>
 
 </div>
