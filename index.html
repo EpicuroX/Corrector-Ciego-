@@ -429,6 +429,96 @@ button.secondary {
   background: var(--border-strong);
   color: var(--text-0);
 }
+ /* ── BOTÓN VALIDAR LONGITUDINAL (estado guardado) ─────────────────── */
+.btn-validar-longitudinal.guardado {
+  background: var(--green) !important;
+  color: var(--bg-0) !important;
+  border-color: var(--green) !important;
+  cursor: default;
+}
+
+/* ── TOAST DE GUARDADO LONGITUDINAL ───────────────────────────────── */
+.toast-longitudinal {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(15, 20, 30, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--green);
+  border-radius: 12px;
+  padding: 16px 20px;
+  min-width: 320px;
+  max-width: 420px;
+  box-shadow: 0 12px 40px rgba(16, 217, 138, 0.25), 0 0 0 1px rgba(16, 217, 138, 0.15);
+  font-family: 'Inter', sans-serif;
+  color: var(--text-0);
+  animation: toast-entrada 0.35s ease-out;
+}
+.toast-longitudinal.saliendo {
+  animation: toast-salida 0.4s ease-in forwards;
+}
+@keyframes toast-entrada {
+  from { transform: translateX(120%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes toast-salida {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(120%); opacity: 0; }
+}
+.toast-longitudinal .toast-icono {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--green);
+  color: var(--bg-0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+.toast-longitudinal .toast-contenido {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.toast-longitudinal .toast-contenido strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-0);
+}
+.toast-longitudinal .toast-contenido a {
+  font-size: 13px;
+  color: var(--green);
+  text-decoration: none;
+  font-weight: 500;
+}
+.toast-longitudinal .toast-contenido a:hover {
+  text-decoration: underline;
+}
+.toast-longitudinal .toast-cerrar {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+.toast-longitudinal .toast-cerrar:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-0);
+}  
 .btn-copiar.copiado {
   background: var(--green);
   color: var(--bg-0);
