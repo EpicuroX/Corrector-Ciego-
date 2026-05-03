@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfil longitudinal · Darabia</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Chart.js (CDN, sin npm) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+:root {
+  --bg-0: #0a0d12;
+  --bg-1: #11161e;
+  --bg-2: #1a212c;
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.16);
+  --text-0: #f5f7fa;
+  --text-1: #c5cdd6;
+  --text-2: #8b95a3;
+  --text-3: #5b6675;
+  --green: #10d98a;
+  --red: #ff4d6a;
+  --amber: #f59e0b;
+  --blue: #60a5fa;
+  --purple: #a78bfa;
+  --pink: #ec4899;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(96,165,250,0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 100%, rgba(16,217,138,0.06) 0%, transparent 40%),
+    var(--bg-0);
+  color: var(--text-0);
+  min-height: 100vh;
+  padding: 32px 24px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Cabecera ──────────────────────────────────────────────────── */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 20px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-0);
+  margin-bottom: 4px;
+}
+
+header .subtitulo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+header .badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  color: var(--text-1);
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── Panel info alumno ─────────────────────────────────────────── */
+.panel-alumno {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.panel-alumno .student-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-0);
+}
+
+.panel-alumno .student-id-label {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+}
+
+.panel-alumno .stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-alumno .stat .num {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--green);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.panel-alumno .stat .label {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+}
+
+.panel-alumno .separador {
+  width: 1px;
+  height: 48px;
+  background: var(--border);
+}
+
+/* ── Panel gráfico ─────────────────────────────────────────────── */
+.panel-grafico {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.panel-grafico .titulo {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-0);
+  margin-bottom: 4px;
+}
+
+.panel-grafico .descripcion {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-bottom: 20px;
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 420px;
+  width: 100%;
+}
+
+/* ── Estados (cargando, vacío, error) ──────────────────────────── */
+.estado {
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.estado .icono {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.estado .titulo {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-0);
+  margin-bottom: 8px;
+}
+
+.estado .descripcion {
+  font-size: 14px;
+  color: var(--text-2);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.estado.error {
+  color: var(--red);
+}
+
+.estado .codigo-error {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: var(--bg-2);
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border-strong);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.hidden { display: none !important; }
+
+/* ── Tabla resumen (debajo del gráfico) ────────────────────────── */
+.panel-tabla {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.panel-tabla .titulo {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-0);
+  margin-bottom: 16px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--bg-2);
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+
+thead th.num { text-align: right; }
+
+tbody td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-1);
+}
+
+tbody td.num {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+tbody td.case-id {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-2);
+  font-size: 12px;
+}
+
+tbody td.score {
+  font-weight: 600;
+  color: var(--text-0);
+}
+
+tbody td.score.high { color: var(--green); }
+tbody td.score.mid  { color: var(--amber); }
+tbody td.score.low  { color: var(--red); }
+
+footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 768px) {
+  body { padding: 20px 16px; }
+  header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .panel-alumno { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .panel-alumno .separador { display: none; }
+  .chart-wrapper { height: 320px; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <header>
+    <div>
+      <h1>Perfil longitudinal del alumno</h1>
+      <div class="subtitulo">Darabia Engine V5 · Evolución competencial</div>
+    </div>
+    <div class="badge">Vista profesor</div>
+  </header>
+
+  <!-- ESTADO: cargando -->
+  <div id="estado-cargando" class="estado">
+    <div class="spinner"></div>
+    <div class="titulo" style="margin-top: 16px;">Cargando perfil del alumno...</div>
+  </div>
+
+  <!-- ESTADO: error -->
+  <div id="estado-error" class="estado error hidden">
+    <div class="icono">⚠️</div>
+    <div class="titulo">No se pudo cargar el perfil</div>
+    <div class="descripcion" id="error-mensaje"></div>
+    <div class="codigo-error" id="error-codigo"></div>
+  </div>
+
+  <!-- ESTADO: sin datos -->
+  <div id="estado-vacio" class="estado hidden">
+    <div class="icono">📭</div>
+    <div class="titulo">Sin evaluaciones validadas</div>
+    <div class="descripcion">
+      Este alumno aún no tiene ninguna evaluación validada por el profesor en el sistema longitudinal.
+      Las evaluaciones aparecerán aquí cuando el profesor pulse <strong>"Validar y guardar en perfil"</strong>
+      desde el corrector.
+    </div>
+  </div>
+
+  <!-- ESTADO: datos cargados -->
+  <div id="estado-datos" class="hidden">
+
+    <div class="panel-alumno">
+      <div>
+        <div class="student-id-label">Código de alumno</div>
+        <div class="student-id" id="student-id-valor">—</div>
+      </div>
+
+      <div class="separador"></div>
+
+      <div class="stat">
+        <div class="num" id="stat-num-casos">0</div>
+        <div class="label">Casos validados</div>
+      </div>
+
+      <div class="separador"></div>
+
+      <div class="stat">
+        <div class="num" id="stat-ultima-fecha">—</div>
+        <div class="label">Última validación</div>
+      </div>
+    </div>
+
+    <div class="panel-grafico">
+      <div class="titulo">Evolución por ejes competenciales</div>
+      <div class="descripcion">
+        Cada línea representa la puntuación obtenida (0–10) en uno de los cinco ejes
+        a lo largo de los casos validados. El eje X ordena los casos cronológicamente
+        por fecha de validación.
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="chart-evolucion"></canvas>
+      </div>
+    </div>
+
+    <div class="panel-tabla">
+      <div class="titulo">Detalle por evaluación</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Caso</th>
+            <th>Validado</th>
+            <th class="num">Análisis</th>
+            <th class="num">Marcos</th>
+            <th class="num">Intervención</th>
+            <th class="num">Riesgos</th>
+            <th class="num">Argumentación</th>
+            <th class="num">Total</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-evaluaciones"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <footer>
+    Darabia Engine V5 · IES Virgen del Pilar · Zaragoza
+  </footer>
+
+</div>
+
+<script>
+'use strict';
+
+// ============================================================================
+// CONFIGURACIÓN
+// ============================================================================
+const API_GET = '/api/longitudinal/get';
+
+const EJES_CONFIG = [
+  { id: 'axis_analisis',       label: 'Capacidad de análisis',   color: '#60a5fa' },
+  { id: 'axis_modelos',        label: 'Marcos teóricos',          color: '#a78bfa' },
+  { id: 'axis_intervencion',   label: 'Criterio de intervención', color: '#10d98a' },
+  { id: 'axis_riesgos',        label: 'Detección de riesgos',     color: '#f59e0b' },
+  { id: 'axis_argumentacion',  label: 'Argumentación profesional',color: '#ec4899' }
+];
+
+// ============================================================================
+// HELPERS DE UI
+// ============================================================================
+const $ = id => document.getElementById(id);
+
+function mostrarEstado(idEstado) {
+  const estados = ['estado-cargando', 'estado-error', 'estado-vacio', 'estado-datos'];
+  estados.forEach(e => $(e).classList.toggle('hidden', e !== idEstado));
+}
+
+function escapeHTML(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function formatearFecha(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+}
+
+function formatearFechaCorta(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit'
+  });
+}
+
+function clasificarPuntuacion(p) {
+  const n = Number(p);
+  if (n >= 7.5) return 'high';
+  if (n >= 5.0) return 'mid';
+  return 'low';
+}
+
+// ============================================================================
+// LECTURA DEL PARÁMETRO student_id
+// ============================================================================
+function obtenerStudentId() {
+  const params = new URLSearchParams(window.location.search);
+  return (params.get('student') || '').trim();
+}
+
+// ============================================================================
+// CARGA DE DATOS
+// ============================================================================
+async function cargarPerfil() {
+  const studentId = obtenerStudentId();
+
+  if (!studentId) {
+    mostrarError(
+      'Falta el parámetro "student" en la URL.',
+      'Ejemplo correcto: /dashboard-alumno.html?student=PRL2526_001'
+    );
+    return;
+  }
+
+  mostrarEstado('estado-cargando');
+
+  try {
+    const resp = await fetch(`${API_GET}?student_id=${encodeURIComponent(studentId)}`);
+    const data = await resp.json();
+
+    if (!resp.ok || !data.ok) {
+      throw new Error(data.message || data.error || `HTTP ${resp.status}`);
+    }
+
+    if (!Array.isArray(data.evaluaciones) || data.evaluaciones.length === 0) {
+      $('student-id-valor').textContent = studentId;
+      mostrarEstado('estado-vacio');
+      return;
+    }
+
+    renderizarPerfil(studentId, data.evaluaciones);
+    mostrarEstado('estado-datos');
+
+  } catch (err) {
+    console.error('[DASHBOARD] Error al cargar perfil:', err);
+    mostrarError(
+      'Hubo un problema al recuperar las evaluaciones del alumno.',
+      err.message
+    );
+  }
+}
+
+function mostrarError(mensaje, codigo) {
+  $('error-mensaje').textContent = mensaje;
+  $('error-codigo').textContent = codigo || '';
+  mostrarEstado('estado-error');
+}
+
+// ============================================================================
+// RENDERIZADO
+// ============================================================================
+function renderizarPerfil(studentId, evaluaciones) {
+  // Cabecera
+  $('student-id-valor').textContent = studentId;
+  $('stat-num-casos').textContent = evaluaciones.length;
+
+  const ultima = evaluaciones[evaluaciones.length - 1];
+  $('stat-ultima-fecha').textContent = formatearFechaCorta(ultima.validated_at || ultima.timestamp);
+
+  // Gráfico
+  renderizarGrafico(evaluaciones);
+
+  // Tabla
+  renderizarTabla(evaluaciones);
+}
+
+function renderizarGrafico(evaluaciones) {
+  const labels = evaluaciones.map((ev, idx) => {
+    const fecha = formatearFechaCorta(ev.validated_at || ev.timestamp);
+    return `${ev.case_id} (${fecha})`;
+  });
+
+  const datasets = EJES_CONFIG.map(eje => ({
+    label: eje.label,
+    data: evaluaciones.map(ev => Number(ev[eje.id])),
+    borderColor: eje.color,
+    backgroundColor: eje.color + '22',
+    borderWidth: 2,
+    tension: 0.3,
+    pointRadius: 5,
+    pointHoverRadius: 7,
+    pointBackgroundColor: eje.color,
+    pointBorderColor: '#0a0d12',
+    pointBorderWidth: 2
+  }));
+
+  const ctx = document.getElementById('chart-evolucion').getContext('2d');
+
+  new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          position: 'top',
+          align: 'start',
+          labels: {
+            color: '#c5cdd6',
+            font: { family: 'Inter', size: 12 },
+            usePointStyle: true,
+            pointStyle: 'circle',
+            padding: 14
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(15, 20, 30, 0.95)',
+          borderColor: 'rgba(255,255,255,0.12)',
+          borderWidth: 1,
+          titleColor: '#f5f7fa',
+          bodyColor: '#c5cdd6',
+          padding: 12,
+          cornerRadius: 8,
+          titleFont: { family: 'Inter', size: 13, weight: '600' },
+          bodyFont: { family: 'Inter', size: 12 }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#8b95a3',
+            font: { family: 'JetBrains Mono', size: 11 }
+          },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        },
+        y: {
+          beginAtZero: true,
+          max: 10,
+          ticks: {
+            color: '#8b95a3',
+            font: { family: 'JetBrains Mono', size: 11 },
+            stepSize: 2
+          },
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          title: {
+            display: true,
+            text: 'Puntuación (0 – 10)',
+            color: '#5b6675',
+            font: { family: 'Inter', size: 11, weight: '500' }
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderizarTabla(evaluaciones) {
+  const tbody = $('tabla-evaluaciones');
+  tbody.innerHTML = '';
+
+  evaluaciones.forEach(ev => {
+    const tr = document.createElement('tr');
+
+    const score = Number(ev.score_total);
+    const scoreCls = clasificarPuntuacion(score / 10);
+
+    tr.innerHTML = `
+      <td class="case-id">${escapeHTML(ev.case_id)}</td>
+      <td>${formatearFecha(ev.validated_at || ev.timestamp)}</td>
+      <td class="num">${Number(ev.axis_analisis).toFixed(1)}</td>
+      <td class="num">${Number(ev.axis_modelos).toFixed(1)}</td>
+      <td class="num">${Number(ev.axis_intervencion).toFixed(1)}</td>
+      <td class="num">${Number(ev.axis_riesgos).toFixed(1)}</td>
+      <td class="num">${Number(ev.axis_argumentacion).toFixed(1)}</td>
+      <td class="num score ${scoreCls}">${score.toFixed(1)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ============================================================================
+// ARRANQUE
+// ============================================================================
+document.addEventListener('DOMContentLoaded', cargarPerfil);
+</script>
+</body>
+</html>
