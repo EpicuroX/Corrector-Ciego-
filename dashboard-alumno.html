@@ -7,41 +7,49 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- Chart.js (CDN, sin npm) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <style>
 :root {
-  --bg-0: #0a0d12;
-  --bg-1: #11161e;
-  --bg-2: #1a212c;
-  --border: rgba(255,255,255,0.08);
-  --border-strong: rgba(255,255,255,0.16);
-  --text-0: #f5f7fa;
-  --text-1: #c5cdd6;
-  --text-2: #8b95a3;
-  --text-3: #5b6675;
-  --green: #10d98a;
-  --red: #ff4d6a;
-  --amber: #f59e0b;
-  --blue: #60a5fa;
-  --purple: #a78bfa;
-  --pink: #ec4899;
+  /* Fondos · paleta oscura Darabia */
+  --bg-0: #0a0e1a;
+  --bg-1: #111827;
+  --bg-2: #1f2937;
+
+  /* Texto */
+  --text-1: #f1f5f9;
+  --text-2: #cbd5e1;
+  --text-3: #94a3b8;
+  --text-4: #64748b;
+
+  /* Bordes */
+  --border-1: rgba(255, 255, 255, 0.08);
+  --border-2: rgba(255, 255, 255, 0.16);
+
+  /* Acentos Darabia */
+  --accent-green: #10d98a;
+  --accent-green-deep: #0a9968;
+  --accent-green-soft: rgba(16, 217, 138, 0.10);
+  --accent-red:    #ff4d6a;
+  --accent-amber:  #f59e0b;
+  --accent-blue:   #60a5fa;
+  --accent-purple: #a78bfa;
+  --accent-pink:   #ec4899;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   font-family: 'Inter', sans-serif;
-  background:
-    radial-gradient(circle at 15% 0%, rgba(96,165,250,0.08) 0%, transparent 40%),
-    radial-gradient(circle at 85% 100%, rgba(16,217,138,0.06) 0%, transparent 40%),
-    var(--bg-0);
-  color: var(--text-0);
+  background: var(--bg-0);
+  color: var(--text-1);
   min-height: 100vh;
   padding: 32px 24px;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 .container {
@@ -49,174 +57,219 @@ body {
   margin: 0 auto;
 }
 
+/* ── Wordmark Darabia ──────────────────────────────────────────── */
+.darabia-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.darabia-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--accent-green);
+  color: var(--bg-0);
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  border-radius: 4px;
+}
+.darabia-name {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+  font-size: 14pt;
+  color: var(--text-1);
+  letter-spacing: -0.025em;
+}
+
 /* ── Cabecera ──────────────────────────────────────────────────── */
 header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding-bottom: 20px;
+  padding-bottom: 24px;
   margin-bottom: 32px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-1);
+}
+
+.header-textos {
+  flex: 1;
+}
+
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 12px;
 }
 
 header h1 {
-  font-size: 24px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 28px;
   font-weight: 700;
-  color: var(--text-0);
-  margin-bottom: 4px;
-}
-
-header .subtitulo {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--text-2);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-header .badge {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  background: var(--bg-2);
-  border: 1px solid var(--border-strong);
   color: var(--text-1);
-  padding: 6px 12px;
-  border-radius: 6px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-2);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+}
+
+/* ── Card base ─────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-1);
+  border: 1px solid var(--border-1);
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.card-titulo {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+
+.card-descripcion {
+  font-size: 13px;
+  color: var(--text-3);
+  margin-bottom: 20px;
+  line-height: 1.6;
 }
 
 /* ── Panel info alumno ─────────────────────────────────────────── */
 .panel-alumno {
-  background: var(--bg-1);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
   display: flex;
   gap: 32px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
-.panel-alumno .student-id {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-0);
-}
-
-.panel-alumno .student-id-label {
-  font-size: 11px;
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 4px;
-}
-
-.panel-alumno .stat {
+.panel-alumno .stat-bloque {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
-.panel-alumno .stat .num {
+.stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.stat-valor-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+}
+
+.stat-valor-num {
+  font-family: 'JetBrains Mono', monospace;
   font-size: 28px;
   font-weight: 700;
-  color: var(--green);
-  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent-green);
+  letter-spacing: -0.02em;
+  line-height: 1;
 }
 
-.panel-alumno .stat .label {
-  font-size: 11px;
+.stat-valor-fecha {
   font-family: 'JetBrains Mono', monospace;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-top: 2px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-1);
 }
 
-.panel-alumno .separador {
+.separador-vert {
   width: 1px;
   height: 48px;
-  background: var(--border);
+  background: var(--border-1);
 }
 
-/* ── Panel gráfico ─────────────────────────────────────────────── */
-.panel-grafico {
-  background: var(--bg-1);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-}
-
-.panel-grafico .titulo {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-0);
-  margin-bottom: 4px;
-}
-
-.panel-grafico .descripcion {
-  font-size: 13px;
-  color: var(--text-2);
-  margin-bottom: 20px;
-}
-
+/* ── Gráfico ───────────────────────────────────────────────────── */
 .chart-wrapper {
   position: relative;
   height: 420px;
   width: 100%;
+  margin-top: 8px;
 }
 
 /* ── Estados (cargando, vacío, error) ──────────────────────────── */
 .estado {
   text-align: center;
-  padding: 48px 24px;
+  padding: 64px 24px;
 }
 
 .estado .icono {
-  font-size: 48px;
+  font-size: 36px;
   margin-bottom: 16px;
-  opacity: 0.5;
+  opacity: 0.6;
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
 }
 
 .estado .titulo {
+  font-family: 'Inter Tight', sans-serif;
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-0);
+  color: var(--text-1);
+  letter-spacing: -0.01em;
   margin-bottom: 8px;
 }
 
 .estado .descripcion {
   font-size: 14px;
-  color: var(--text-2);
+  color: var(--text-3);
   max-width: 480px;
   margin: 0 auto;
   line-height: 1.6;
 }
 
-.estado.error {
-  color: var(--red);
-}
-
 .estado .codigo-error {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--text-3);
-  margin-top: 12px;
+  font-size: 11.5px;
+  color: var(--text-4);
+  margin-top: 14px;
   padding: 8px 12px;
   background: var(--bg-2);
-  border-radius: 6px;
+  border: 1px solid var(--border-1);
+  border-radius: 4px;
   display: inline-block;
 }
 
 .spinner {
   display: inline-block;
-  width: 24px;
-  height: 24px;
-  border: 3px solid var(--border-strong);
-  border-top-color: var(--green);
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--border-2);
+  border-top-color: var(--accent-green);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -227,21 +280,7 @@ header .badge {
 
 .hidden { display: none !important; }
 
-/* ── Tabla resumen (debajo del gráfico) ────────────────────────── */
-.panel-tabla {
-  background: var(--bg-1);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-}
-
-.panel-tabla .titulo {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-0);
-  margin-bottom: 16px;
-}
-
+/* ── Tabla ─────────────────────────────────────────────────────── */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -250,27 +289,29 @@ table {
 
 thead th {
   text-align: left;
-  padding: 10px 12px;
-  background: var(--bg-2);
+  padding: 12px 14px;
+  background: transparent;
   color: var(--text-3);
-  font-size: 11px;
-  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.12em;
+  border-bottom: 1px solid var(--border-1);
 }
 
 thead th.num { text-align: right; }
 
 tbody td {
-  padding: 12px;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-1);
+  padding: 14px;
+  border-bottom: 1px solid var(--border-1);
+  color: var(--text-2);
 }
 
 tbody td.num {
   text-align: right;
   font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
 }
 
 tbody tr:last-child td {
@@ -278,42 +319,51 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover {
-  background: rgba(255,255,255,0.02);
+  background: rgba(255,255,255,0.015);
 }
 
 tbody td.case-id {
   font-family: 'JetBrains Mono', monospace;
-  color: var(--text-2);
+  color: var(--text-3);
   font-size: 12px;
+  font-weight: 500;
+}
+
+tbody td.fecha-mono {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-2);
+  font-size: 12.5px;
 }
 
 tbody td.score {
-  font-weight: 600;
-  color: var(--text-0);
+  font-weight: 700;
 }
 
-tbody td.score.high { color: var(--green); }
-tbody td.score.mid  { color: var(--amber); }
-tbody td.score.low  { color: var(--red); }
+tbody td.score.high { color: var(--accent-green); }
+tbody td.score.mid  { color: var(--accent-amber); }
+tbody td.score.low  { color: var(--accent-red); }
 
+/* ── Pie ───────────────────────────────────────────────────────── */
 footer {
-  margin-top: 40px;
+  margin-top: 48px;
   padding-top: 20px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-1);
   text-align: center;
-  font-size: 11px;
+  font-size: 10.5px;
   font-family: 'JetBrains Mono', monospace;
-  color: var(--text-3);
+  color: var(--text-4);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
+  font-weight: 600;
 }
 
 @media (max-width: 768px) {
   body { padding: 20px 16px; }
-  header { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .panel-alumno { flex-direction: column; align-items: flex-start; gap: 16px; }
-  .panel-alumno .separador { display: none; }
+  header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .panel-alumno { gap: 20px; }
+  .panel-alumno .separador-vert { display: none; }
   .chart-wrapper { height: 320px; }
+  header h1 { font-size: 22px; }
 }
 </style>
 </head>
@@ -321,23 +371,28 @@ footer {
 <body>
 <div class="container">
 
+  <div class="darabia-wordmark">
+    <span class="darabia-mark">D</span>
+    <span class="darabia-name">Darabia</span>
+  </div>
+
   <header>
-    <div>
+    <div class="header-textos">
+      <div class="eyebrow">Darabia Engine V5 · Evolución competencial</div>
       <h1>Perfil longitudinal del alumno</h1>
-      <div class="subtitulo">Darabia Engine V5 · Evolución competencial</div>
     </div>
-    <div class="badge">Vista profesor</div>
+    <span class="pill">Vista profesor</span>
   </header>
 
   <!-- ESTADO: cargando -->
   <div id="estado-cargando" class="estado">
     <div class="spinner"></div>
-    <div class="titulo" style="margin-top: 16px;">Cargando perfil del alumno...</div>
+    <div class="titulo" style="margin-top: 18px;">Cargando perfil del alumno</div>
   </div>
 
   <!-- ESTADO: error -->
-  <div id="estado-error" class="estado error hidden">
-    <div class="icono">⚠️</div>
+  <div id="estado-error" class="estado hidden">
+    <div class="icono" style="color: var(--accent-red);">!</div>
     <div class="titulo">No se pudo cargar el perfil</div>
     <div class="descripcion" id="error-mensaje"></div>
     <div class="codigo-error" id="error-codigo"></div>
@@ -345,11 +400,11 @@ footer {
 
   <!-- ESTADO: sin datos -->
   <div id="estado-vacio" class="estado hidden">
-    <div class="icono">📭</div>
+    <div class="icono" style="color: var(--text-4);">·</div>
     <div class="titulo">Sin evaluaciones validadas</div>
     <div class="descripcion">
       Este alumno aún no tiene ninguna evaluación validada por el profesor en el sistema longitudinal.
-      Las evaluaciones aparecerán aquí cuando el profesor pulse <strong>"Validar y guardar en perfil"</strong>
+      Las evaluaciones aparecerán aquí cuando el profesor pulse <strong>Validar y guardar en perfil</strong>
       desde el corrector.
     </div>
   </div>
@@ -357,30 +412,32 @@ footer {
   <!-- ESTADO: datos cargados -->
   <div id="estado-datos" class="hidden">
 
-    <div class="panel-alumno">
-      <div>
-        <div class="student-id-label">Código de alumno</div>
-        <div class="student-id" id="student-id-valor">—</div>
-      </div>
+    <div class="card">
+      <div class="panel-alumno">
+        <div class="stat-bloque">
+          <span class="stat-label">Código de alumno</span>
+          <span class="stat-valor-mono" id="student-id-valor">—</span>
+        </div>
 
-      <div class="separador"></div>
+        <div class="separador-vert"></div>
 
-      <div class="stat">
-        <div class="num" id="stat-num-casos">0</div>
-        <div class="label">Casos validados</div>
-      </div>
+        <div class="stat-bloque">
+          <span class="stat-label">Casos validados</span>
+          <span class="stat-valor-num" id="stat-num-casos">0</span>
+        </div>
 
-      <div class="separador"></div>
+        <div class="separador-vert"></div>
 
-      <div class="stat">
-        <div class="num" id="stat-ultima-fecha">—</div>
-        <div class="label">Última validación</div>
+        <div class="stat-bloque">
+          <span class="stat-label">Última validación</span>
+          <span class="stat-valor-fecha" id="stat-ultima-fecha">—</span>
+        </div>
       </div>
     </div>
 
-    <div class="panel-grafico">
-      <div class="titulo">Evolución por ejes competenciales</div>
-      <div class="descripcion">
+    <div class="card">
+      <div class="card-titulo">Evolución por ejes competenciales</div>
+      <div class="card-descripcion">
         Cada línea representa la puntuación obtenida (0–10) en uno de los cinco ejes
         a lo largo de los casos validados. El eje X ordena los casos cronológicamente
         por fecha de validación.
@@ -390,8 +447,8 @@ footer {
       </div>
     </div>
 
-    <div class="panel-tabla">
-      <div class="titulo">Detalle por evaluación</div>
+    <div class="card">
+      <div class="card-titulo">Detalle por evaluación</div>
       <table>
         <thead>
           <tr>
@@ -426,11 +483,11 @@ footer {
 const API_GET = '/api/longitudinal/get';
 
 const EJES_CONFIG = [
-  { id: 'axis_analisis',       label: 'Capacidad de análisis',   color: '#60a5fa' },
-  { id: 'axis_modelos',        label: 'Marcos teóricos',          color: '#a78bfa' },
-  { id: 'axis_intervencion',   label: 'Criterio de intervención', color: '#10d98a' },
-  { id: 'axis_riesgos',        label: 'Detección de riesgos',     color: '#f59e0b' },
-  { id: 'axis_argumentacion',  label: 'Argumentación profesional',color: '#ec4899' }
+  { id: 'axis_analisis',       label: 'Capacidad de análisis',    color: '#60a5fa' },
+  { id: 'axis_modelos',        label: 'Marcos teóricos',           color: '#a78bfa' },
+  { id: 'axis_intervencion',   label: 'Criterio de intervención',  color: '#10d98a' },
+  { id: 'axis_riesgos',        label: 'Detección de riesgos',      color: '#f59e0b' },
+  { id: 'axis_argumentacion',  label: 'Argumentación profesional', color: '#ec4899' }
 ];
 
 // ============================================================================
@@ -554,22 +611,22 @@ function renderizarPerfil(studentId, evaluaciones) {
 }
 
 function renderizarGrafico(evaluaciones) {
-  const labels = evaluaciones.map((ev, idx) => {
+  const labels = evaluaciones.map((ev) => {
     const fecha = formatearFechaCorta(ev.validated_at || ev.timestamp);
-    return `${ev.case_id} (${fecha})`;
+    return `${ev.case_id} · ${fecha}`;
   });
 
   const datasets = EJES_CONFIG.map(eje => ({
     label: eje.label,
     data: evaluaciones.map(ev => Number(ev[eje.id])),
     borderColor: eje.color,
-    backgroundColor: eje.color + '22',
+    backgroundColor: eje.color + '14',
     borderWidth: 2,
-    tension: 0.3,
+    tension: 0.25,
     pointRadius: 5,
     pointHoverRadius: 7,
     pointBackgroundColor: eje.color,
-    pointBorderColor: '#0a0d12',
+    pointBorderColor: '#0a0e1a',
     pointBorderWidth: 2
   }));
 
@@ -582,52 +639,59 @@ function renderizarGrafico(evaluaciones) {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
+      layout: {
+        padding: { top: 8, right: 8, bottom: 0, left: 0 }
+      },
       plugins: {
         legend: {
           position: 'top',
           align: 'start',
           labels: {
-            color: '#c5cdd6',
-            font: { family: 'Inter', size: 12 },
+            color: '#cbd5e1',
+            font: { family: 'Inter', size: 12, weight: 500 },
             usePointStyle: true,
             pointStyle: 'circle',
-            padding: 14
+            padding: 14,
+            boxWidth: 8,
+            boxHeight: 8
           }
         },
         tooltip: {
-          backgroundColor: 'rgba(15, 20, 30, 0.95)',
-          borderColor: 'rgba(255,255,255,0.12)',
+          backgroundColor: '#111827',
+          borderColor: 'rgba(255,255,255,0.16)',
           borderWidth: 1,
-          titleColor: '#f5f7fa',
-          bodyColor: '#c5cdd6',
+          titleColor: '#f1f5f9',
+          bodyColor: '#cbd5e1',
           padding: 12,
-          cornerRadius: 8,
-          titleFont: { family: 'Inter', size: 13, weight: '600' },
-          bodyFont: { family: 'Inter', size: 12 }
+          cornerRadius: 6,
+          titleFont: { family: 'Inter Tight', size: 13, weight: '600' },
+          bodyFont: { family: 'Inter', size: 12 },
+          displayColors: true,
+          boxPadding: 4
         }
       },
       scales: {
         x: {
           ticks: {
-            color: '#8b95a3',
-            font: { family: 'JetBrains Mono', size: 11 }
+            color: '#94a3b8',
+            font: { family: 'JetBrains Mono', size: 10.5, weight: 500 }
           },
-          grid: { color: 'rgba(255,255,255,0.04)' }
+          grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false }
         },
         y: {
           beginAtZero: true,
           max: 10,
           ticks: {
-            color: '#8b95a3',
-            font: { family: 'JetBrains Mono', size: 11 },
+            color: '#94a3b8',
+            font: { family: 'JetBrains Mono', size: 10.5, weight: 500 },
             stepSize: 2
           },
-          grid: { color: 'rgba(255,255,255,0.06)' },
+          grid: { color: 'rgba(255,255,255,0.06)', drawBorder: false },
           title: {
             display: true,
             text: 'Puntuación (0 – 10)',
-            color: '#5b6675',
-            font: { family: 'Inter', size: 11, weight: '500' }
+            color: '#64748b',
+            font: { family: 'JetBrains Mono', size: 10.5, weight: 600 }
           }
         }
       }
@@ -647,7 +711,7 @@ function renderizarTabla(evaluaciones) {
 
     tr.innerHTML = `
       <td class="case-id">${escapeHTML(ev.case_id)}</td>
-      <td>${formatearFecha(ev.validated_at || ev.timestamp)}</td>
+      <td class="fecha-mono">${formatearFecha(ev.validated_at || ev.timestamp)}</td>
       <td class="num">${Number(ev.axis_analisis).toFixed(1)}</td>
       <td class="num">${Number(ev.axis_modelos).toFixed(1)}</td>
       <td class="num">${Number(ev.axis_intervencion).toFixed(1)}</td>
