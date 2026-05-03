@@ -6,22 +6,47 @@
  * Marca la nueva fila como is_latest=true y las anteriores del mismo
  * alumno+caso como is_latest=false. Todo en una transacción atómica.
  *
+ * NORMALIZACIÓN DE EJES (incorporada en esta versión):
+ * El motor de evaluación (api/evaluar.js) devuelve vector_ejes en escala
+ * ABSOLUTA: cada eje tiene una puntuación entre 0 y su 'max', donde 'max' es
+ * la suma de los pesos de los criterios que componen ese eje (p.ej. 25 si el
+ * eje agrega criterios de peso 10 + 15). Esto es correcto pedagógicamente
+ * para la vista del corrector (el alumno ve "21/25 en análisis"), pero rompe
+ * la comparabilidad longitudinal entre casos cuyas rúbricas pesan distinto.
+ *
+ * Solución (Opción A, decisión sesión normalización mayo 2026):
+ *   Este endpoint normaliza cada eje a escala 0-10 antes de guardar en BD.
+ *   Fórmula: puntuacion_normalizada = (puntuacion / max) * 10, 1 decimal.
+ *   El dashboard longitudinal lee siempre 0-10 y pinta sin lógica adicional.
+ *
+ * CONTRATO DE PAYLOAD (vector_ejes):
+ *   Cada elemento DEBE incluir 'max'. Sin 'max' no podemos normalizar y el
+ *   endpoint rechaza el payload con error explícito. Esto evita guardar
+ *   silenciosamente datos sin normalizar (que es el bug que estamos arreglando).
+ *
  * Body esperado (JSON):
  *   {
  *     student_id: "PRL2526_001",
  *     case_id: "psicosocial_gestoria_v1",
  *     case_order: 1,                       // opcional
- *     vector_ejes: [                       // 5 ejes obligatorios
- *       { eje: "capacidad_analisis", puntuacion: 7.5 },
- *       { eje: "uso_marcos_teoricos", puntuacion: 6.0 },
- *       { eje: "criterio_intervencion", puntuacion: 8.0 },
- *       { eje: "deteccion_riesgos_criticos", puntuacion: 7.0 },
- *       { eje: "argumentacion_profesional", puntuacion: 6.5 }
+ *     vector_ejes: [                       // 5 ejes obligatorios, cada uno con max
+ *       { eje: "capacidad_analisis",         puntuacion: 21, max: 25 },
+ *       { eje: "uso_marcos_teoricos",        puntuacion: 13, max: 20 },
+ *       { eje: "criterio_intervencion",      puntuacion: 16, max: 20 },
+ *       { eje: "deteccion_riesgos_criticos", puntuacion: 22, max: 30 },
+ *       { eje: "argumentacion_profesional",  puntuacion: 10, max: 15 }
  *     ],
  *     score_total: 70.0,
  *     validated_by: "jonas.agudo",         // opcional
  *     notes: "..."                          // opcional
  *   }
+ *
+ * Tras la normalización, la fila guardada en BD tendrá:
+ *   axis_analisis      = 8.4   (21/25 * 10)
+ *   axis_modelos       = 6.5   (13/20 * 10)
+ *   axis_intervencion  = 8.0   (16/20 * 10)
+ *   axis_riesgos       = 7.3   (22/30 * 10)
+ *   axis_argumentacion = 6.7   (10/15 * 10)
  * ============================================================================ */
 
 import { neon } from '@neondatabase/serverless';
@@ -46,10 +71,15 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'PAYLOAD_INVALIDO', detalles: errores });
     }
 
-    // 2. Mapeo vector_ejes → columnas
+    // 2. Normalización de ejes a escala 0-10
+    //    Tras validarPayload sabemos que cada eje tiene 'puntuacion' y 'max' válidos.
     const ejesMap = {};
     for (const item of body.vector_ejes) {
-        ejesMap[item.eje] = Number(item.puntuacion);
+        const puntuacion = Number(item.puntuacion);
+        const max = Number(item.max);
+        // (puntuacion / max) * 10, redondeado a 1 decimal
+        const normalizada = Math.round((puntuacion / max) * 10 * 10) / 10;
+        ejesMap[item.eje] = normalizada;
     }
 
     const fila = {
@@ -124,6 +154,21 @@ export default async function handler(req, res) {
 
 /* ============================================================================
  * Validación del payload
+ *
+ * Reglas:
+ *   - student_id, case_id: strings no vacíos.
+ *   - vector_ejes: array de exactamente 5 elementos, uno por eje requerido.
+ *   - Cada elemento de vector_ejes:
+ *       · eje: uno de los 5 EJES_REQUERIDOS.
+ *       · puntuacion: número finito >= 0.
+ *       · max: número finito > 0.
+ *       · puntuacion <= max (no aceptamos puntuaciones que excedan el techo
+ *         del eje — sería un bug del motor que debe explotar pronto).
+ *   - score_total: número entre 0 y 100.
+ *
+ * NOTA: el rango anterior de puntuacion (0-100) se ha sustituido por
+ * (0 <= puntuacion <= max), porque ahora el contrato de payload acepta
+ * valores absolutos por eje (que pueden ser menores de 100, p.ej. max=15).
  * ============================================================================ */
 
 function validarPayload(body) {
@@ -146,15 +191,24 @@ function validarPayload(body) {
             }
         }
         for (const item of body.vector_ejes) {
-            const p = Number(item?.puntuacion);
-            if (Number.isNaN(p) || p < 0 || p > 100) {
-                errores.push(`Puntuación inválida en eje "${item?.eje}": ${item?.puntuacion}`);
+            const eje = item?.eje;
+            const puntuacion = Number(item?.puntuacion);
+            const max = Number(item?.max);
+
+            if (!Number.isFinite(puntuacion) || puntuacion < 0) {
+                errores.push(`Puntuación inválida en eje "${eje}": ${item?.puntuacion} (debe ser número >= 0).`);
+            }
+            if (!Number.isFinite(max) || max <= 0) {
+                errores.push(`'max' ausente o inválido en eje "${eje}": ${item?.max}. Cada eje debe enviar 'max' (suma de pesos de sus criterios) para poder normalizar a escala 0-10.`);
+            }
+            if (Number.isFinite(puntuacion) && Number.isFinite(max) && max > 0 && puntuacion > max) {
+                errores.push(`Puntuación (${puntuacion}) excede 'max' (${max}) en eje "${eje}".`);
             }
         }
     }
 
     const score = Number(body.score_total);
-    if (Number.isNaN(score) || score < 0 || score > 100) {
+    if (!Number.isFinite(score) || score < 0 || score > 100) {
         errores.push('score_total debe ser un número entre 0 y 100.');
     }
 
