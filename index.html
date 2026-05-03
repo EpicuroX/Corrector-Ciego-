@@ -2994,13 +2994,27 @@ $('btn-otro').addEventListener('click', () => {
       return;
     }
 
+    // Defensa: cada eje debe traer 'max' (lo emite el motor api/evaluar.js).
+    // Sin 'max' el endpoint /save no puede normalizar a escala 0-10 y rechaza
+    // el payload. Avisamos aquí con un mensaje claro antes de hacer la petición.
+    const ejesSinMax = data.vector_ejes.filter(e => !Number.isFinite(Number(e?.max)) || Number(e.max) <= 0);
+    if (ejesSinMax.length > 0) {
+      const nombres = ejesSinMax.map(e => e?.eje || '?').join(', ');
+      alert(`No se puede guardar: faltan datos técnicos ('max') en los siguientes ejes: ${nombres}.\n\nEsto suele indicar una versión antigua del motor. Vuelve a evaluar el dictamen y reintenta.`);
+      return;
+    }
+
     const payload = {
       student_id: STUDENT_ID_HARDCODED,
       case_id: CASE_ID_HARDCODED,
       case_order: CASE_ORDER,
+      // Enviamos puntuacion + max. El endpoint /save normaliza a 0-10 antes de
+      // guardar (la BD longitudinal vive en escala 0-10 fija para que sea
+      // comparable entre casos cuyas rúbricas pesan distinto).
       vector_ejes: data.vector_ejes.map(e => ({
         eje: e.eje,
-        puntuacion: Number(e.puntuacion)
+        puntuacion: Number(e.puntuacion),
+        max: Number(e.max)
       })),
       score_total: Number(data.nota_global),
       validated_by: estado.ultimoAlumno?.nombre || 'profesor',
