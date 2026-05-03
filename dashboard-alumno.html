@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfil longitudinal · Darabia</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Chart.js (CDN, sin npm) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+:root {
+  /* Fondos · paleta oscura Darabia */
+  --bg-0: #0a0e1a;
+  --bg-1: #111827;
+  --bg-2: #1f2937;
+
+  /* Texto */
+  --text-1: #f1f5f9;
+  --text-2: #cbd5e1;
+  --text-3: #94a3b8;
+  --text-4: #64748b;
+
+  /* Bordes */
+  --border-1: rgba(255, 255, 255, 0.08);
+  --border-2: rgba(255, 255, 255, 0.16);
+
+  /* Acentos Darabia */
+  --accent-green: #10d98a;
+  --accent-green-deep: #0a9968;
+  --accent-green-soft: rgba(16, 217, 138, 0.10);
+  --accent-red:    #ff4d6a;
+  --accent-amber:  #f59e0b;
+  --accent-blue:   #60a5fa;
+  --accent-purple: #a78bfa;
+  --accent-pink:   #ec4899;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-0);
+  color: var(--text-1);
+  min-height: 100vh;
+  padding: 32px 24px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Wordmark Darabia ──────────────────────────────────────────── */
+.darabia-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.darabia-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--accent-green);
+  color: var(--bg-0);
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  border-radius: 4px;
+}
+.darabia-name {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+  font-size: 14pt;
+  color: var(--text-1);
+  letter-spacing: -0.025em;
+}
+
+/* ── Cabecera ──────────────────────────────────────────────────── */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 24px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-1);
+}
+
+.header-textos {
+  flex: 1;
+}
+
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+header h1 {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-2);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ── Card base ─────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-1);
+  border: 1px solid var(--border-1);
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.card-titulo {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+
+.card-descripcion {
+  font-size: 13px;
+  color: var(--text-3);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+/* ── Panel info alumno ─────────────────────────────────────────── */
+.panel-alumno {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.panel-alumno .stat-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.stat-valor-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+}
+
+.stat-valor-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent-green);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.stat-valor-fecha {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.separador-vert {
+  width: 1px;
+  height: 48px;
+  background: var(--border-1);
+}
+
+/* ── Gráfico ───────────────────────────────────────────────────── */
+.chart-wrapper {
+  position: relative;
+  height: 420px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* ── Estados (cargando, vacío, error) ──────────────────────────── */
+.estado {
+  text-align: center;
+  padding: 64px 24px;
+}
+
+.estado .icono {
+  font-size: 36px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+}
+
+.estado .titulo {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+
+.estado .descripcion {
+  font-size: 14px;
+  color: var(--text-3);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.estado .codigo-error {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: var(--text-4);
+  margin-top: 14px;
+  padding: 8px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.spinner {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--border-2);
+  border-top-color: var(--accent-green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.hidden { display: none !important; }
+
+/* ── Tabla ─────────────────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead th {
+  text-align: left;
+  padding: 12px 14px;
+  background: transparent;
+  color: var(--text-3);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-bottom: 1px solid var(--border-1);
+}
+
+thead th.num { text-align: right; }
+
+tbody td {
+  padding: 14px;
+  border-bottom: 1px solid var(--border-1);
+  color: var(--text-2);
+}
+
+tbody td.num {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: rgba(255,255,255,0.015);
+}
+
+tbody td.case-id {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-3);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+tbody td.fecha-mono {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-2);
+  font-size: 12.5px;
+}
+
+tbody td.score {
+  font-weight: 700;
+}
+
+tbody td.score.high { color: var(--accent-green); }
+tbody td.score.mid  { color: var(--accent-amber); }
+tbody td.score.low  { color: var(--accent-red); }
+
+/* ── BANDA SUPERIOR · resumen competencial ──────────────────────── */
+.banda-resumen {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 32px;
+  align-items: center;
+  padding: 28px 28px;
+  margin-bottom: 24px;
+  background: var(--bg-1);
+  border: 1px solid var(--border-1);
+  border-radius: 12px;
+}
+.banda-nota {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding-right: 32px;
+  border-right: 1px solid var(--border-1);
+}
+.banda-nota-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.banda-nota-num.high { color: var(--accent-green); }
+.banda-nota-num.mid  { color: var(--accent-amber); }
+.banda-nota-num.low  { color: var(--accent-red); }
+.banda-nota-max {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  color: var(--text-4);
+  margin-left: 4px;
+  font-weight: 500;
+}
+.banda-nota-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.banda-narrativa {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.banda-narrativa-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.banda-narrativa-texto {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+.banda-narrativa-texto strong {
+  color: var(--text-1);
+  font-weight: 600;
+}
+.banda-tendencia {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-top: 6px;
+  width: fit-content;
+}
+.banda-tendencia.sube  { background: rgba(16,217,138,0.10); color: var(--accent-green); }
+.banda-tendencia.baja  { background: rgba(255,77,106,0.10); color: var(--accent-red); }
+.banda-tendencia.plana { background: rgba(255,255,255,0.04); color: var(--text-3); border: 1px solid var(--border-1); }
+.banda-tendencia-arrow {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1;
+}
+.banda-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-left: 24px;
+  border-left: 1px solid var(--border-1);
+  min-width: 180px;
+}
+.banda-meta-fila {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.banda-meta-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.banda-meta-valor {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.005em;
+}
+
+/* ── TARJETAS DE EJE · 5 competencias ───────────────────────────── */
+.ejes-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.eje-card {
+  background: var(--bg-1);
+  border: 1px solid var(--border-1);
+  border-radius: 10px;
+  padding: 18px 16px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  position: relative;
+  border-top-width: 3px;
+}
+.eje-card:hover {
+  border-color: var(--border-2);
+  background: var(--bg-2);
+}
+.eje-card.activo {
+  background: var(--bg-2);
+  border-color: var(--border-2);
+}
+.eje-card.activo::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-1);
+}
+.eje-card-nombre {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: -0.005em;
+  line-height: 1.3;
+  min-height: 32px;
+}
+.eje-card-fila {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.eje-card-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.eje-card-num.high { color: var(--accent-green); }
+.eje-card-num.mid  { color: var(--accent-amber); }
+.eje-card-num.low  { color: var(--accent-red); }
+.eje-card-max {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-4);
+  font-weight: 500;
+}
+.eje-card-delta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.eje-card-delta.sube  { color: var(--accent-green); }
+.eje-card-delta.baja  { color: var(--accent-red); }
+.eje-card-delta.plana { color: var(--text-4); }
+.eje-card-spark {
+  width: 100%;
+  height: 28px;
+  display: block;
+  margin-top: 2px;
+}
+
+/* ── HINT pedagógico (un solo caso) ─────────────────────────────── */
+.hint-pedagogico {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(96, 165, 250, 0.08);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-2);
+  margin-bottom: 24px;
+}
+.hint-pedagogico strong { color: var(--text-1); font-weight: 600; }
+
+/* ── Botón "Ver todos los ejes" del gráfico ─────────────────────── */
+.chart-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+  min-height: 26px;
+}
+.btn-reset-grafico {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  background: transparent;
+  border: 1px solid var(--border-1);
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-reset-grafico:hover {
+  color: var(--text-1);
+  border-color: var(--border-2);
+  background: var(--bg-2);
+}
+.btn-reset-grafico.hidden { display: none; }
+
+/* ── Pie ───────────────────────────────────────────────────────── */
+footer {
+  margin-top: 48px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-1);
+  text-align: center;
+  font-size: 10.5px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-4);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  body { padding: 20px 16px; }
+  header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .panel-alumno { gap: 20px; }
+  .panel-alumno .separador-vert { display: none; }
+  .chart-wrapper { height: 320px; }
+  header h1 { font-size: 22px; }
+  .banda-resumen {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 22px;
+  }
+  .banda-nota { padding-right: 0; border-right: none; padding-bottom: 16px; border-bottom: 1px solid var(--border-1); width: 100%; }
+  .banda-meta { padding-left: 0; border-left: none; padding-top: 16px; border-top: 1px solid var(--border-1); flex-direction: row; gap: 24px; min-width: 0; }
+  .ejes-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .ejes-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="darabia-wordmark">
+    <span class="darabia-mark">D</span>
+    <span class="darabia-name">Darabia</span>
+  </div>
+
+  <header>
+    <div class="header-textos">
+      <div class="eyebrow">Darabia Engine V5 · Evolución competencial</div>
+      <h1>Perfil competencial del alumno</h1>
+    </div>
+    <span class="pill">Vista profesor</span>
+  </header>
+
+  <!-- ESTADO: cargando -->
+  <div id="estado-cargando" class="estado">
+    <div class="spinner"></div>
+    <div class="titulo" style="margin-top: 18px;">Cargando perfil del alumno</div>
+  </div>
+
+  <!-- ESTADO: error -->
+  <div id="estado-error" class="estado hidden">
+    <div class="icono" style="color: var(--accent-red);">!</div>
+    <div class="titulo">No se pudo cargar el perfil</div>
+    <div class="descripcion" id="error-mensaje"></div>
+    <div class="codigo-error" id="error-codigo"></div>
+  </div>
+
+  <!-- ESTADO: sin datos -->
+  <div id="estado-vacio" class="estado hidden">
+    <div class="icono" style="color: var(--text-4);">·</div>
+    <div class="titulo">Sin evaluaciones validadas</div>
+    <div class="descripcion">
+      Este alumno aún no tiene ninguna evaluación validada por el profesor en el sistema longitudinal.
+      Las evaluaciones aparecerán aquí cuando el profesor pulse <strong>Validar y guardar en perfil</strong>
+      desde el corrector.
+    </div>
+  </div>
+
+  <!-- ESTADO: datos cargados -->
+  <div id="estado-datos" class="hidden">
+
+    <!-- Banda de resumen competencial: nota global + narrativa + metadatos -->
+    <div class="banda-resumen">
+      <div class="banda-nota">
+        <div>
+          <span class="banda-nota-num" id="banda-nota-num">—</span><span class="banda-nota-max">/10</span>
+        </div>
+        <div class="banda-nota-label">Media competencial</div>
+        <div class="banda-tendencia plana" id="banda-tendencia">
+          <span class="banda-tendencia-arrow" id="banda-tendencia-arrow">→</span>
+          <span id="banda-tendencia-texto">Sin tendencia</span>
+        </div>
+      </div>
+      <div class="banda-narrativa">
+        <div class="banda-narrativa-eyebrow">Lectura del perfil</div>
+        <div class="banda-narrativa-texto" id="banda-narrativa-texto">—</div>
+      </div>
+      <div class="banda-meta">
+        <div class="banda-meta-fila">
+          <span class="banda-meta-label">Código de alumno</span>
+          <span class="banda-meta-valor" id="student-id-valor">—</span>
+        </div>
+        <div class="banda-meta-fila">
+          <span class="banda-meta-label">Casos validados</span>
+          <span class="banda-meta-valor" id="stat-num-casos">0</span>
+        </div>
+        <div class="banda-meta-fila">
+          <span class="banda-meta-label">Última validación</span>
+          <span class="banda-meta-valor" id="stat-ultima-fecha">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 tarjetas de eje competencial · clic enfoca el eje en el gráfico -->
+    <div class="ejes-grid" id="ejes-grid"></div>
+
+    <!-- Hint pedagógico: solo visible cuando hay un único caso -->
+    <div class="hint-pedagogico hidden" id="hint-un-caso">
+      <span><strong>Solo hay una evaluación validada.</strong> La gráfica de evolución y las tendencias aparecerán cuando este alumno tenga al menos dos casos validados.</span>
+    </div>
+
+    <div class="card" id="card-grafico">
+      <div class="card-titulo">Evolución por ejes competenciales</div>
+      <div class="card-descripcion">
+        Cada línea representa la puntuación obtenida (0–10) en uno de los cinco ejes
+        a lo largo de los casos validados. Pulsa una tarjeta de eje arriba para enfocarlo.
+      </div>
+      <div class="chart-toolbar">
+        <button class="btn-reset-grafico hidden" id="btn-reset-grafico" type="button">Ver todos los ejes</button>
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="chart-evolucion"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-titulo">Detalle por evaluación</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Caso</th>
+            <th>Validado</th>
+            <th class="num">Análisis</th>
+            <th class="num">Marcos</th>
+            <th class="num">Intervención</th>
+            <th class="num">Riesgos</th>
+            <th class="num">Argumentación</th>
+            <th class="num">Total</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-evaluaciones"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <footer>
+    Darabia Engine V5 · IES Virgen del Pilar · Zaragoza
+  </footer>
+
+</div>
+
+<script>
+'use strict';
+
+// ============================================================================
+// CONFIGURACIÓN
+// ============================================================================
+const API_GET = '/api/longitudinal/get';
+
+const EJES_CONFIG = [
+  { id: 'axis_analisis',       label: 'Capacidad de análisis',    color: '#60a5fa' },
+  { id: 'axis_modelos',        label: 'Marcos teóricos',           color: '#a78bfa' },
+  { id: 'axis_intervencion',   label: 'Criterio de intervención',  color: '#10d98a' },
+  { id: 'axis_riesgos',        label: 'Detección de riesgos',      color: '#f59e0b' },
+  { id: 'axis_argumentacion',  label: 'Argumentación profesional', color: '#ec4899' }
+];
+
+// ============================================================================
+// HELPERS DE UI
+// ============================================================================
+const $ = id => document.getElementById(id);
+
+function mostrarEstado(idEstado) {
+  const estados = ['estado-cargando', 'estado-error', 'estado-vacio', 'estado-datos'];
+  estados.forEach(e => $(e).classList.toggle('hidden', e !== idEstado));
+}
+
+function escapeHTML(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function formatearFecha(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+}
+
+function formatearFechaCorta(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit'
+  });
+}
+
+function clasificarPuntuacion(p) {
+  const n = Number(p);
+  if (n >= 7.5) return 'high';
+  if (n >= 5.0) return 'mid';
+  return 'low';
+}
+
+// ============================================================================
+// LECTURA DEL PARÁMETRO student_id
+// ============================================================================
+function obtenerStudentId() {
+  const params = new URLSearchParams(window.location.search);
+  return (params.get('student') || '').trim();
+}
+
+// ============================================================================
+// CARGA DE DATOS
+// ============================================================================
+async function cargarPerfil() {
+  const studentId = obtenerStudentId();
+
+  if (!studentId) {
+    mostrarError(
+      'Falta el parámetro "student" en la URL.',
+      'Ejemplo correcto: /dashboard-alumno.html?student=PRL2526_001'
+    );
+    return;
+  }
+
+  mostrarEstado('estado-cargando');
+
+  try {
+    const resp = await fetch(`${API_GET}?student_id=${encodeURIComponent(studentId)}`);
+    const data = await resp.json();
+
+    if (!resp.ok || !data.ok) {
+      throw new Error(data.message || data.error || `HTTP ${resp.status}`);
+    }
+
+    if (!Array.isArray(data.evaluaciones) || data.evaluaciones.length === 0) {
+      $('student-id-valor').textContent = studentId;
+      mostrarEstado('estado-vacio');
+      return;
+    }
+
+    renderizarPerfil(studentId, data.evaluaciones);
+    mostrarEstado('estado-datos');
+
+  } catch (err) {
+    console.error('[DASHBOARD] Error al cargar perfil:', err);
+    mostrarError(
+      'Hubo un problema al recuperar las evaluaciones del alumno.',
+      err.message
+    );
+  }
+}
+
+function mostrarError(mensaje, codigo) {
+  $('error-mensaje').textContent = mensaje;
+  $('error-codigo').textContent = codigo || '';
+  mostrarEstado('estado-error');
+}
+
+// ============================================================================
+// RENDERIZADO
+// ============================================================================
+// Variable global para guardar la instancia del gráfico (necesario para el
+// toggle de "enfocar un eje" / "ver todos").
+let chartEvolucion = null;
+let ejeEnfocadoActual = null;
+
+function renderizarPerfil(studentId, evaluaciones) {
+  // Metadatos (los IDs originales se preservan, ahora viven en la banda-meta)
+  $('student-id-valor').textContent = studentId;
+  $('stat-num-casos').textContent = evaluaciones.length;
+
+  const ultima = evaluaciones[evaluaciones.length - 1];
+  $('stat-ultima-fecha').textContent = formatearFechaCorta(ultima.validated_at || ultima.timestamp);
+
+  // Banda superior · resumen competencial (nota global + tendencia + narrativa)
+  renderizarBandaResumen(evaluaciones);
+
+  // 5 tarjetas de eje con sparkline y delta
+  renderizarTarjetasEjes(evaluaciones);
+
+  // Hint pedagógico si solo hay 1 caso (gráfica de evolución no tiene sentido)
+  const unSoloCaso = evaluaciones.length === 1;
+  $('hint-un-caso').classList.toggle('hidden', !unSoloCaso);
+  $('card-grafico').classList.toggle('hidden', unSoloCaso);
+
+  // Gráfico
+  if (!unSoloCaso) {
+    renderizarGrafico(evaluaciones);
+  }
+
+  // Tabla
+  renderizarTabla(evaluaciones);
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Cálculos competenciales (medias, deltas, tendencias)
+// ────────────────────────────────────────────────────────────────────────────
+function calcularMediaCaso(ev) {
+  const valores = EJES_CONFIG.map(e => Number(ev[e.id])).filter(v => Number.isFinite(v));
+  if (valores.length === 0) return 0;
+  return valores.reduce((a, b) => a + b, 0) / valores.length;
+}
+
+function calcularDelta(serie) {
+  // Delta entre el primer y el último valor de la serie
+  if (!serie || serie.length < 2) return 0;
+  return serie[serie.length - 1] - serie[0];
+}
+
+function clasificarDelta(delta) {
+  // Umbral pedagógico: < 0.5 puntos se considera "estable"
+  if (delta >= 0.5) return 'sube';
+  if (delta <= -0.5) return 'baja';
+  return 'plana';
+}
+
+function flechaDelta(clase) {
+  if (clase === 'sube')  return '↑';
+  if (clase === 'baja')  return '↓';
+  return '→';
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Banda superior: nota media + tendencia + narrativa
+// ────────────────────────────────────────────────────────────────────────────
+function renderizarBandaResumen(evaluaciones) {
+  // Serie de medias por caso (cronológica)
+  const mediasPorCaso = evaluaciones.map(calcularMediaCaso);
+  const mediaActual = mediasPorCaso[mediasPorCaso.length - 1];
+
+  // Pintar el número grande
+  const numEl = $('banda-nota-num');
+  numEl.textContent = mediaActual.toFixed(1);
+  numEl.classList.remove('high', 'mid', 'low');
+  numEl.classList.add(clasificarPuntuacion(mediaActual));
+
+  // Tendencia global (delta entre primera y última media)
+  const deltaGlobal = calcularDelta(mediasPorCaso);
+  const claseDelta = clasificarDelta(deltaGlobal);
+  const tendenciaEl = $('banda-tendencia');
+  tendenciaEl.classList.remove('sube', 'baja', 'plana');
+  tendenciaEl.classList.add(claseDelta);
+  $('banda-tendencia-arrow').textContent = flechaDelta(claseDelta);
+
+  if (evaluaciones.length < 2) {
+    $('banda-tendencia-texto').textContent = 'Primera evaluación';
+  } else {
+    const signo = deltaGlobal >= 0 ? '+' : '';
+    const textoDelta = `${signo}${deltaGlobal.toFixed(1)} desde el primer caso`;
+    $('banda-tendencia-texto').textContent = textoDelta;
+  }
+
+  // Narrativa pedagógica
+  $('banda-narrativa-texto').innerHTML = generarNarrativa(evaluaciones, mediasPorCaso);
+}
+
+function generarNarrativa(evaluaciones, mediasPorCaso) {
+  const ultima = evaluaciones[evaluaciones.length - 1];
+  const n = evaluaciones.length;
+
+  // Calcular puntuación actual por eje
+  const ejesActuales = EJES_CONFIG.map(eje => ({
+    label: eje.label,
+    valor: Number(ultima[eje.id])
+  }));
+
+  // Mejor y peor eje (en la última evaluación)
+  const mejor = ejesActuales.reduce((a, b) => b.valor > a.valor ? b : a);
+  const peor  = ejesActuales.reduce((a, b) => b.valor < a.valor ? b : a);
+
+  // Caso 1: una sola evaluación → narrativa de partida
+  if (n === 1) {
+    return `Primera evaluación validada. Su mejor eje es <strong>${escapeHTML(mejor.label)}</strong> ` +
+           `(${mejor.valor.toFixed(1)}). El eje con más margen de mejora es ` +
+           `<strong>${escapeHTML(peor.label)}</strong> (${peor.valor.toFixed(1)}).`;
+  }
+
+  // Caso 2+: comparar trayectoria
+  const deltaGlobal = calcularDelta(mediasPorCaso);
+  const claseGlobal = clasificarDelta(deltaGlobal);
+
+  let frase1;
+  if (claseGlobal === 'sube') {
+    frase1 = `Progresa de forma sostenida desde su primera evaluación`;
+  } else if (claseGlobal === 'baja') {
+    frase1 = `Su rendimiento ha descendido respecto a su primera evaluación`;
+  } else {
+    frase1 = `Su rendimiento se mantiene estable a lo largo de los casos`;
+  }
+
+  // Calcular delta por eje para destacar el que más sube/baja
+  const deltasPorEje = EJES_CONFIG.map(eje => ({
+    label: eje.label,
+    delta: Number(ultima[eje.id]) - Number(evaluaciones[0][eje.id])
+  }));
+  const ejeMasSube  = deltasPorEje.reduce((a, b) => b.delta > a.delta ? b : a);
+  const ejeMasBaja  = deltasPorEje.reduce((a, b) => b.delta < a.delta ? b : a);
+
+  let frase2 = ` (${n} casos). Mejor eje actual: <strong>${escapeHTML(mejor.label)}</strong> ` +
+               `(${mejor.valor.toFixed(1)}). Punto débil: <strong>${escapeHTML(peor.label)}</strong> ` +
+               `(${peor.valor.toFixed(1)}).`;
+
+  // Si hay un eje con cambio relevante (>=1 punto), lo añadimos como tercera frase
+  let frase3 = '';
+  if (ejeMasSube.delta >= 1.0) {
+    frase3 = ` Destaca el avance en <strong>${escapeHTML(ejeMasSube.label)}</strong> (+${ejeMasSube.delta.toFixed(1)}).`;
+  } else if (ejeMasBaja.delta <= -1.0) {
+    frase3 = ` Atención al retroceso en <strong>${escapeHTML(ejeMasBaja.label)}</strong> (${ejeMasBaja.delta.toFixed(1)}).`;
+  }
+
+  return frase1 + frase2 + frase3;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 5 tarjetas de eje con sparkline SVG + delta
+// ────────────────────────────────────────────────────────────────────────────
+function renderizarTarjetasEjes(evaluaciones) {
+  const grid = $('ejes-grid');
+  grid.innerHTML = '';
+
+  EJES_CONFIG.forEach((eje, idx) => {
+    const serie = evaluaciones.map(ev => Number(ev[eje.id]));
+    const valorActual = serie[serie.length - 1];
+    const delta = calcularDelta(serie);
+    const claseDelta = clasificarDelta(delta);
+    const claseValor = clasificarPuntuacion(valorActual);
+
+    const card = document.createElement('div');
+    card.className = 'eje-card';
+    card.style.borderTopColor = eje.color;
+    card.dataset.ejeIdx = String(idx);
+    card.dataset.ejeId = eje.id;
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `Enfocar eje ${eje.label} en el gráfico`);
+
+    const deltaTxt = serie.length < 2
+      ? '<span class="eje-card-delta plana">primer caso</span>'
+      : `<span class="eje-card-delta ${claseDelta}">${flechaDelta(claseDelta)} ${delta >= 0 ? '+' : ''}${delta.toFixed(1)}</span>`;
+
+    const sparkSvg = serie.length >= 2
+      ? construirSparkline(serie, eje.color)
+      : '<svg class="eje-card-spark" viewBox="0 0 100 28"></svg>';
+
+    card.innerHTML = `
+      <div class="eje-card-nombre">${escapeHTML(eje.label)}</div>
+      <div class="eje-card-fila">
+        <span class="eje-card-num ${claseValor}">${valorActual.toFixed(1)}</span>
+        <span class="eje-card-max">/10</span>
+      </div>
+      ${deltaTxt}
+      ${sparkSvg}
+    `;
+
+    // Click → enfocar este eje en el gráfico
+    card.addEventListener('click', () => enfocarEje(eje.id));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        enfocarEje(eje.id);
+      }
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+// Construye un sparkline SVG inline. Sin dependencias.
+// Mapea la serie a un viewBox de 100×28 con padding interno.
+function construirSparkline(serie, color) {
+  if (!serie || serie.length < 2) return '';
+
+  const W = 100, H = 28;
+  const padX = 2, padTop = 4, padBottom = 4;
+  const innerW = W - padX * 2;
+  const innerH = H - padTop - padBottom;
+
+  // Escala Y fija a 0–10 (puntuación competencial), no autoescalada,
+  // para que el sparkline sea comparable entre ejes.
+  const yMin = 0, yMax = 10;
+
+  const puntos = serie.map((v, i) => {
+    const x = padX + (i / (serie.length - 1)) * innerW;
+    const yClamped = Math.max(yMin, Math.min(yMax, v));
+    const y = padTop + (1 - (yClamped - yMin) / (yMax - yMin)) * innerH;
+    return [x, y];
+  });
+
+  // Path del trazo
+  const d = puntos.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+
+  // Path del área (relleno suave bajo la curva)
+  const dArea = `${d} L${puntos[puntos.length - 1][0].toFixed(1)},${(H - padBottom).toFixed(1)} L${puntos[0][0].toFixed(1)},${(H - padBottom).toFixed(1)} Z`;
+
+  // Punto final destacado
+  const fin = puntos[puntos.length - 1];
+
+  return `<svg class="eje-card-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+    <path d="${dArea}" fill="${color}" fill-opacity="0.10" stroke="none"/>
+    <path d="${d}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${fin[0].toFixed(1)}" cy="${fin[1].toFixed(1)}" r="2.2" fill="${color}" stroke="#0a0e1a" stroke-width="1"/>
+  </svg>`;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Toggle de enfoque del gráfico (click en tarjeta = enfoca un eje)
+// ────────────────────────────────────────────────────────────────────────────
+function enfocarEje(ejeId) {
+  if (!chartEvolucion) return;
+
+  // Toggle: si ya está enfocado este mismo eje, resetear
+  if (ejeEnfocadoActual === ejeId) {
+    resetearGrafico();
+    return;
+  }
+
+  ejeEnfocadoActual = ejeId;
+
+  // Ajustar opacidad de cada dataset según si es el enfocado o no
+  chartEvolucion.data.datasets.forEach((ds, i) => {
+    const esEnfocado = EJES_CONFIG[i].id === ejeId;
+    const colorBase = EJES_CONFIG[i].color;
+    ds.borderColor = esEnfocado ? colorBase : colorBase + '33';
+    ds.backgroundColor = esEnfocado ? colorBase + '14' : 'transparent';
+    ds.borderWidth = esEnfocado ? 2.5 : 1;
+    ds.pointRadius = esEnfocado ? 5 : 2;
+    ds.pointHoverRadius = esEnfocado ? 7 : 4;
+  });
+  chartEvolucion.update();
+
+  // Marcar tarjeta activa
+  document.querySelectorAll('.eje-card').forEach(c => {
+    c.classList.toggle('activo', c.dataset.ejeId === ejeId);
+  });
+
+  // Mostrar el botón de reset
+  $('btn-reset-grafico').classList.remove('hidden');
+}
+
+function resetearGrafico() {
+  if (!chartEvolucion) return;
+  ejeEnfocadoActual = null;
+
+  chartEvolucion.data.datasets.forEach((ds, i) => {
+    const colorBase = EJES_CONFIG[i].color;
+    ds.borderColor = colorBase;
+    ds.backgroundColor = colorBase + '14';
+    ds.borderWidth = 2;
+    ds.pointRadius = 5;
+    ds.pointHoverRadius = 7;
+  });
+  chartEvolucion.update();
+
+  document.querySelectorAll('.eje-card').forEach(c => c.classList.remove('activo'));
+  $('btn-reset-grafico').classList.add('hidden');
+}
+
+function renderizarGrafico(evaluaciones) {
+  const labels = evaluaciones.map((ev) => {
+    const fecha = formatearFechaCorta(ev.validated_at || ev.timestamp);
+    return `${ev.case_id} · ${fecha}`;
+  });
+
+  const datasets = EJES_CONFIG.map(eje => ({
+    label: eje.label,
+    data: evaluaciones.map(ev => Number(ev[eje.id])),
+    borderColor: eje.color,
+    backgroundColor: eje.color + '14',
+    borderWidth: 2,
+    tension: 0.25,
+    pointRadius: 5,
+    pointHoverRadius: 7,
+    pointBackgroundColor: eje.color,
+    pointBorderColor: '#0a0e1a',
+    pointBorderWidth: 2
+  }));
+
+  const ctx = document.getElementById('chart-evolucion').getContext('2d');
+
+  // Si había un chart previo (re-render), destruirlo para evitar fugas
+  if (chartEvolucion) {
+    chartEvolucion.destroy();
+    chartEvolucion = null;
+    ejeEnfocadoActual = null;
+  }
+
+  chartEvolucion = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      layout: {
+        padding: { top: 8, right: 8, bottom: 0, left: 0 }
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+          align: 'start',
+          labels: {
+            color: '#cbd5e1',
+            font: { family: 'Inter', size: 12, weight: 500 },
+            usePointStyle: true,
+            pointStyle: 'circle',
+            padding: 14,
+            boxWidth: 8,
+            boxHeight: 8
+          }
+        },
+        tooltip: {
+          backgroundColor: '#111827',
+          borderColor: 'rgba(255,255,255,0.16)',
+          borderWidth: 1,
+          titleColor: '#f1f5f9',
+          bodyColor: '#cbd5e1',
+          padding: 12,
+          cornerRadius: 6,
+          titleFont: { family: 'Inter Tight', size: 13, weight: '600' },
+          bodyFont: { family: 'Inter', size: 12 },
+          displayColors: true,
+          boxPadding: 4
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#94a3b8',
+            font: { family: 'JetBrains Mono', size: 10.5, weight: 500 }
+          },
+          grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false }
+        },
+        y: {
+          beginAtZero: true,
+          max: 10,
+          ticks: {
+            color: '#94a3b8',
+            font: { family: 'JetBrains Mono', size: 10.5, weight: 500 },
+            stepSize: 2
+          },
+          grid: { color: 'rgba(255,255,255,0.06)', drawBorder: false },
+          title: {
+            display: true,
+            text: 'Puntuación (0 – 10)',
+            color: '#64748b',
+            font: { family: 'JetBrains Mono', size: 10.5, weight: 600 }
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderizarTabla(evaluaciones) {
+  const tbody = $('tabla-evaluaciones');
+  tbody.innerHTML = '';
+
+  evaluaciones.forEach(ev => {
+    const tr = document.createElement('tr');
+
+    const score = Number(ev.score_total);
+    const scoreCls = clasificarPuntuacion(score / 10);
+
+    tr.innerHTML = `
+      <td class="case-id">${escapeHTML(ev.case_id)}</td>
+      <td class="fecha-mono">${formatearFecha(ev.validated_at || ev.timestamp)}</td>
+      <td class="num">${Number(ev.axis_analisis).toFixed(1)}</td>
+      <td class="num">${Number(ev.axis_modelos).toFixed(1)}</td>
+      <td class="num">${Number(ev.axis_intervencion).toFixed(1)}</td>
+      <td class="num">${Number(ev.axis_riesgos).toFixed(1)}</td>
+      <td class="num">${Number(ev.axis_argumentacion).toFixed(1)}</td>
+      <td class="num score ${scoreCls}">${score.toFixed(1)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ============================================================================
+// ARRANQUE
+// ============================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Listener del botón "Ver todos los ejes" del gráfico
+  const btnReset = document.getElementById('btn-reset-grafico');
+  if (btnReset) btnReset.addEventListener('click', resetearGrafico);
+
+  cargarPerfil();
+});
+</script>
+</body>
+</html>

@@ -514,6 +514,96 @@ button.secondary {
   background: var(--border-strong);
   color: var(--text-0);
 }
+ /* ── BOTÓN VALIDAR LONGITUDINAL (estado guardado) ─────────────────── */
+.btn-validar-longitudinal.guardado {
+  background: var(--green) !important;
+  color: var(--bg-0) !important;
+  border-color: var(--green) !important;
+  cursor: default;
+}
+
+/* ── TOAST DE GUARDADO LONGITUDINAL ───────────────────────────────── */
+.toast-longitudinal {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(15, 20, 30, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--green);
+  border-radius: 12px;
+  padding: 16px 20px;
+  min-width: 320px;
+  max-width: 420px;
+  box-shadow: 0 12px 40px rgba(16, 217, 138, 0.25), 0 0 0 1px rgba(16, 217, 138, 0.15);
+  font-family: 'Inter', sans-serif;
+  color: var(--text-0);
+  animation: toast-entrada 0.35s ease-out;
+}
+.toast-longitudinal.saliendo {
+  animation: toast-salida 0.4s ease-in forwards;
+}
+@keyframes toast-entrada {
+  from { transform: translateX(120%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes toast-salida {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(120%); opacity: 0; }
+}
+.toast-longitudinal .toast-icono {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--green);
+  color: var(--bg-0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+.toast-longitudinal .toast-contenido {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.toast-longitudinal .toast-contenido strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-0);
+}
+.toast-longitudinal .toast-contenido a {
+  font-size: 13px;
+  color: var(--green);
+  text-decoration: none;
+  font-weight: 500;
+}
+.toast-longitudinal .toast-contenido a:hover {
+  text-decoration: underline;
+}
+.toast-longitudinal .toast-cerrar {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+.toast-longitudinal .toast-cerrar:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-0);
+}  
 .btn-copiar.copiado {
   background: var(--green);
   color: var(--bg-0);
@@ -1555,6 +1645,7 @@ section#estado-resultado.con-visor .visor-pdf {
       <button class="btn-descartar" id="btn-descartar">Descartar cambios</button>
       <button class="btn-restaurar" id="btn-restaurar">Restaurar IA original</button>
       <button class="btn-print" id="btn-print">Generar PDF alumno</button>
+      <button class="btn-validar-longitudinal" id="btn-validar-longitudinal">📊 Validar y guardar en perfil</button>
     </div>
   </div>
 
@@ -2967,7 +3058,107 @@ $('btn-otro').addEventListener('click', () => {
   Semaforo.limpiar();
   mostrarEstado('estado-formulario');
 });
+// ============================================================================
+// BOTÓN VALIDAR Y GUARDAR EN PERFIL LONGITUDINAL
+// ============================================================================
+(function setupValidarLongitudinal() {
+  const STUDENT_ID_HARDCODED = 'PRL2526_TEST';
+  const CASE_ID_HARDCODED = 'psicosocial_gestoria_v1';
+  const CASE_ORDER = 1;
 
+  const btn = document.getElementById('btn-validar-longitudinal');
+  if (!btn) return;
+
+  btn.addEventListener('click', async () => {
+    if (!estado || !estado.original) {
+      alert('No hay evaluación cargada en pantalla. Sube primero un dictamen.');
+      return;
+    }
+
+    // Si el profesor ha editado el resultado, usamos lo editado.
+    const data = estado.editado || estado.original;
+
+    if (!Array.isArray(data.vector_ejes) || data.vector_ejes.length !== 5) {
+      alert('La evaluación no contiene un vector_ejes válido.');
+      return;
+    }
+
+    // Defensa: cada eje debe traer 'max' (lo emite el motor api/evaluar.js).
+    // Sin 'max' el endpoint /save no puede normalizar a escala 0-10 y rechaza
+    // el payload. Avisamos aquí con un mensaje claro antes de hacer la petición.
+    const ejesSinMax = data.vector_ejes.filter(e => !Number.isFinite(Number(e?.max)) || Number(e.max) <= 0);
+    if (ejesSinMax.length > 0) {
+      const nombres = ejesSinMax.map(e => e?.eje || '?').join(', ');
+      alert(`No se puede guardar: faltan datos técnicos ('max') en los siguientes ejes: ${nombres}.\n\nEsto suele indicar una versión antigua del motor. Vuelve a evaluar el dictamen y reintenta.`);
+      return;
+    }
+
+    const payload = {
+      student_id: STUDENT_ID_HARDCODED,
+      case_id: CASE_ID_HARDCODED,
+      case_order: CASE_ORDER,
+      // Enviamos puntuacion + max. El endpoint /save normaliza a 0-10 antes de
+      // guardar (la BD longitudinal vive en escala 0-10 fija para que sea
+      // comparable entre casos cuyas rúbricas pesan distinto).
+      vector_ejes: data.vector_ejes.map(e => ({
+        eje: e.eje,
+        puntuacion: Number(e.puntuacion),
+        max: Number(e.max)
+      })),
+      score_total: Number(data.nota_global),
+      validated_by: estado.ultimoAlumno?.nombre || 'profesor',
+      notes: `Validado desde corrector. Alumno: ${estado.ultimoAlumno?.nombre || 'sin nombre'} · Grupo: ${estado.ultimoAlumno?.grupo || 'sin grupo'}`
+    };
+
+    btn.disabled = true;
+    const textoOriginal = btn.textContent;
+    btn.textContent = '⏳ Guardando...';
+
+    try {
+      const resp = await fetch('/api/longitudinal/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const result = await resp.json();
+
+      if (!resp.ok || !result.ok) {
+        throw new Error(result.message || result.error || 'Error desconocido del servidor.');
+      }
+
+      mostrarToastLongitudinal(STUDENT_ID_HARDCODED);
+      btn.textContent = '✓ Guardado';
+      btn.classList.add('guardado');
+
+    } catch (err) {
+      console.error('[VALIDAR-LONGITUDINAL] Error:', err);
+      alert(`No se pudo guardar la evaluación:\n\n${err.message}`);
+      btn.disabled = false;
+      btn.textContent = textoOriginal;
+    }
+  });
+})();
+
+function mostrarToastLongitudinal(studentId) {
+  const toast = document.createElement('div');
+  toast.className = 'toast-longitudinal';
+  toast.innerHTML = `
+    <div class="toast-icono">✓</div>
+    <div class="toast-contenido">
+      <strong>Evaluación guardada en el perfil del alumno</strong>
+      <a href="/dashboard-alumno.html?student=${encodeURIComponent(studentId)}" target="_blank" rel="noopener">
+        Ver perfil del alumno →
+      </a>
+    </div>
+    <button class="toast-cerrar" onclick="this.parentElement.remove()">✕</button>
+  `;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    if (toast.parentElement) toast.classList.add('saliendo');
+    setTimeout(() => toast.remove(), 400);
+  }, 8000);
+}
 </script>
 </body>
 </html>
