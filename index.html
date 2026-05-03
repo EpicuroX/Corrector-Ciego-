@@ -1576,8 +1576,8 @@ section#estado-resultado.con-visor .visor-pdf {
   <form id="form-subir">
     <div class="form-grid">
       <div>
-        <label for="alumno-nombre">Nombre del alumno</label>
-        <input type="text" id="alumno-nombre" required autocomplete="off" placeholder="p.ej. Jorge García">
+        <label for="alumno-nombre">Código del alumno</label>
+        <input type="text" id="alumno-nombre" required autocomplete="off" placeholder="p.ej. PRL2526-01">
       </div>
       <div>
         <label for="alumno-grupo">Grupo</label>
@@ -3061,17 +3061,36 @@ $('btn-otro').addEventListener('click', () => {
 // ============================================================================
 // BOTÓN VALIDAR Y GUARDAR EN PERFIL LONGITUDINAL
 // ============================================================================
+// Lee dinámicamente:
+//   · student_id   → del campo "Código del alumno" del formulario (ej: PRL2526-01).
+//                    Convención de protección de datos: el profesor escribe el
+//                    código anonimizado, no el nombre real. La correspondencia
+//                    {código → nombre} la lleva el profesor en su lista local.
+//   · case_id      → de CONFIG.caso_id (leído de la URL ?caso=...).
+//   · case_order   → no se envía. El backend lo deja null (ordenable por timestamp).
+// ============================================================================
 (function setupValidarLongitudinal() {
-  const STUDENT_ID_HARDCODED = 'PRL2526_TEST';
-  const CASE_ID_HARDCODED = 'psicosocial_gestoria_v1';
-  const CASE_ORDER = 1;
-
   const btn = document.getElementById('btn-validar-longitudinal');
   if (!btn) return;
 
   btn.addEventListener('click', async () => {
     if (!estado || !estado.original) {
       alert('No hay evaluación cargada en pantalla. Sube primero un dictamen.');
+      return;
+    }
+
+    // El student_id se lee del campo del formulario (ya guardado en estado.ultimoAlumno.nombre).
+    // El profesor lo escribe como código anonimizado (ej: PRL2526-01).
+    const studentId = (estado.ultimoAlumno?.nombre || '').trim();
+    if (!studentId) {
+      alert('Falta el código del alumno. Vuelve al formulario y rellena el campo "Código del alumno".');
+      return;
+    }
+
+    // El case_id se lee de la URL (?caso=...) vía CONFIG, ya cargado al inicio.
+    const caseId = CONFIG.caso_id;
+    if (!caseId) {
+      alert('No se ha podido determinar el caso. La URL debe incluir ?caso=...');
       return;
     }
 
@@ -3094,20 +3113,17 @@ $('btn-otro').addEventListener('click', () => {
     }
 
     const payload = {
-      student_id: STUDENT_ID_HARDCODED,
-      case_id: CASE_ID_HARDCODED,
-      case_order: CASE_ORDER,
-      // Enviamos puntuacion + max. El endpoint /save normaliza a 0-10 antes de
-      // guardar (la BD longitudinal vive en escala 0-10 fija para que sea
-      // comparable entre casos cuyas rúbricas pesan distinto).
+      student_id: studentId,
+      case_id: caseId,
+      // case_order omitido: backend lo deja null, dashboard ordena por timestamp.
       vector_ejes: data.vector_ejes.map(e => ({
         eje: e.eje,
         puntuacion: Number(e.puntuacion),
         max: Number(e.max)
       })),
       score_total: Number(data.nota_global),
-      validated_by: estado.ultimoAlumno?.nombre || 'profesor',
-      notes: `Validado desde corrector. Alumno: ${estado.ultimoAlumno?.nombre || 'sin nombre'} · Grupo: ${estado.ultimoAlumno?.grupo || 'sin grupo'}`
+      validated_by: 'profesor',
+      notes: `Validado desde corrector. Alumno: ${studentId} · Grupo: ${estado.ultimoAlumno?.grupo || 'sin grupo'} · Caso: ${caseId}`
     };
 
     btn.disabled = true;
@@ -3126,7 +3142,7 @@ $('btn-otro').addEventListener('click', () => {
         throw new Error(result.message || result.error || 'Error desconocido del servidor.');
       }
 
-      mostrarToastLongitudinal(STUDENT_ID_HARDCODED);
+      mostrarToastLongitudinal(studentId);
       btn.textContent = '✓ Guardado';
       btn.classList.add('guardado');
 
