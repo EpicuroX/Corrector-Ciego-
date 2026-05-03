@@ -2748,7 +2748,93 @@ $('btn-otro').addEventListener('click', () => {
   Semaforo.limpiar();
   mostrarEstado('estado-formulario');
 });
+// ============================================================================
+// BOTÓN VALIDAR Y GUARDAR EN PERFIL LONGITUDINAL
+// ============================================================================
+(function setupValidarLongitudinal() {
+  const STUDENT_ID_HARDCODED = 'PRL2526_TEST';
+  const CASE_ID_HARDCODED = 'psicosocial_gestoria_v1';
+  const CASE_ORDER = 1;
 
+  const btn = document.getElementById('btn-validar-longitudinal');
+  if (!btn) return;
+
+  btn.addEventListener('click', async () => {
+    if (!estado || !estado.original) {
+      alert('No hay evaluación cargada en pantalla. Sube primero un dictamen.');
+      return;
+    }
+
+    // Si el profesor ha editado el resultado, usamos lo editado.
+    const data = estado.editado || estado.original;
+
+    if (!Array.isArray(data.vector_ejes) || data.vector_ejes.length !== 5) {
+      alert('La evaluación no contiene un vector_ejes válido.');
+      return;
+    }
+
+    const payload = {
+      student_id: STUDENT_ID_HARDCODED,
+      case_id: CASE_ID_HARDCODED,
+      case_order: CASE_ORDER,
+      vector_ejes: data.vector_ejes.map(e => ({
+        eje: e.eje,
+        puntuacion: Number(e.puntuacion)
+      })),
+      score_total: Number(data.nota_global),
+      validated_by: estado.ultimoAlumno?.nombre || 'profesor',
+      notes: `Validado desde corrector. Alumno: ${estado.ultimoAlumno?.nombre || 'sin nombre'} · Grupo: ${estado.ultimoAlumno?.grupo || 'sin grupo'}`
+    };
+
+    btn.disabled = true;
+    const textoOriginal = btn.textContent;
+    btn.textContent = '⏳ Guardando...';
+
+    try {
+      const resp = await fetch('/api/longitudinal/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const result = await resp.json();
+
+      if (!resp.ok || !result.ok) {
+        throw new Error(result.message || result.error || 'Error desconocido del servidor.');
+      }
+
+      mostrarToastLongitudinal(STUDENT_ID_HARDCODED);
+      btn.textContent = '✓ Guardado';
+      btn.classList.add('guardado');
+
+    } catch (err) {
+      console.error('[VALIDAR-LONGITUDINAL] Error:', err);
+      alert(`No se pudo guardar la evaluación:\n\n${err.message}`);
+      btn.disabled = false;
+      btn.textContent = textoOriginal;
+    }
+  });
+})();
+
+function mostrarToastLongitudinal(studentId) {
+  const toast = document.createElement('div');
+  toast.className = 'toast-longitudinal';
+  toast.innerHTML = `
+    <div class="toast-icono">✓</div>
+    <div class="toast-contenido">
+      <strong>Evaluación guardada en el perfil del alumno</strong>
+      <a href="/dashboard-alumno.html?student=${encodeURIComponent(studentId)}" target="_blank" rel="noopener">
+        Ver perfil del alumno →
+      </a>
+    </div>
+    <button class="toast-cerrar" onclick="this.parentElement.remove()">✕</button>
+  `;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    if (toast.parentElement) toast.classList.add('saliendo');
+    setTimeout(() => toast.remove(), 400);
+  }, 8000);
+}
 </script>
 </body>
 </html>
