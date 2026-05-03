@@ -343,6 +343,259 @@ tbody td.score.high { color: var(--accent-green); }
 tbody td.score.mid  { color: var(--accent-amber); }
 tbody td.score.low  { color: var(--accent-red); }
 
+/* ── BANDA SUPERIOR · resumen competencial ──────────────────────── */
+.banda-resumen {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 32px;
+  align-items: center;
+  padding: 28px 28px;
+  margin-bottom: 24px;
+  background: var(--bg-1);
+  border: 1px solid var(--border-1);
+  border-radius: 12px;
+}
+.banda-nota {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding-right: 32px;
+  border-right: 1px solid var(--border-1);
+}
+.banda-nota-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.banda-nota-num.high { color: var(--accent-green); }
+.banda-nota-num.mid  { color: var(--accent-amber); }
+.banda-nota-num.low  { color: var(--accent-red); }
+.banda-nota-max {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  color: var(--text-4);
+  margin-left: 4px;
+  font-weight: 500;
+}
+.banda-nota-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.banda-narrativa {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.banda-narrativa-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.banda-narrativa-texto {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+.banda-narrativa-texto strong {
+  color: var(--text-1);
+  font-weight: 600;
+}
+.banda-tendencia {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-top: 6px;
+  width: fit-content;
+}
+.banda-tendencia.sube  { background: rgba(16,217,138,0.10); color: var(--accent-green); }
+.banda-tendencia.baja  { background: rgba(255,77,106,0.10); color: var(--accent-red); }
+.banda-tendencia.plana { background: rgba(255,255,255,0.04); color: var(--text-3); border: 1px solid var(--border-1); }
+.banda-tendencia-arrow {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1;
+}
+.banda-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-left: 24px;
+  border-left: 1px solid var(--border-1);
+  min-width: 180px;
+}
+.banda-meta-fila {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.banda-meta-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.banda-meta-valor {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.005em;
+}
+
+/* ── TARJETAS DE EJE · 5 competencias ───────────────────────────── */
+.ejes-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.eje-card {
+  background: var(--bg-1);
+  border: 1px solid var(--border-1);
+  border-radius: 10px;
+  padding: 18px 16px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  position: relative;
+  border-top-width: 3px;
+}
+.eje-card:hover {
+  border-color: var(--border-2);
+  background: var(--bg-2);
+}
+.eje-card.activo {
+  background: var(--bg-2);
+  border-color: var(--border-2);
+}
+.eje-card.activo::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-1);
+}
+.eje-card-nombre {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: -0.005em;
+  line-height: 1.3;
+  min-height: 32px;
+}
+.eje-card-fila {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.eje-card-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.eje-card-num.high { color: var(--accent-green); }
+.eje-card-num.mid  { color: var(--accent-amber); }
+.eje-card-num.low  { color: var(--accent-red); }
+.eje-card-max {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-4);
+  font-weight: 500;
+}
+.eje-card-delta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.eje-card-delta.sube  { color: var(--accent-green); }
+.eje-card-delta.baja  { color: var(--accent-red); }
+.eje-card-delta.plana { color: var(--text-4); }
+.eje-card-spark {
+  width: 100%;
+  height: 28px;
+  display: block;
+  margin-top: 2px;
+}
+
+/* ── HINT pedagógico (un solo caso) ─────────────────────────────── */
+.hint-pedagogico {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(96, 165, 250, 0.08);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-2);
+  margin-bottom: 24px;
+}
+.hint-pedagogico strong { color: var(--text-1); font-weight: 600; }
+
+/* ── Botón "Ver todos los ejes" del gráfico ─────────────────────── */
+.chart-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+  min-height: 26px;
+}
+.btn-reset-grafico {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  background: transparent;
+  border: 1px solid var(--border-1);
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-reset-grafico:hover {
+  color: var(--text-1);
+  border-color: var(--border-2);
+  background: var(--bg-2);
+}
+.btn-reset-grafico.hidden { display: none; }
+
 /* ── Pie ───────────────────────────────────────────────────────── */
 footer {
   margin-top: 48px;
@@ -364,6 +617,17 @@ footer {
   .panel-alumno .separador-vert { display: none; }
   .chart-wrapper { height: 320px; }
   header h1 { font-size: 22px; }
+  .banda-resumen {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 22px;
+  }
+  .banda-nota { padding-right: 0; border-right: none; padding-bottom: 16px; border-bottom: 1px solid var(--border-1); width: 100%; }
+  .banda-meta { padding-left: 0; border-left: none; padding-top: 16px; border-top: 1px solid var(--border-1); flex-direction: row; gap: 24px; min-width: 0; }
+  .ejes-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .ejes-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -412,35 +676,54 @@ footer {
   <!-- ESTADO: datos cargados -->
   <div id="estado-datos" class="hidden">
 
-    <div class="card">
-      <div class="panel-alumno">
-        <div class="stat-bloque">
-          <span class="stat-label">Código de alumno</span>
-          <span class="stat-valor-mono" id="student-id-valor">—</span>
+    <!-- Banda de resumen competencial: nota global + narrativa + metadatos -->
+    <div class="banda-resumen">
+      <div class="banda-nota">
+        <div>
+          <span class="banda-nota-num" id="banda-nota-num">—</span><span class="banda-nota-max">/10</span>
         </div>
-
-        <div class="separador-vert"></div>
-
-        <div class="stat-bloque">
-          <span class="stat-label">Casos validados</span>
-          <span class="stat-valor-num" id="stat-num-casos">0</span>
+        <div class="banda-nota-label">Media competencial</div>
+        <div class="banda-tendencia plana" id="banda-tendencia">
+          <span class="banda-tendencia-arrow" id="banda-tendencia-arrow">→</span>
+          <span id="banda-tendencia-texto">Sin tendencia</span>
         </div>
-
-        <div class="separador-vert"></div>
-
-        <div class="stat-bloque">
-          <span class="stat-label">Última validación</span>
-          <span class="stat-valor-fecha" id="stat-ultima-fecha">—</span>
+      </div>
+      <div class="banda-narrativa">
+        <div class="banda-narrativa-eyebrow">Lectura del perfil</div>
+        <div class="banda-narrativa-texto" id="banda-narrativa-texto">—</div>
+      </div>
+      <div class="banda-meta">
+        <div class="banda-meta-fila">
+          <span class="banda-meta-label">Código de alumno</span>
+          <span class="banda-meta-valor" id="student-id-valor">—</span>
+        </div>
+        <div class="banda-meta-fila">
+          <span class="banda-meta-label">Casos validados</span>
+          <span class="banda-meta-valor" id="stat-num-casos">0</span>
+        </div>
+        <div class="banda-meta-fila">
+          <span class="banda-meta-label">Última validación</span>
+          <span class="banda-meta-valor" id="stat-ultima-fecha">—</span>
         </div>
       </div>
     </div>
 
-    <div class="card">
+    <!-- 5 tarjetas de eje competencial · clic enfoca el eje en el gráfico -->
+    <div class="ejes-grid" id="ejes-grid"></div>
+
+    <!-- Hint pedagógico: solo visible cuando hay un único caso -->
+    <div class="hint-pedagogico hidden" id="hint-un-caso">
+      <span><strong>Solo hay una evaluación validada.</strong> La gráfica de evolución y las tendencias aparecerán cuando este alumno tenga al menos dos casos validados.</span>
+    </div>
+
+    <div class="card" id="card-grafico">
       <div class="card-titulo">Evolución por ejes competenciales</div>
       <div class="card-descripcion">
         Cada línea representa la puntuación obtenida (0–10) en uno de los cinco ejes
-        a lo largo de los casos validados. El eje X ordena los casos cronológicamente
-        por fecha de validación.
+        a lo largo de los casos validados. Pulsa una tarjeta de eje arriba para enfocarlo.
+      </div>
+      <div class="chart-toolbar">
+        <button class="btn-reset-grafico hidden" id="btn-reset-grafico" type="button">Ver todos los ejes</button>
       </div>
       <div class="chart-wrapper">
         <canvas id="chart-evolucion"></canvas>
@@ -595,19 +878,300 @@ function mostrarError(mensaje, codigo) {
 // ============================================================================
 // RENDERIZADO
 // ============================================================================
+// Variable global para guardar la instancia del gráfico (necesario para el
+// toggle de "enfocar un eje" / "ver todos").
+let chartEvolucion = null;
+let ejeEnfocadoActual = null;
+
 function renderizarPerfil(studentId, evaluaciones) {
-  // Cabecera
+  // Metadatos (los IDs originales se preservan, ahora viven en la banda-meta)
   $('student-id-valor').textContent = studentId;
   $('stat-num-casos').textContent = evaluaciones.length;
 
   const ultima = evaluaciones[evaluaciones.length - 1];
   $('stat-ultima-fecha').textContent = formatearFechaCorta(ultima.validated_at || ultima.timestamp);
 
+  // Banda superior · resumen competencial (nota global + tendencia + narrativa)
+  renderizarBandaResumen(evaluaciones);
+
+  // 5 tarjetas de eje con sparkline y delta
+  renderizarTarjetasEjes(evaluaciones);
+
+  // Hint pedagógico si solo hay 1 caso (gráfica de evolución no tiene sentido)
+  const unSoloCaso = evaluaciones.length === 1;
+  $('hint-un-caso').classList.toggle('hidden', !unSoloCaso);
+  $('card-grafico').classList.toggle('hidden', unSoloCaso);
+
   // Gráfico
-  renderizarGrafico(evaluaciones);
+  if (!unSoloCaso) {
+    renderizarGrafico(evaluaciones);
+  }
 
   // Tabla
   renderizarTabla(evaluaciones);
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Cálculos competenciales (medias, deltas, tendencias)
+// ────────────────────────────────────────────────────────────────────────────
+function calcularMediaCaso(ev) {
+  const valores = EJES_CONFIG.map(e => Number(ev[e.id])).filter(v => Number.isFinite(v));
+  if (valores.length === 0) return 0;
+  return valores.reduce((a, b) => a + b, 0) / valores.length;
+}
+
+function calcularDelta(serie) {
+  // Delta entre el primer y el último valor de la serie
+  if (!serie || serie.length < 2) return 0;
+  return serie[serie.length - 1] - serie[0];
+}
+
+function clasificarDelta(delta) {
+  // Umbral pedagógico: < 0.5 puntos se considera "estable"
+  if (delta >= 0.5) return 'sube';
+  if (delta <= -0.5) return 'baja';
+  return 'plana';
+}
+
+function flechaDelta(clase) {
+  if (clase === 'sube')  return '↑';
+  if (clase === 'baja')  return '↓';
+  return '→';
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Banda superior: nota media + tendencia + narrativa
+// ────────────────────────────────────────────────────────────────────────────
+function renderizarBandaResumen(evaluaciones) {
+  // Serie de medias por caso (cronológica)
+  const mediasPorCaso = evaluaciones.map(calcularMediaCaso);
+  const mediaActual = mediasPorCaso[mediasPorCaso.length - 1];
+
+  // Pintar el número grande
+  const numEl = $('banda-nota-num');
+  numEl.textContent = mediaActual.toFixed(1);
+  numEl.classList.remove('high', 'mid', 'low');
+  numEl.classList.add(clasificarPuntuacion(mediaActual));
+
+  // Tendencia global (delta entre primera y última media)
+  const deltaGlobal = calcularDelta(mediasPorCaso);
+  const claseDelta = clasificarDelta(deltaGlobal);
+  const tendenciaEl = $('banda-tendencia');
+  tendenciaEl.classList.remove('sube', 'baja', 'plana');
+  tendenciaEl.classList.add(claseDelta);
+  $('banda-tendencia-arrow').textContent = flechaDelta(claseDelta);
+
+  if (evaluaciones.length < 2) {
+    $('banda-tendencia-texto').textContent = 'Primera evaluación';
+  } else {
+    const signo = deltaGlobal >= 0 ? '+' : '';
+    const textoDelta = `${signo}${deltaGlobal.toFixed(1)} desde el primer caso`;
+    $('banda-tendencia-texto').textContent = textoDelta;
+  }
+
+  // Narrativa pedagógica
+  $('banda-narrativa-texto').innerHTML = generarNarrativa(evaluaciones, mediasPorCaso);
+}
+
+function generarNarrativa(evaluaciones, mediasPorCaso) {
+  const ultima = evaluaciones[evaluaciones.length - 1];
+  const n = evaluaciones.length;
+
+  // Calcular puntuación actual por eje
+  const ejesActuales = EJES_CONFIG.map(eje => ({
+    label: eje.label,
+    valor: Number(ultima[eje.id])
+  }));
+
+  // Mejor y peor eje (en la última evaluación)
+  const mejor = ejesActuales.reduce((a, b) => b.valor > a.valor ? b : a);
+  const peor  = ejesActuales.reduce((a, b) => b.valor < a.valor ? b : a);
+
+  // Caso 1: una sola evaluación → narrativa de partida
+  if (n === 1) {
+    return `Primera evaluación validada. Su mejor eje es <strong>${escapeHTML(mejor.label)}</strong> ` +
+           `(${mejor.valor.toFixed(1)}). El eje con más margen de mejora es ` +
+           `<strong>${escapeHTML(peor.label)}</strong> (${peor.valor.toFixed(1)}).`;
+  }
+
+  // Caso 2+: comparar trayectoria
+  const deltaGlobal = calcularDelta(mediasPorCaso);
+  const claseGlobal = clasificarDelta(deltaGlobal);
+
+  let frase1;
+  if (claseGlobal === 'sube') {
+    frase1 = `Progresa de forma sostenida desde su primera evaluación`;
+  } else if (claseGlobal === 'baja') {
+    frase1 = `Su rendimiento ha descendido respecto a su primera evaluación`;
+  } else {
+    frase1 = `Su rendimiento se mantiene estable a lo largo de los casos`;
+  }
+
+  // Calcular delta por eje para destacar el que más sube/baja
+  const deltasPorEje = EJES_CONFIG.map(eje => ({
+    label: eje.label,
+    delta: Number(ultima[eje.id]) - Number(evaluaciones[0][eje.id])
+  }));
+  const ejeMasSube  = deltasPorEje.reduce((a, b) => b.delta > a.delta ? b : a);
+  const ejeMasBaja  = deltasPorEje.reduce((a, b) => b.delta < a.delta ? b : a);
+
+  let frase2 = ` (${n} casos). Mejor eje actual: <strong>${escapeHTML(mejor.label)}</strong> ` +
+               `(${mejor.valor.toFixed(1)}). Punto débil: <strong>${escapeHTML(peor.label)}</strong> ` +
+               `(${peor.valor.toFixed(1)}).`;
+
+  // Si hay un eje con cambio relevante (>=1 punto), lo añadimos como tercera frase
+  let frase3 = '';
+  if (ejeMasSube.delta >= 1.0) {
+    frase3 = ` Destaca el avance en <strong>${escapeHTML(ejeMasSube.label)}</strong> (+${ejeMasSube.delta.toFixed(1)}).`;
+  } else if (ejeMasBaja.delta <= -1.0) {
+    frase3 = ` Atención al retroceso en <strong>${escapeHTML(ejeMasBaja.label)}</strong> (${ejeMasBaja.delta.toFixed(1)}).`;
+  }
+
+  return frase1 + frase2 + frase3;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 5 tarjetas de eje con sparkline SVG + delta
+// ────────────────────────────────────────────────────────────────────────────
+function renderizarTarjetasEjes(evaluaciones) {
+  const grid = $('ejes-grid');
+  grid.innerHTML = '';
+
+  EJES_CONFIG.forEach((eje, idx) => {
+    const serie = evaluaciones.map(ev => Number(ev[eje.id]));
+    const valorActual = serie[serie.length - 1];
+    const delta = calcularDelta(serie);
+    const claseDelta = clasificarDelta(delta);
+    const claseValor = clasificarPuntuacion(valorActual);
+
+    const card = document.createElement('div');
+    card.className = 'eje-card';
+    card.style.borderTopColor = eje.color;
+    card.dataset.ejeIdx = String(idx);
+    card.dataset.ejeId = eje.id;
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `Enfocar eje ${eje.label} en el gráfico`);
+
+    const deltaTxt = serie.length < 2
+      ? '<span class="eje-card-delta plana">primer caso</span>'
+      : `<span class="eje-card-delta ${claseDelta}">${flechaDelta(claseDelta)} ${delta >= 0 ? '+' : ''}${delta.toFixed(1)}</span>`;
+
+    const sparkSvg = serie.length >= 2
+      ? construirSparkline(serie, eje.color)
+      : '<svg class="eje-card-spark" viewBox="0 0 100 28"></svg>';
+
+    card.innerHTML = `
+      <div class="eje-card-nombre">${escapeHTML(eje.label)}</div>
+      <div class="eje-card-fila">
+        <span class="eje-card-num ${claseValor}">${valorActual.toFixed(1)}</span>
+        <span class="eje-card-max">/10</span>
+      </div>
+      ${deltaTxt}
+      ${sparkSvg}
+    `;
+
+    // Click → enfocar este eje en el gráfico
+    card.addEventListener('click', () => enfocarEje(eje.id));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        enfocarEje(eje.id);
+      }
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+// Construye un sparkline SVG inline. Sin dependencias.
+// Mapea la serie a un viewBox de 100×28 con padding interno.
+function construirSparkline(serie, color) {
+  if (!serie || serie.length < 2) return '';
+
+  const W = 100, H = 28;
+  const padX = 2, padTop = 4, padBottom = 4;
+  const innerW = W - padX * 2;
+  const innerH = H - padTop - padBottom;
+
+  // Escala Y fija a 0–10 (puntuación competencial), no autoescalada,
+  // para que el sparkline sea comparable entre ejes.
+  const yMin = 0, yMax = 10;
+
+  const puntos = serie.map((v, i) => {
+    const x = padX + (i / (serie.length - 1)) * innerW;
+    const yClamped = Math.max(yMin, Math.min(yMax, v));
+    const y = padTop + (1 - (yClamped - yMin) / (yMax - yMin)) * innerH;
+    return [x, y];
+  });
+
+  // Path del trazo
+  const d = puntos.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+
+  // Path del área (relleno suave bajo la curva)
+  const dArea = `${d} L${puntos[puntos.length - 1][0].toFixed(1)},${(H - padBottom).toFixed(1)} L${puntos[0][0].toFixed(1)},${(H - padBottom).toFixed(1)} Z`;
+
+  // Punto final destacado
+  const fin = puntos[puntos.length - 1];
+
+  return `<svg class="eje-card-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+    <path d="${dArea}" fill="${color}" fill-opacity="0.10" stroke="none"/>
+    <path d="${d}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${fin[0].toFixed(1)}" cy="${fin[1].toFixed(1)}" r="2.2" fill="${color}" stroke="#0a0e1a" stroke-width="1"/>
+  </svg>`;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Toggle de enfoque del gráfico (click en tarjeta = enfoca un eje)
+// ────────────────────────────────────────────────────────────────────────────
+function enfocarEje(ejeId) {
+  if (!chartEvolucion) return;
+
+  // Toggle: si ya está enfocado este mismo eje, resetear
+  if (ejeEnfocadoActual === ejeId) {
+    resetearGrafico();
+    return;
+  }
+
+  ejeEnfocadoActual = ejeId;
+
+  // Ajustar opacidad de cada dataset según si es el enfocado o no
+  chartEvolucion.data.datasets.forEach((ds, i) => {
+    const esEnfocado = EJES_CONFIG[i].id === ejeId;
+    const colorBase = EJES_CONFIG[i].color;
+    ds.borderColor = esEnfocado ? colorBase : colorBase + '33';
+    ds.backgroundColor = esEnfocado ? colorBase + '14' : 'transparent';
+    ds.borderWidth = esEnfocado ? 2.5 : 1;
+    ds.pointRadius = esEnfocado ? 5 : 2;
+    ds.pointHoverRadius = esEnfocado ? 7 : 4;
+  });
+  chartEvolucion.update();
+
+  // Marcar tarjeta activa
+  document.querySelectorAll('.eje-card').forEach(c => {
+    c.classList.toggle('activo', c.dataset.ejeId === ejeId);
+  });
+
+  // Mostrar el botón de reset
+  $('btn-reset-grafico').classList.remove('hidden');
+}
+
+function resetearGrafico() {
+  if (!chartEvolucion) return;
+  ejeEnfocadoActual = null;
+
+  chartEvolucion.data.datasets.forEach((ds, i) => {
+    const colorBase = EJES_CONFIG[i].color;
+    ds.borderColor = colorBase;
+    ds.backgroundColor = colorBase + '14';
+    ds.borderWidth = 2;
+    ds.pointRadius = 5;
+    ds.pointHoverRadius = 7;
+  });
+  chartEvolucion.update();
+
+  document.querySelectorAll('.eje-card').forEach(c => c.classList.remove('activo'));
+  $('btn-reset-grafico').classList.add('hidden');
 }
 
 function renderizarGrafico(evaluaciones) {
@@ -632,7 +1196,14 @@ function renderizarGrafico(evaluaciones) {
 
   const ctx = document.getElementById('chart-evolucion').getContext('2d');
 
-  new Chart(ctx, {
+  // Si había un chart previo (re-render), destruirlo para evitar fugas
+  if (chartEvolucion) {
+    chartEvolucion.destroy();
+    chartEvolucion = null;
+    ejeEnfocadoActual = null;
+  }
+
+  chartEvolucion = new Chart(ctx, {
     type: 'line',
     data: { labels, datasets },
     options: {
@@ -726,7 +1297,13 @@ function renderizarTabla(evaluaciones) {
 // ============================================================================
 // ARRANQUE
 // ============================================================================
-document.addEventListener('DOMContentLoaded', cargarPerfil);
+document.addEventListener('DOMContentLoaded', () => {
+  // Listener del botón "Ver todos los ejes" del gráfico
+  const btnReset = document.getElementById('btn-reset-grafico');
+  if (btnReset) btnReset.addEventListener('click', resetearGrafico);
+
+  cargarPerfil();
+});
 </script>
 </body>
 </html>
