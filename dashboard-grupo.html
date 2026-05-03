@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vista de aula · Darabia</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  /* Paleta oscura Darabia · idéntica a dashboard-alumno.html */
+  --bg-0: #0a0e1a;
+  --bg-1: #111827;
+  --bg-2: #1f2937;
+
+  --text-1: #f1f5f9;
+  --text-2: #cbd5e1;
+  --text-3: #94a3b8;
+  --text-4: #64748b;
+
+  --border-1: rgba(255, 255, 255, 0.08);
+  --border-2: rgba(255, 255, 255, 0.16);
+
+  --accent-green: #10d98a;
+  --accent-green-deep: #0a9968;
+  --accent-green-soft: rgba(16, 217, 138, 0.10);
+  --accent-red:    #ff4d6a;
+  --accent-amber:  #f59e0b;
+  --accent-blue:   #60a5fa;
+  --accent-purple: #a78bfa;
+  --accent-pink:   #ec4899;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-0);
+  color: var(--text-1);
+  min-height: 100vh;
+  padding: 32px 24px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+/* ── Wordmark Darabia ──────────────────────────────────────────── */
+.darabia-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.darabia-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--accent-green);
+  color: var(--bg-0);
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  border-radius: 4px;
+}
+.darabia-name {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+  font-size: 14pt;
+  color: var(--text-1);
+  letter-spacing: -0.025em;
+}
+
+/* ── Cabecera ──────────────────────────────────────────────────── */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 24px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-1);
+}
+.header-textos { flex: 1; }
+
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+header h1 {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-2);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ── Card base ─────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-1);
+  border: 1px solid var(--border-1);
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.card-titulo {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+.card-descripcion {
+  font-size: 13px;
+  color: var(--text-3);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+/* ── Estados ───────────────────────────────────────────────────── */
+.estado {
+  text-align: center;
+  padding: 64px 24px;
+}
+.estado .icono {
+  font-size: 36px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+}
+.estado .titulo {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+.estado .descripcion {
+  font-size: 14px;
+  color: var(--text-3);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+.estado .codigo-error {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: var(--text-4);
+  margin-top: 14px;
+  padding: 8px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: 4px;
+  display: inline-block;
+}
+.spinner {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--border-2);
+  border-top-color: var(--accent-green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.hidden { display: none !important; }
+
+/* ── Banda superior · KPIs de aula ──────────────────────────────── */
+.banda-aula {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  padding: 0;
+  margin-bottom: 24px;
+  background: var(--bg-1);
+  border: 1px solid var(--border-1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.kpi-cell {
+  padding: 24px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-right: 1px solid var(--border-1);
+  position: relative;
+}
+.kpi-cell:last-child { border-right: none; }
+
+.kpi-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.kpi-valor {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--text-1);
+}
+.kpi-valor.high  { color: var(--accent-green); }
+.kpi-valor.mid   { color: var(--accent-amber); }
+.kpi-valor.low   { color: var(--accent-red); }
+.kpi-valor.dim   { color: var(--text-3); }
+.kpi-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-4);
+  font-weight: 500;
+}
+.kpi-detalle {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* ── Toolbar de filtros ────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.filtro-grupo {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-1);
+  border: 1px solid var(--border-1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.filtro-grupo-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0 12px 0 14px;
+  border-right: 1px solid var(--border-1);
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+}
+.filtro-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--border-1);
+  padding: 0 14px;
+  height: 36px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.filtro-btn:last-child { border-right: none; }
+.filtro-btn:hover { background: var(--bg-2); color: var(--text-1); }
+.filtro-btn.activo {
+  background: var(--accent-green-soft);
+  color: var(--accent-green);
+  font-weight: 600;
+}
+.filtro-select-wrap {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-1);
+  border: 1px solid var(--border-1);
+  border-radius: 8px;
+  height: 36px;
+  padding: 0 12px 0 14px;
+  gap: 10px;
+}
+.filtro-select-wrap .filtro-grupo-label {
+  border-right: none;
+  padding: 0;
+  height: auto;
+}
+.filtro-select {
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px 4px 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path fill='none' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M2 4l3 3 3-3'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0 center;
+  padding-right: 18px;
+}
+.filtro-select:focus { outline: none; color: var(--text-1); }
+.filtro-select option { background: var(--bg-2); color: var(--text-1); }
+
+.toolbar-spacer { flex: 1; }
+
+.toolbar-info {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+.toolbar-info strong {
+  color: var(--text-1);
+  font-weight: 600;
+}
+
+.btn-limpiar {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  background: transparent;
+  border: 1px solid var(--border-1);
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-limpiar:hover {
+  color: var(--text-1);
+  border-color: var(--border-2);
+  background: var(--bg-2);
+}
+.btn-limpiar.hidden { display: none; }
+
+/* ── Tabla de alumnos ───────────────────────────────────────────── */
+.card-aula { padding: 0; overflow: hidden; }
+.card-aula-encabezado {
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--border-1);
+}
+
+.tabla-aula {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.tabla-aula thead th {
+  text-align: left;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.015);
+  color: var(--text-3);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-bottom: 1px solid var(--border-1);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.15s, background 0.15s;
+}
+.tabla-aula thead th:hover {
+  color: var(--text-1);
+  background: rgba(255,255,255,0.03);
+}
+.tabla-aula thead th.num { text-align: right; }
+.tabla-aula thead th.no-sort { cursor: default; }
+.tabla-aula thead th.no-sort:hover { color: var(--text-3); background: rgba(255,255,255,0.015); }
+
+.sort-arrow {
+  display: inline-block;
+  margin-left: 4px;
+  width: 10px;
+  font-size: 10px;
+  color: var(--accent-green);
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 800;
+  opacity: 0;
+}
+th.activo .sort-arrow { opacity: 1; }
+
+.tabla-aula tbody tr {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.tabla-aula tbody tr:hover { background: rgba(16, 217, 138, 0.04); }
+
+.tabla-aula tbody td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-1);
+  color: var(--text-2);
+  vertical-align: middle;
+}
+.tabla-aula tbody tr:last-child td { border-bottom: none; }
+
+.tabla-aula td.num {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+}
+
+td.codigo {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: var(--text-1);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+td.casos-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  color: var(--text-2);
+}
+td.casos-cell .un-solo-caso {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-4);
+  margin-left: 6px;
+}
+
+td.media-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+td.media-cell.high { color: var(--accent-green); }
+td.media-cell.mid  { color: var(--accent-amber); }
+td.media-cell.low  { color: var(--accent-red); }
+td.media-cell.dim  { color: var(--text-3); }
+
+td.delta-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+}
+td.delta-cell.sube  { color: var(--accent-green); }
+td.delta-cell.baja  { color: var(--accent-red); }
+td.delta-cell.plana { color: var(--text-4); }
+td.delta-cell.dim   { color: var(--text-4); font-weight: 400; }
+
+.tendencia-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.tendencia-pill.ascendente  { background: rgba(16,217,138,0.10); color: var(--accent-green); }
+.tendencia-pill.descendente { background: rgba(255,77,106,0.10); color: var(--accent-red); }
+.tendencia-pill.estable     { background: rgba(255,255,255,0.04); color: var(--text-3); border: 1px solid var(--border-1); }
+.tendencia-pill.sin_datos   { background: transparent; color: var(--text-4); border: 1px dashed var(--border-1); }
+.tendencia-pill .arrow {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* Tag de eje (mejor / peor): pequeño punto del color del eje + nombre */
+.eje-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+.eje-tag-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.eje-tag-valor {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+.eje-tag.dim { color: var(--text-4); }
+.eje-tag.dim .eje-tag-dot { background: var(--text-4) !important; opacity: 0.4; }
+
+/* Estado vacío dentro de la tabla */
+.tabla-vacia {
+  padding: 56px 24px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 13.5px;
+}
+.tabla-vacia strong { color: var(--text-1); font-weight: 600; }
+
+/* ── Footer ─────────────────────────────────────────────────────── */
+footer {
+  margin-top: 48px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-1);
+  text-align: center;
+  font-size: 10.5px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-4);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .banda-aula { grid-template-columns: repeat(3, 1fr); }
+  .kpi-cell:nth-child(3) { border-right: none; }
+  .kpi-cell:nth-child(n+4) { border-top: 1px solid var(--border-1); }
+}
+@media (max-width: 768px) {
+  body { padding: 20px 16px; }
+  header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .banda-aula { grid-template-columns: repeat(2, 1fr); }
+  .kpi-cell { border-right: 1px solid var(--border-1); }
+  .kpi-cell:nth-child(2n) { border-right: none; }
+  .kpi-cell:nth-child(n+3) { border-top: 1px solid var(--border-1); }
+  header h1 { font-size: 22px; }
+  .tabla-aula { font-size: 12px; }
+  .tabla-aula tbody td { padding: 12px; }
+  /* Ocultar columnas menos críticas en móvil */
+  .col-mejor, .col-peor { display: none; }
+}
+@media (max-width: 480px) {
+  .banda-aula { grid-template-columns: 1fr; }
+  .kpi-cell { border-right: none !important; }
+  .kpi-cell:nth-child(n+2) { border-top: 1px solid var(--border-1); }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="darabia-wordmark">
+    <span class="darabia-mark">D</span>
+    <span class="darabia-name">Darabia</span>
+  </div>
+
+  <header>
+    <div class="header-textos">
+      <div class="eyebrow">Darabia Engine V5 · Vista de aula</div>
+      <h1>Evolución competencial del grupo</h1>
+    </div>
+    <span class="pill">Vista profesor</span>
+  </header>
+
+  <!-- ESTADO: cargando -->
+  <div id="estado-cargando" class="estado">
+    <div class="spinner"></div>
+    <div class="titulo" style="margin-top: 18px;">Cargando aula</div>
+  </div>
+
+  <!-- ESTADO: error -->
+  <div id="estado-error" class="estado hidden">
+    <div class="icono" style="color: var(--accent-red);">!</div>
+    <div class="titulo">No se pudo cargar el aula</div>
+    <div class="descripcion" id="error-mensaje"></div>
+    <div class="codigo-error" id="error-codigo"></div>
+  </div>
+
+  <!-- ESTADO: aula vacía -->
+  <div id="estado-vacio" class="estado hidden">
+    <div class="icono" style="color: var(--text-4);">·</div>
+    <div class="titulo">Sin alumnos en el sistema longitudinal</div>
+    <div class="descripcion">
+      Aún no hay ninguna evaluación validada. Las primeras tarjetas aparecerán aquí
+      cuando valides una evaluación desde el corrector pulsando
+      <strong>Validar y guardar en perfil</strong>.
+    </div>
+  </div>
+
+  <!-- ESTADO: datos cargados -->
+  <div id="estado-datos" class="hidden">
+
+    <!-- Banda superior · KPIs del aula -->
+    <div class="banda-aula">
+      <div class="kpi-cell">
+        <span class="kpi-label">Alumnos</span>
+        <span class="kpi-valor" id="kpi-alumnos">—</span>
+        <span class="kpi-sub" id="kpi-alumnos-sub">—</span>
+      </div>
+      <div class="kpi-cell">
+        <span class="kpi-label">Media del aula</span>
+        <span class="kpi-valor" id="kpi-media">—</span>
+        <span class="kpi-sub">sobre 10 · solo alumnos con 2+ casos</span>
+      </div>
+      <div class="kpi-cell">
+        <span class="kpi-label">Rango</span>
+        <span class="kpi-valor dim" id="kpi-rango">—</span>
+        <span class="kpi-sub" id="kpi-rango-sub">—</span>
+      </div>
+      <div class="kpi-cell">
+        <span class="kpi-label">Destacados</span>
+        <span class="kpi-valor high" id="kpi-destacados">0</span>
+        <span class="kpi-sub">tendencia ascendente</span>
+      </div>
+      <div class="kpi-cell">
+        <span class="kpi-label">En riesgo</span>
+        <span class="kpi-valor low" id="kpi-riesgo">0</span>
+        <span class="kpi-sub">tendencia descendente</span>
+      </div>
+    </div>
+
+    <!-- Toolbar de filtros -->
+    <div class="toolbar">
+      <div class="filtro-grupo" role="group" aria-label="Filtrar por tendencia">
+        <span class="filtro-grupo-label">Tendencia</span>
+        <button class="filtro-btn activo" data-filtro-tendencia="todos">Todos</button>
+        <button class="filtro-btn" data-filtro-tendencia="ascendente">Mejorando</button>
+        <button class="filtro-btn" data-filtro-tendencia="estable">Estancado</button>
+        <button class="filtro-btn" data-filtro-tendencia="descendente">Retrocediendo</button>
+      </div>
+
+      <div class="filtro-grupo" role="group" aria-label="Filtrar por número de casos">
+        <span class="filtro-grupo-label">Casos hechos</span>
+        <button class="filtro-btn activo" data-filtro-casos="todos">Todos</button>
+        <button class="filtro-btn" data-filtro-casos="1">1 caso</button>
+        <button class="filtro-btn" data-filtro-casos="2plus">2 o más</button>
+      </div>
+
+      <div class="filtro-select-wrap">
+        <span class="filtro-grupo-label">Su peor eje es</span>
+        <select id="filtro-peor-eje" class="filtro-select">
+          <option value="todos">Cualquiera</option>
+          <option value="axis_analisis">Capacidad de análisis</option>
+          <option value="axis_modelos">Marcos teóricos</option>
+          <option value="axis_intervencion">Criterio de intervención</option>
+          <option value="axis_riesgos">Detección de riesgos</option>
+          <option value="axis_argumentacion">Argumentación profesional</option>
+        </select>
+      </div>
+
+      <button id="btn-limpiar" class="btn-limpiar hidden" type="button">Limpiar filtros</button>
+
+      <div class="toolbar-spacer"></div>
+
+      <div class="toolbar-info">
+        Mostrando <strong id="contador-visibles">0</strong> de <strong id="contador-total">0</strong>
+      </div>
+    </div>
+
+    <!-- Tabla del aula -->
+    <div class="card card-aula">
+      <div class="card-aula-encabezado">
+        <div class="card-titulo">Alumnos del aula</div>
+        <div class="card-descripcion" style="margin-bottom: 0;">
+          Cada fila resume el estado actual del alumno en sus casos validados.
+          Pulsa una fila para abrir su perfil competencial individual.
+        </div>
+      </div>
+
+      <table class="tabla-aula" id="tabla-aula">
+        <thead>
+          <tr>
+            <th data-sort-key="student_id">Código <span class="sort-arrow">↑</span></th>
+            <th data-sort-key="num_casos" class="num">Casos <span class="sort-arrow">↑</span></th>
+            <th data-sort-key="media_actual" class="num">Media <span class="sort-arrow">↑</span></th>
+            <th data-sort-key="delta_media" class="num">Delta <span class="sort-arrow">↑</span></th>
+            <th data-sort-key="tendencia">Tendencia <span class="sort-arrow">↑</span></th>
+            <th data-sort-key="mejor_eje" class="col-mejor">Mejor eje <span class="sort-arrow">↑</span></th>
+            <th data-sort-key="peor_eje" class="col-peor">Peor eje <span class="sort-arrow">↑</span></th>
+            <th data-sort-key="last_validated_at" class="num">Última <span class="sort-arrow">↑</span></th>
+          </tr>
+        </thead>
+        <tbody id="tabla-aula-body"></tbody>
+      </table>
+
+      <!-- Cuando los filtros dejan la tabla a cero -->
+      <div id="tabla-vacia-filtros" class="tabla-vacia hidden">
+        <strong>Ningún alumno coincide con los filtros activos.</strong><br>
+        Prueba a relajar los filtros o pulsa <em>Limpiar filtros</em>.
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    Darabia Engine V5 · IES Virgen del Pilar · Zaragoza
+  </footer>
+
+</div>
+
+<script>
+'use strict';
+
+// ============================================================================
+// CONFIGURACIÓN
+// ============================================================================
+const API_GROUP = '/api/longitudinal/group-summary';
+const URL_PERFIL = '/dashboard-alumno.html'; // ?student=PRL2526_xxx
+
+// Mismo EJES_CONFIG que dashboard-alumno.html · una sola fuente de verdad
+const EJES_CONFIG = [
+  { id: 'axis_analisis',       label: 'Capacidad de análisis',    color: '#60a5fa' },
+  { id: 'axis_modelos',        label: 'Marcos teóricos',           color: '#a78bfa' },
+  { id: 'axis_intervencion',   label: 'Criterio de intervención',  color: '#10d98a' },
+  { id: 'axis_riesgos',        label: 'Detección de riesgos',      color: '#f59e0b' },
+  { id: 'axis_argumentacion',  label: 'Argumentación profesional', color: '#ec4899' }
+];
+
+const EJES_BY_ID = Object.fromEntries(EJES_CONFIG.map(e => [e.id, e]));
+
+// Estado del cliente (datos crudos + estado de filtros y orden)
+let datosOriginales = null;   // { agregados, alumnos: [...] }
+let filtros = {
+  tendencia: 'todos',
+  casos: 'todos',
+  peorEje: 'todos'
+};
+let orden = {
+  key: 'student_id',
+  asc: true
+};
+
+// ============================================================================
+// HELPERS DE UI
+// ============================================================================
+const $ = id => document.getElementById(id);
+
+function mostrarEstado(idEstado) {
+  const estados = ['estado-cargando', 'estado-error', 'estado-vacio', 'estado-datos'];
+  estados.forEach(e => $(e).classList.toggle('hidden', e !== idEstado));
+}
+
+function escapeHTML(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function formatearFechaCorta(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+}
+
+function clasificarPuntuacion(p) {
+  const n = Number(p);
+  if (n >= 7.5) return 'high';
+  if (n >= 5.0) return 'mid';
+  return 'low';
+}
+
+function flecha(tendencia) {
+  if (tendencia === 'ascendente')  return '↑';
+  if (tendencia === 'descendente') return '↓';
+  if (tendencia === 'estable')     return '→';
+  return '·';
+}
+
+function etiquetaTendencia(tendencia) {
+  if (tendencia === 'ascendente')  return 'Mejorando';
+  if (tendencia === 'descendente') return 'Retrocediendo';
+  if (tendencia === 'estable')     return 'Estancado';
+  return 'Sin tendencia';
+}
+
+// ============================================================================
+// CARGA INICIAL
+// ============================================================================
+async function cargarAula() {
+  mostrarEstado('estado-cargando');
+
+  // Cohorte opcional: ?cohorte=PRL2526
+  const params = new URLSearchParams(window.location.search);
+  const cohorte = (params.get('cohorte') || '').trim();
+  const url = cohorte
+    ? `${API_GROUP}?cohorte=${encodeURIComponent(cohorte)}`
+    : API_GROUP;
+
+  try {
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    if (!resp.ok || !data.ok) {
+      throw new Error(data.message || data.error || `HTTP ${resp.status}`);
+    }
+
+    datosOriginales = data;
+
+    if (!Array.isArray(data.alumnos) || data.alumnos.length === 0) {
+      mostrarEstado('estado-vacio');
+      return;
+    }
+
+    pintarBanda(data.agregados);
+    aplicarFiltrosYRender();
+    mostrarEstado('estado-datos');
+
+  } catch (err) {
+    console.error('[DASHBOARD-GRUPO] Error al cargar aula:', err);
+    $('error-mensaje').textContent = 'Hubo un problema al recuperar el resumen del aula.';
+    $('error-codigo').textContent = err.message || '';
+    mostrarEstado('estado-error');
+  }
+}
+
+// ============================================================================
+// BANDA SUPERIOR · KPIs del aula
+// ============================================================================
+function pintarBanda(ag) {
+  // Alumnos totales + nota de los con un solo caso
+  $('kpi-alumnos').textContent = ag.num_alumnos;
+  if (ag.num_un_solo_caso > 0) {
+    const txt = ag.num_un_solo_caso === 1
+      ? '1 con una sola evaluación'
+      : `${ag.num_un_solo_caso} con una sola evaluación`;
+    $('kpi-alumnos-sub').textContent = txt;
+  } else {
+    $('kpi-alumnos-sub').textContent = `${ag.num_alumnos_con_delta} con dos o más casos`;
+  }
+
+  // Media del aula
+  const mediaEl = $('kpi-media');
+  mediaEl.classList.remove('high', 'mid', 'low', 'dim');
+  if (ag.media_aula == null) {
+    mediaEl.textContent = '—';
+    mediaEl.classList.add('dim');
+  } else {
+    mediaEl.textContent = ag.media_aula.toFixed(1);
+    mediaEl.classList.add(clasificarPuntuacion(ag.media_aula));
+  }
+
+  // Rango
+  const rangoEl = $('kpi-rango');
+  if (ag.rango_aula == null) {
+    rangoEl.textContent = '—';
+    $('kpi-rango-sub').textContent = 'sin datos suficientes';
+  } else {
+    rangoEl.textContent = ag.rango_aula.toFixed(1);
+    const max = ag.media_maxima != null ? ag.media_maxima.toFixed(1) : '—';
+    const min = ag.media_minima != null ? ag.media_minima.toFixed(1) : '—';
+    $('kpi-rango-sub').textContent = `de ${min} a ${max}`;
+  }
+
+  // Destacados / Riesgo
+  $('kpi-destacados').textContent = ag.num_destacados;
+  $('kpi-riesgo').textContent = ag.num_riesgo;
+}
+
+// ============================================================================
+// FILTRADO + ORDENADO + RENDER
+// ============================================================================
+function aplicarFiltrosYRender() {
+  if (!datosOriginales) return;
+
+  // 1. Filtrar
+  const filtrados = datosOriginales.alumnos.filter(pasaFiltros);
+
+  // 2. Ordenar
+  const ordenados = ordenarAlumnos(filtrados);
+
+  // 3. Render
+  renderizarTabla(ordenados);
+
+  // 4. Contador
+  $('contador-visibles').textContent = ordenados.length;
+  $('contador-total').textContent = datosOriginales.alumnos.length;
+
+  // 5. Visibilidad del botón "Limpiar filtros"
+  const algunActivo = filtros.tendencia !== 'todos'
+                   || filtros.casos !== 'todos'
+                   || filtros.peorEje !== 'todos';
+  $('btn-limpiar').classList.toggle('hidden', !algunActivo);
+
+  // 6. Mensaje de tabla vacía si los filtros dejan a cero
+  $('tabla-vacia-filtros').classList.toggle('hidden', ordenados.length > 0);
+}
+
+function pasaFiltros(a) {
+  // Filtro por tendencia
+  if (filtros.tendencia !== 'todos') {
+    if (a.tendencia !== filtros.tendencia) return false;
+  }
+
+  // Filtro por número de casos
+  if (filtros.casos === '1' && a.num_casos !== 1) return false;
+  if (filtros.casos === '2plus' && a.num_casos < 2) return false;
+
+  // Filtro por peor eje
+  if (filtros.peorEje !== 'todos') {
+    if (!a.peor_eje || a.peor_eje.eje !== filtros.peorEje) return false;
+  }
+
+  return true;
+}
+
+function ordenarAlumnos(arr) {
+  const k = orden.key;
+  const factor = orden.asc ? 1 : -1;
+
+  // Definimos cómo extraer el valor comparable de cada alumno según la key
+  const valor = (a) => {
+    switch (k) {
+      case 'student_id':        return a.student_id;
+      case 'num_casos':         return a.num_casos;
+      case 'media_actual':      return a.media_actual;
+      case 'delta_media':       return a.delta_media; // null para 1-caso
+      case 'tendencia':         return ordenTendencia(a.tendencia);
+      case 'mejor_eje':         return a.mejor_eje ? a.mejor_eje.eje : '';
+      case 'peor_eje':          return a.peor_eje  ? a.peor_eje.eje  : '';
+      case 'last_validated_at': return a.last_validated_at || '';
+      default: return a.student_id;
+    }
+  };
+
+  return [...arr].sort((a, b) => {
+    const va = valor(a);
+    const vb = valor(b);
+
+    // null al final siempre, sin importar dirección de orden
+    const aNull = va == null || va === '';
+    const bNull = vb == null || vb === '';
+    if (aNull && bNull) return a.student_id.localeCompare(b.student_id);
+    if (aNull) return 1;
+    if (bNull) return -1;
+
+    if (typeof va === 'number' && typeof vb === 'number') {
+      if (va === vb) return a.student_id.localeCompare(b.student_id);
+      return (va - vb) * factor;
+    }
+    const cmp = String(va).localeCompare(String(vb));
+    if (cmp === 0) return a.student_id.localeCompare(b.student_id);
+    return cmp * factor;
+  });
+}
+
+function ordenTendencia(t) {
+  // Orden lógico: ascendente (mejor) → estable → descendente → sin_datos
+  return ({ ascendente: 0, estable: 1, descendente: 2, sin_datos: 3 })[t] ?? 4;
+}
+
+// ============================================================================
+// RENDER DE FILAS
+// ============================================================================
+function renderizarTabla(alumnos) {
+  const tbody = $('tabla-aula-body');
+  tbody.innerHTML = '';
+
+  alumnos.forEach(a => {
+    const tr = document.createElement('tr');
+    tr.dataset.studentId = a.student_id;
+    tr.setAttribute('role', 'button');
+    tr.setAttribute('tabindex', '0');
+
+    // Media
+    const mediaCls = a.num_casos < 1
+      ? 'dim'
+      : clasificarPuntuacion(a.media_actual);
+    const mediaTxt = Number(a.media_actual).toFixed(1);
+
+    // Delta
+    let deltaHTML;
+    if (a.delta_media == null) {
+      deltaHTML = '<td class="num delta-cell dim">—</td>';
+    } else {
+      const cls = a.tendencia === 'ascendente' ? 'sube'
+                : a.tendencia === 'descendente' ? 'baja'
+                : 'plana';
+      const signo = a.delta_media >= 0 ? '+' : '';
+      const flechaTxt = a.tendencia === 'ascendente' ? '↑'
+                      : a.tendencia === 'descendente' ? '↓'
+                      : '→';
+      deltaHTML = `<td class="num delta-cell ${cls}">${flechaTxt} ${signo}${a.delta_media.toFixed(1)}</td>`;
+    }
+
+    // Tendencia pill
+    const tendCls = a.tendencia; // 'ascendente' | 'descendente' | 'estable' | 'sin_datos'
+    const tendHTML = `
+      <td>
+        <span class="tendencia-pill ${tendCls}">
+          <span class="arrow">${flecha(a.tendencia)}</span>
+          ${etiquetaTendencia(a.tendencia)}
+        </span>
+      </td>`;
+
+    // Casos (con badge "1 caso" si aplica)
+    const casosHTML = a.num_casos === 1
+      ? `<td class="num casos-cell">1<span class="un-solo-caso">· primera</span></td>`
+      : `<td class="num casos-cell">${a.num_casos}</td>`;
+
+    // Mejor / Peor eje
+    const mejorHTML = renderEjeTag(a.mejor_eje, 'mejor');
+    const peorHTML  = renderEjeTag(a.peor_eje,  'peor');
+
+    // Última validación
+    const ultimaHTML = `<td class="num">${escapeHTML(formatearFechaCorta(a.last_validated_at))}</td>`;
+
+    tr.innerHTML = `
+      <td class="codigo">${escapeHTML(a.student_id)}</td>
+      ${casosHTML}
+      <td class="num media-cell ${mediaCls}">${mediaTxt}</td>
+      ${deltaHTML}
+      ${tendHTML}
+      <td class="col-mejor">${mejorHTML}</td>
+      <td class="col-peor">${peorHTML}</td>
+      ${ultimaHTML}
+    `;
+
+    tr.addEventListener('click', () => abrirPerfilAlumno(a.student_id));
+    tr.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        ev.preventDefault();
+        abrirPerfilAlumno(a.student_id);
+      }
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+function renderEjeTag(ejeData, tipo) {
+  // tipo: 'mejor' | 'peor' (solo para semántica futura)
+  if (!ejeData || !ejeData.eje) {
+    return `<td><span class="eje-tag dim"><span class="eje-tag-dot"></span>—</span></td>`;
+  }
+  const cfg = EJES_BY_ID[ejeData.eje];
+  const label = cfg ? cfg.label : ejeData.eje;
+  const color = cfg ? cfg.color : '#94a3b8';
+  return `
+    <td>
+      <span class="eje-tag">
+        <span class="eje-tag-dot" style="background:${color}"></span>
+        ${escapeHTML(label)}
+        <span class="eje-tag-valor">${Number(ejeData.valor).toFixed(1)}</span>
+      </span>
+    </td>`;
+}
+
+function abrirPerfilAlumno(studentId) {
+  window.location.href = `${URL_PERFIL}?student=${encodeURIComponent(studentId)}`;
+}
+
+// ============================================================================
+// LISTENERS DE FILTROS Y ORDEN
+// ============================================================================
+function inicializarListeners() {
+  // Filtros de tendencia (botones)
+  document.querySelectorAll('[data-filtro-tendencia]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filtros.tendencia = btn.dataset.filtroTendencia;
+      activarBoton(btn, '[data-filtro-tendencia]');
+      aplicarFiltrosYRender();
+    });
+  });
+
+  // Filtros de casos (botones)
+  document.querySelectorAll('[data-filtro-casos]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filtros.casos = btn.dataset.filtroCasos;
+      activarBoton(btn, '[data-filtro-casos]');
+      aplicarFiltrosYRender();
+    });
+  });
+
+  // Filtro de peor eje (select)
+  $('filtro-peor-eje').addEventListener('change', (ev) => {
+    filtros.peorEje = ev.target.value;
+    aplicarFiltrosYRender();
+  });
+
+  // Limpiar filtros
+  $('btn-limpiar').addEventListener('click', limpiarFiltros);
+
+  // Ordenado (click en cabeceras)
+  document.querySelectorAll('.tabla-aula thead th[data-sort-key]').forEach(th => {
+    th.addEventListener('click', () => {
+      const key = th.dataset.sortKey;
+      if (orden.key === key) {
+        orden.asc = !orden.asc;
+      } else {
+        orden.key = key;
+        // Por defecto: códigos asc, fechas y números desc (más útil)
+        orden.asc = (key === 'student_id' || key === 'mejor_eje' || key === 'peor_eje' || key === 'tendencia');
+      }
+      pintarFlechasOrden();
+      aplicarFiltrosYRender();
+    });
+  });
+
+  pintarFlechasOrden();
+}
+
+function activarBoton(btnActivo, selectorGrupo) {
+  document.querySelectorAll(selectorGrupo).forEach(b => b.classList.remove('activo'));
+  btnActivo.classList.add('activo');
+}
+
+function limpiarFiltros() {
+  filtros = { tendencia: 'todos', casos: 'todos', peorEje: 'todos' };
+  document.querySelectorAll('[data-filtro-tendencia]').forEach(b => {
+    b.classList.toggle('activo', b.dataset.filtroTendencia === 'todos');
+  });
+  document.querySelectorAll('[data-filtro-casos]').forEach(b => {
+    b.classList.toggle('activo', b.dataset.filtroCasos === 'todos');
+  });
+  $('filtro-peor-eje').value = 'todos';
+  aplicarFiltrosYRender();
+}
+
+function pintarFlechasOrden() {
+  document.querySelectorAll('.tabla-aula thead th[data-sort-key]').forEach(th => {
+    const flecha = th.querySelector('.sort-arrow');
+    th.classList.toggle('activo', th.dataset.sortKey === orden.key);
+    if (th.dataset.sortKey === orden.key) {
+      flecha.textContent = orden.asc ? '↑' : '↓';
+    }
+  });
+}
+
+// ============================================================================
+// ARRANQUE
+// ============================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  inicializarListeners();
+  cargarAula();
+});
+</script>
+</body>
+</html>
