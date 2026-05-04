@@ -1,0 +1,286 @@
+{
+  "caso": {
+    "id": "burnout_huella_v1",
+    "titulo": "Caso 03 - Centro de Salud Virgen de la Huella",
+    "expediente": "VA-2026-003",
+    "sector": "Atencion Primaria - Sanidad Publica",
+    "modelos_teoricos": ["Maslach-MBI", "Demands-Resources_Bakker", "Karasek-DCA"],
+    "instrumento": "ISTAS21 (CoPsoQ) + MBI-HSS complementario",
+    "prompt_template": "prompt_evaluacion_burnout.txt",
+    "puntuacion_maxima_automatica": 100,
+    "puntuacion_simulador": 60,
+    "ra_evaluados": ["RA4"],
+    "version_motor_minima": "5.0.0",
+    "calibracion": "Severidad moderada-alta. Mas exigente que Caso 02, sin la dureza del Caso 05."
+  },
+
+  "contexto": {
+    "empresa": "Centro de Salud Virgen de la Huella",
+    "sector": "Atencion Primaria publica - Servicio de Salud",
+    "direccion": "Zona urbana clase media-baja - 18.000 pacientes adscritos",
+    "plantilla": 14,
+    "datos_objetivos": {
+      "ratio_pacientes_enfermera": "1.285 pacientes/enfermera (recomendacion Ministerio: max 1.000)",
+      "absentismo": "11,2%",
+      "referencia_sector": "5,8%",
+      "bajas_ansiedad_trastorno_adaptativo_12m": "12 procesos (+165% vs sector sanitario)",
+      "duracion_media_baja_psicologica": "58 dias (media sector: 22 dias)",
+      "trabajadoras_2_o_mas_bajas_12m": "5 de 14 (35% de la plantilla)",
+      "coste_absentismo": "94.600 euros",
+      "horas_extra_2025": "847 horas (78% no compensadas economicamente)",
+      "subregistro_agresiones": "7 incidencias verbales registradas, solo 2 comunicadas formalmente",
+      "ratio_femenino": "93% (13 de 14)",
+      "interinidad": "47%",
+      "asistencia_jornada_autocuidado_2024": "3 de 14 enfermeras"
+    }
+  },
+
+  "estructura_dictamen_esperada": {
+    "apartados_evaluables": [
+      {
+        "id": "ap1_analisis",
+        "titulo": "01 - Analisis e interpretacion de factores de riesgo",
+        "cr_demostrables": ["RA4a", "RA4b", "RA4c"],
+        "descripcion": "Aplicacion operativa de los modelos teoricos al caso. Identificacion de factores ISTAS21 criticos. Lectura de la doble presencia como factor diferencial."
+      },
+      {
+        "id": "ap2_triangulacion",
+        "titulo": "02 - Triangulacion de evidencias",
+        "cr_demostrables": ["RA4d", "RA4e"],
+        "descripcion": "Cruce de las tres fuentes (ISTAS21 + Mutua + Entrevistas) sobre los factores de riesgo principales con datos concretos."
+      },
+      {
+        "id": "ap3_impacto",
+        "titulo": "03 - Impacto en salud",
+        "cr_demostrables": ["RA4b", "RA4d"],
+        "descripcion": "Conexion entre factores y dano documentado. Aplicacion de Maslach al sindrome ya instalado. Cuantificacion con datos de la mutua. Lectura demografica del dano (subgrupo 35-45 con cargas familiares)."
+      },
+      {
+        "id": "ap4_plan",
+        "titulo": "04 - Plan de accion",
+        "cr_demostrables": ["RA4f", "RA4g"],
+        "descripcion": "Tabla de medidas con jerarquia preventiva correcta + indicadores de proceso y resultado validos."
+      }
+    ]
+  },
+
+  "ra_cubiertos": [
+    {
+      "ra": "RA4",
+      "titulo": "Aplica tecnicas de evaluacion e intervencion sobre el sindrome de quemado por el trabajo (SQT)",
+      "evidencia_esperada": "El alumno demuestra capacidad para diagnosticar burnout como sindrome tridimensional, identificar sus causas organizacionales, triangular evidencias de tres fuentes y proponer medidas preventivas que ataquen la causa raiz.",
+      "cr_cubiertos": [
+        { "id": "RA4a", "descripcion": "Identifica los factores de riesgo psicosocial vinculados al SQT en el contexto laboral." },
+        { "id": "RA4b", "descripcion": "Reconoce las tres dimensiones del burnout (Maslach) y las conecta con el dano observado." },
+        { "id": "RA4c", "descripcion": "Aplica el modelo Demands-Resources (Bakker) al equilibrio demandas/recursos del puesto." },
+        { "id": "RA4d", "descripcion": "Selecciona y aplica el instrumento adecuado (ISTAS21 + MBI-HSS) para la evaluacion." },
+        { "id": "RA4e", "descripcion": "Triangula evidencias entre cuestionario, registros documentales y entrevista." },
+        { "id": "RA4f", "descripcion": "Argumenta el diagnostico ante la direccion con datos del expediente y normativa aplicable." },
+        { "id": "RA4g", "descripcion": "Propone medidas preventivas jerarquizadas (primarias antes que secundarias o terciarias) con indicadores operativos." }
+      ]
+    }
+  ],
+
+  "ra_no_cubiertos": [
+    "RA1 (Identificacion general de riesgos psicosociales) - cubierto en UD anteriores",
+    "RA2 (Tecnicas de evaluacion psicosocial general) - cubierto en Caso 02",
+    "RA3 (Estres laboral) - cubierto en Caso 02",
+    "RA5 (Acoso y violencia organizacional) - cubierto en Caso 05"
+  ],
+
+  "aciertos_criticos": {
+
+    "ejes_evaluacion": [
+      "capacidad_analisis",
+      "uso_marcos_teoricos",
+      "deteccion_riesgos_criticos",
+      "criterio_intervencion",
+      "argumentacion_profesional"
+    ],
+
+    "rubrica_evaluacion": {
+      "total_sumando": 100,
+      "criterios": [
+        {
+          "id": "analisis",
+          "nombre": "Analisis e interpretacion",
+          "peso": 25,
+          "descripcion": "Aplicacion operativa de Maslach (3 dimensiones) y Bakker (Demands-Resources). Karasek bonus. Identifica doble presencia como factor diferencial en plantilla 93% femenina con denegaciones de conciliacion.",
+          "apartado_evaluado": "ap1_analisis"
+        },
+        {
+          "id": "triangulacion",
+          "nombre": "Triangulacion de evidencias",
+          "peso": 25,
+          "descripcion": "Cruce de las tres fuentes (ISTAS21 + Mutua + Entrevistas a Ana, Roberto y Lucia). Tres fuentes obligatorias para Nivel A; con dos baja a Nivel B.",
+          "apartado_evaluado": "ap2_triangulacion"
+        },
+        {
+          "id": "impacto",
+          "nombre": "Impacto en salud",
+          "peso": 25,
+          "descripcion": "Aplicacion de Maslach al dano ya instalado. Cita 5+ de las 6 evidencias canonicas (3 cifras + 3 cualitativas). Conexion del dano con subgrupo demografico (35-45 anos con cargas familiares).",
+          "apartado_evaluado": "ap3_impacto"
+        },
+        {
+          "id": "plan_accion",
+          "nombre": "Plan de accion",
+          "peso": 25,
+          "descripcion": "Jerarquia preventiva (componente A, peso 14) + Rigor operativo de indicadores (componente B, peso 11). Severidad sube respecto al Caso 02: la jerarquia pesa mas porque el alumno ya viene del 02.",
+          "apartado_evaluado": "ap4_plan",
+          "componentes": [
+            { "id": "jerarquia_preventiva", "peso": 14, "descripcion": "Al menos 1 medida primaria que ataque causa raiz (ratio, conciliacion, agresiones)." },
+            { "id": "rigor_operativo", "peso": 11, "descripcion": "Cada medida con nivel + plazo + indicador proceso + indicador resultado." }
+          ]
+        }
+      ]
+    },
+
+    "mapeo_ejes_criterios": {
+      "capacidad_analisis": ["analisis", "triangulacion"],
+      "uso_marcos_teoricos": ["analisis"],
+      "deteccion_riesgos_criticos": ["impacto"],
+      "criterio_intervencion": ["plan_accion"],
+      "argumentacion_profesional": ["plan_accion"]
+    },
+
+    "evidencias_canonicas": {
+      "//": "Las 6 evidencias que el alumno DEBERIA citar en ap3_impacto.",
+      "//mecanica": "Si cita 5+ -> max impacto. 3-4 -> proporcional. <=2 -> penalizacion. Si cita <5, el evaluador lista las omitidas LITERALMENTE en nota_asesoramiento_docente.",
+      "cuantitativas": [
+        {
+          "id": "ev_q1_ratio",
+          "etiqueta": "Ratio 1.285 pacientes/enfermera",
+          "descripcion": "+28% sobre el maximo recomendado por el Ministerio (1.000). Sobrecarga estructural cuantificada.",
+          "apartado_principal": "ap1_analisis"
+        },
+        {
+          "id": "ev_q2_bajas",
+          "etiqueta": "+165% bajas ansiedad/trastorno adaptativo vs sector",
+          "descripcion": "12 procesos en 12 meses. Patron sanitario claro.",
+          "apartado_principal": "ap3_impacto"
+        },
+        {
+          "id": "ev_q3_duracion",
+          "etiqueta": "58 dias media baja psicologica",
+          "descripcion": "Casi triplica la media del sector sanitario (22 dias). Indicador de gravedad clinica del dano.",
+          "apartado_principal": "ap3_impacto"
+        }
+      ],
+      "cualitativas": [
+        {
+          "id": "ev_c1_conciliacion",
+          "etiqueta": "Denegacion sistematica de conciliacion a Ana",
+          "descripcion": "3 solicitudes en 3 anos, 0 propuestas alternativas. Politica organizacional documentada que penaliza la conciliacion.",
+          "apartado_principal": "ap1_analisis"
+        },
+        {
+          "id": "ev_c2_subregistro",
+          "etiqueta": "Subregistro de agresiones (7 incidencias, solo 2 comunicadas)",
+          "descripcion": "Cultura de ocultacion del dano. La normalizacion de la violencia verbal como 'parte del trabajo' es burnout estructural en construccion.",
+          "apartado_principal": "ap3_impacto"
+        },
+        {
+          "id": "ev_c3_mindfulness",
+          "etiqueta": "Jornada autocuidado: 3 de 14 enfermeras asistieron",
+          "descripcion": "Rechazo masivo a la intervencion individual de la direccion. Demuestra que la prevencion terciaria voluntaria fuera de horario es ineficaz en este caso.",
+          "apartado_principal": "ap4_plan"
+        }
+      ]
+    },
+
+    "factores_riesgo_esperados": {
+      "ratio_insostenible": {
+        "fuentes_convergentes": ["ISTAS21_exigencias_cuantitativas_MUY_ALTO", "expediente_ratio_1285", "entrevista_ana_23_pacientes_antes_14h"],
+        "modelo_aplicable": "Bakker_alta_demanda",
+        "puntos_max_criterio2": 8
+      },
+      "agotamiento_emocional_cronico": {
+        "fuentes_convergentes": ["ISTAS21_exigencias_emocionales_MUY_ALTO", "mutua_12_bajas_trastorno_adaptativo", "entrevista_ana_estado_emocional"],
+        "modelo_aplicable": "Maslach_dimension_1",
+        "puntos_max_criterio2": 8
+      },
+      "ausencia_apoyo_superior": {
+        "fuentes_convergentes": ["ISTAS21_apoyo_superiores_MUY_BAJO", "expediente_0_quejas_tramitadas_2_anos", "entrevista_roberto_vocacion_motor"],
+        "modelo_aplicable": "Bakker_bajo_recurso_apoyo_social",
+        "puntos_max_criterio2": 7
+      },
+      "doble_presencia": {
+        "fuentes_convergentes": ["ISTAS21_doble_presencia_ALTO", "expediente_3_denegaciones_ana", "entrevista_ana_madre_movilidad_reducida"],
+        "modelo_aplicable": "ISTAS21_doble_presencia",
+        "puntos_max_criterio2": 7,
+        "factor_diferencial": "Plantilla 93% femenina. Subgrupo 35-45 anos con cargas familiares concentra el dano (5 de 14 con 2+ bajas)."
+      }
+    },
+
+    "jerarquia_preventiva": {
+      "medidas_primarias_esperadas": [
+        "Rediseno agenda asistencial - reduccion ratio a 1.000 pacientes/enfermera",
+        "Protocolo gestion agresiones verbales y fisicas con registro obligatorio",
+        "Politica efectiva de conciliacion - comision paritaria",
+        "Rediseno sistema registro administrativo (HCD) con tiempo remunerado",
+        "Evaluacion psicosocial anual ISTAS21 con devolucion sindical"
+      ],
+      "medidas_secundarias_aceptables": [
+        "Grupos de apoyo entre iguales con psicologo externo en horario laboral obligatorio",
+        "Formacion en inteligencia emocional (12h en horario laboral)"
+      ],
+      "medidas_terciarias_penalizadas_como_unicas": [
+        "Programa mindfulness voluntario fuera de horario",
+        "Servicio psicologo individual voluntario",
+        "Plan de reconocimiento profesional ('enfermera del trimestre')"
+      ],
+      "penalizacion_terciaria_como_unica": -15
+    },
+
+    "indicadores_validos": {
+      "formato_requerido": "indicador proceso + indicador resultado + plazo + responsable",
+      "ejemplos_validos": [
+        "Ratio reducido a <=1.100 pacientes/enfermera en 6 meses (responsable: Direccion + Recursos Humanos)",
+        "100% incidencias agresion registradas via parte de accidente en 3 meses (responsable: Supervisor enfermeria + SPRL)",
+        "Reduccion absentismo de 11,2% a 7,5% en 12 meses (responsable: Servicio Salud + Comision paritaria)",
+        "Item ISTAS21 'apoyo superior' mejora de MUY BAJO a MEDIO en 5 de 14 enfermeras en 12 meses (responsable: Servicio Prevencion)"
+      ],
+      "ejemplos_invalidos": [
+        "mejorar el clima laboral",
+        "reducir el burnout",
+        "fomentar el bienestar",
+        "potenciar la motivacion del equipo",
+        "reducir el ratio (sin numero ni plazo)"
+      ]
+    },
+
+    "knockout_criteria": {
+      "subregistro_agresiones": {
+        "obligatorio": false,
+        "tipo": "knockout_blando",
+        "descripcion": "El subregistro masivo de agresiones (7 incidencias documentadas, solo 2 comunicadas formalmente) es un indicador estructural del burnout en sanidad publica. El alumno DEBE mencionar el patron en su dictamen, aunque no se le exige proponer un protocolo formal exhaustivo.",
+        "respuesta_minima": "mencion_patron_subregistro",
+        "penalizacion_si_ignorada": -8,
+        "penalizacion_diagnostico_sin_protocolo": 0,
+        "nota_tecnica": "Knockout blando: no exige apertura de protocolo formal (a diferencia del knockout Sonia del Caso 05). Solo exige que el patron aparezca explicitamente en el dictamen escrito. El simulador ya penaliza si el alumno no marca s03 como senal; este knockout penaliza si el alumno marca la senal pero no la traduce al dictamen escrito."
+      }
+    },
+
+    "doble_presencia_evaluacion": {
+      "//": "La doble presencia es factor diferencial del Caso 03 por la composicion 93% femenina + denegaciones de conciliacion. Se evalua en CRITERIO 1 y CRITERIO 3.",
+      "criterio_1_analisis": {
+        "evaluacion": "Si el alumno aplica Maslach + Bakker pero ignora la doble presencia como dimension ISTAS operativizada al caso, penalizacion -5 sobre el peso del criterio.",
+        "penalizacion_max": -5
+      },
+      "criterio_3_impacto": {
+        "evaluacion": "Si el alumno cita las cifras de la mutua sin conectarlas al perfil demografico (35-45 anos con cargas familiares), penalizacion -3 sobre el peso del criterio.",
+        "penalizacion_max": -3
+      },
+      "penalizacion_total_max": -8,
+      "nota_tecnica": "No es knockout (ya hay uno: subregistro_agresiones). Es penalizacion distribuida entre dos criterios para que la lectura organizacional del genero cuente sin ser eliminatoria."
+    }
+  },
+
+  "prompt_evaluacion": {
+    "archivo": "prompt_evaluacion_burnout.txt",
+    "version": "1.0",
+    "calibrado_con": "informe_tecnico_caso03_modelo (PDF dictamen ejemplo del simulador)",
+    "fecha_calibracion": "mayo 2026"
+  }
+}

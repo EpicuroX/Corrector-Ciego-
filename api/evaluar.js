@@ -43,7 +43,7 @@
 const CASOS = {
   'psicosocial_gestoria_v1': require('../data/psicosocial_gestoria.json'),
   'estres_nexobank_v1':      require('../data/estres_nexobank.json'),
-  // 'burnout_huella_v1':    require('../data/burnout_huella.json'),    ← Caso 03 (próximo)
+  'burnout_huella_v1':       require('../data/burnout_huella.json'),
   // 'psicosocial_hospital_v1': require('../data/psicosocial_hospital.json'),  ← Caso 06
   // 'psicosocial_logistica_v1': require('../data/psicosocial_logistica.json'), ← Caso 07
 };
