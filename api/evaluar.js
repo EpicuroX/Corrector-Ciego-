@@ -13,6 +13,15 @@
  *   4. Llamar a la API de Anthropic (o devolver Mock si DARABIA_MOCK=true)
  *   5. Validar y reenviar la respuesta estructurada al motor
  *
+ * NOVEDADES V5.2 (Sesión 3 · Mayo 2026):
+ *   · Carga del prompt_template (TXT calibrado por caso) declarado en el JSON.
+ *   · Eliminado el bloque "identidad" hardcodeado en JS: el rol del evaluador
+ *     vive ahora en el TXT, editable sin tocar código.
+ *   · Orden del system prompt: [TXT] → contexto → rúbrica → ejes → knockouts
+ *     → llaves → instrucciones salida → instrucciones RA → JSON literal.
+ *   · Si el JSON no declara prompt_template, el motor sigue funcionando
+ *     (campo opcional). Si lo declara y el archivo no existe, falla ruidoso.
+ *
  * NOVEDADES V5.1 (Sesión 2 · Mayo 2026):
  *   · Soporte de ra_status: la IA evalúa el estado de los Resultados de
  *     Aprendizaje (RA) declarados en el bloque ra_cubiertos del JSON del caso.
@@ -36,14 +45,17 @@
 
 'use strict';
 
+// ↓↓↓ NUEVO V5.2 — Carga del prompt_template desde el sistema de archivos
+const fs = require('fs');
+const path = require('path');
+// ↑↑↑ NUEVO V5.2
+
 // ============================================================================
 // SECCIÓN A — REGISTRO DE CASOS (intermodularidad: añadir caso = añadir línea)
 // ============================================================================
 
 const CASOS = {
   'psicosocial_gestoria_v1': require('../data/psicosocial_gestoria.json'),
-  'estres_nexobank_v1':      require('../data/estres_nexobank.json'),
-  'burnout_huella_v1':       require('../data/burnout_huella.json'),
   // 'psicosocial_hospital_v1': require('../data/psicosocial_hospital.json'),  ← Caso 06
   // 'psicosocial_logistica_v1': require('../data/psicosocial_logistica.json'), ← Caso 07
 };
@@ -100,21 +112,13 @@ module.exports = async function handler(req, res) {
     _logAuditoria(payload, respuesta, esMock);
 
     // 6. Enriquecer con metadatos del caso para que el frontend sea caso-agnóstico.
-    //    Los 4 campos siguientes son aditivos: no afectan a _validarRespuestaIA
+    //    Los 3 campos siguientes son aditivos: no afectan a _validarRespuestaIA
     //    (ya pasó) ni al motor cliente si decide ignorarlos.
     return res.status(200).json({
       ...respuesta,
       caso_titulo: caso.caso.titulo,
       ra_no_cubiertos: caso.ra_no_cubiertos || [],
       etiquetas_knockouts: _construirEtiquetasKnockouts(caso),
-      // Nota del simulador (Caso 02/03). null si el caso no la usa (Caso 05).
-      // El frontend pinta el desglose 60+40 si está presente.
-      nota_simulador: payload.nota_simulador || null,
-      // Configuración de visualización de notas: el evaluador puntúa internamente
-      // sobre 100 (calibrado, comparable longitudinal), pero algunos casos aportan
-      // solo X% del total. El frontend muestra la nota normalizada según este peso.
-      peso_nota_evaluador: caso.caso.puntuacion_maxima_automatica || 100,
-      peso_nota_simulador: caso.caso.puntuacion_simulador || 0,
     });
 
   } catch (err) {
@@ -189,17 +193,13 @@ function _resolverCaso(caso_id) {
 function _construirSystemPrompt(caso, payload) {
   const { rubrica_evaluacion, ejes_evaluacion, mapeo_ejes_criterios, knockout_criteria } = caso.aciertos_criticos;
 
-  // — Identidad del perito evaluador —
-  const identidad = `Eres Honás Darabia, técnico PRL colegiado nº 0847, perito evaluador del simulador de psicosociología aplicada Darabia Engine V5.
-Tu función es evaluar el dictamen de un alumno de CFGS Prevención de Riesgos Profesionales y devolver una evaluación estructurada en JSON.
-Tono: directo, técnico, preciso. Sin condescendencia. Sin relleno. Los comentarios al profesor son útiles o no son.`;
+  // ↓↓↓ MODIFICADO V5.2 — Bloque [1] "identidad" eliminado.
+  //     El rol del evaluador lo define ahora el prompt_template (TXT) cargado al final.
+  //     Razón: evitar doble definición de rol (TXT + JS) y mover toda la voz del
+  //     evaluador a archivos externos editables sin tocar código.
+  // ↑↑↑ MODIFICADO V5.2
 
   // — Contexto del caso —
-  // datos_objetivos se serializa genéricamente: cada caso declara sus propios
-  // campos (Caso 05: absentismo/horas_extra/...; Caso 02: AHT/rotación/...).
-  // El motor no conoce los nombres por adelantado.
-  const datosObjTexto = _serializarDatosObjetivos(caso.contexto.datos_objetivos);
-
   const ctxCaso = `
 CASO: ${caso.caso.titulo}
 SECTOR: ${caso.caso.sector}
@@ -207,7 +207,7 @@ MODELOS TEÓRICOS DEL CASO: ${caso.caso.modelos_teoricos.join(', ')}
 INSTRUMENTO: ${caso.caso.instrumento}
 EMPRESA: ${caso.contexto.empresa}
 PLANTILLA: ${caso.contexto.plantilla} personas
-DATOS OBJETIVOS: ${datosObjTexto}`;
+DATOS OBJETIVOS: Absentismo ${caso.contexto.datos_objetivos.absentismo} (sector: ${caso.contexto.datos_objetivos.referencia_sector}), ${caso.contexto.datos_objetivos.bajas_psicologicas_12m} bajas psicológicas en 12 meses (${caso.contexto.datos_objetivos.dias_baja_total} días), horas extra media marzo: ${caso.contexto.datos_objetivos.horas_extra_media_marzo}, última evaluación psicosocial: ${caso.contexto.datos_objetivos.ultima_evaluacion_psicosocial}.`;
 
   // — Rúbrica completa (generada dinámicamente desde el JSON) —
   const rubricaTexto = rubrica_evaluacion.criterios.map(c =>
@@ -357,7 +357,85 @@ REFERENCIA TÉCNICA — JSON COMPLETO DEL CASO (fuente de verdad para la evaluac
 ${JSON.stringify(caso, null, 2)}
 ================================================================================`;
 
-  return [identidad, ctxCaso, rubrica, ejesTexto, knockouts, llaves, instruccionesSalida, instruccionesRA, jsonCasoCompleto].join('\n');
+  // ↓↓↓ MODIFICADO V5.2 — Carga del prompt_template (TXT) e inserción en primera posición
+  //     Orden final: [TXT] → ctxCaso → rubrica → ejes → knockouts → llaves
+  //                  → instruccionesSalida → instruccionesRA → jsonCasoCompleto
+  //     El bloque [1] "identidad" del JS se eliminó: el rol vive ahora en el TXT.
+  const promptTemplate = _cargarPromptTemplate(caso);
+
+  return [promptTemplate, ctxCaso, rubrica, ejesTexto, knockouts, llaves, instruccionesSalida, instruccionesRA, jsonCasoCompleto].join('\n');
+  // ↑↑↑ MODIFICADO V5.2
+}
+
+// ============================================================================
+// SECCIÓN F.bis — CARGA DEL PROMPT_TEMPLATE (TXT calibrado por caso)  ← NUEVO V5.2
+// ============================================================================
+
+/**
+ * Lee el archivo TXT cuyo nombre declara el JSON del caso en el campo
+ * caso.caso.prompt_template, y lo devuelve como string para inyectarlo
+ * en el system prompt.
+ *
+ * Decisiones de diseño:
+ *   - El campo prompt_template es OPCIONAL en el JSON. Si el caso no lo declara,
+ *     devolvemos string vacío (no rompemos casos heredados ni futuros que no
+ *     necesiten un TXT calibrado aparte).
+ *   - Si el campo SÍ existe pero el archivo no se encuentra, lanzamos error
+ *     explícito al cliente: prefiero fallar ruidoso a evaluar con un prompt
+ *     incompleto y producir notas inválidas en silencio.
+ *   - Lectura síncrona con fs.readFileSync: estamos en una serverless function
+ *     que ya hace I/O (fetch a Anthropic). Una lectura local de un TXT añade
+ *     1-3 ms; no merece la pena async aquí.
+ *   - Resolución de ruta: el archivo TXT vive en /data/, igual que los JSON
+ *     de los casos. Mantener todo el material del caso en una sola carpeta
+ *     simplifica el despliegue y la mantenibilidad.
+ */
+function _cargarPromptTemplate(caso) {
+  const nombreArchivo = caso?.caso?.prompt_template;
+
+  // Caso opcional: si el JSON no declara prompt_template, no cargamos nada.
+  if (!nombreArchivo) {
+    console.log('[EVALUAR] El caso no declara prompt_template. Continuando sin TXT calibrado.');
+    return '';
+  }
+
+  // Construcción segura de la ruta. __dirname apunta a /api/ en runtime de Vercel.
+  const rutaTXT = path.join(__dirname, '..', 'data', nombreArchivo);
+
+  try {
+    const contenido = fs.readFileSync(rutaTXT, 'utf8');
+
+    if (!contenido || contenido.trim().length < 50) {
+      throw _crearError(
+        'PROMPT_TEMPLATE_VACIO',
+        500,
+        `El archivo "${nombreArchivo}" existe pero está vacío o es demasiado breve (<50 caracteres).`
+      );
+    }
+
+    console.log(`[EVALUAR] prompt_template cargado: ${nombreArchivo} (${contenido.length} caracteres).`);
+    return contenido;
+
+  } catch (err) {
+    // Si el error ya es nuestro (PROMPT_TEMPLATE_VACIO), lo relanzamos tal cual.
+    if (err.codigo) throw err;
+
+    // ENOENT = archivo no encontrado en el sistema de archivos.
+    if (err.code === 'ENOENT') {
+      throw _crearError(
+        'PROMPT_TEMPLATE_NO_ENCONTRADO',
+        500,
+        `No se encontró el archivo "${nombreArchivo}" en /data/. Verifica que está desplegado en Vercel.`
+      );
+    }
+
+    // Cualquier otro error de lectura (permisos, etc.).
+    throw _crearError(
+      'PROMPT_TEMPLATE_ERROR_LECTURA',
+      500,
+      `Error leyendo "${nombreArchivo}": ${err.message}`
+    );
+  }
 }
 
 // ============================================================================
@@ -790,30 +868,4 @@ function _construirEtiquetasKnockouts(caso) {
     etiquetas[id] = nombre ? `Knockout ${nombre}` : 'Knockout';
   }
   return etiquetas;
-}
-
-/**
- * Serializa el bloque datos_objetivos del JSON del caso a una línea de texto
- * legible para Claude. Cada caso declara sus propios campos (snake_case).
- * Ejemplo:
- *   { absentismo: "21.3%", referencia_sector: "9.8%" }
- *   →  "absentismo: 21.3% · referencia sector: 9.8%"
- *
- * Acepta valores anidados (objeto) y los serializa también, para casos en que
- * un dato objetivo lleve sub-campos (ej: { AHT: { objetivo: "3:48", real: "4:12" } }).
- */
-function _serializarDatosObjetivos(datos) {
-  if (!datos || typeof datos !== 'object') return '(sin datos objetivos)';
-  const partes = [];
-  for (const [k, v] of Object.entries(datos)) {
-    const etiqueta = k.replace(/_/g, ' ');
-    if (v && typeof v === 'object' && !Array.isArray(v)) {
-      // Objeto anidado: serializar también
-      const sub = Object.entries(v).map(([sk, sv]) => `${sk.replace(/_/g, ' ')}: ${sv}`).join(', ');
-      partes.push(`${etiqueta} (${sub})`);
-    } else {
-      partes.push(`${etiqueta}: ${v}`);
-    }
-  }
-  return partes.join(' · ');
 }
