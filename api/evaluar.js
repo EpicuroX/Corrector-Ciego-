@@ -199,15 +199,16 @@ function _construirSystemPrompt(caso, payload) {
   //     evaluador a archivos externos editables sin tocar código.
   // ↑↑↑ MODIFICADO V5.2
 
-  // — Contexto del caso —
-  const ctxCaso = `
-CASO: ${caso.caso.titulo}
-SECTOR: ${caso.caso.sector}
-MODELOS TEÓRICOS DEL CASO: ${caso.caso.modelos_teoricos.join(', ')}
-INSTRUMENTO: ${caso.caso.instrumento}
-EMPRESA: ${caso.contexto.empresa}
-PLANTILLA: ${caso.contexto.plantilla} personas
-DATOS OBJETIVOS: Absentismo ${caso.contexto.datos_objetivos.absentismo} (sector: ${caso.contexto.datos_objetivos.referencia_sector}), ${caso.contexto.datos_objetivos.bajas_psicologicas_12m} bajas psicológicas en 12 meses (${caso.contexto.datos_objetivos.dias_baja_total} días), horas extra media marzo: ${caso.contexto.datos_objetivos.horas_extra_media_marzo}, última evaluación psicosocial: ${caso.contexto.datos_objetivos.ultima_evaluacion_psicosocial}.`;
+  // ↓↓↓ B1a — Contexto del caso leído del JSON como pares clave-valor genéricos.
+  //     Antes: bloque hardcodeado con campos psicosociales (EMPRESA, PLANTILLA,
+  //            DATOS_OBJETIVOS, MODELOS_TEORICOS, INSTRUMENTO).
+  //     Ahora: el JSON declara `caso.contexto_evaluacion` como objeto k-v y el
+  //            motor lo renderiza con _renderContexto. El motor no conoce
+  //            vocabulario de dominio; cada caso decide sus propias claves.
+  //     Compatibilidad: si el JSON no declara contexto_evaluacion (caso heredado
+  //            o futuro que no lo necesite), devolvemos string vacío sin romper.
+  const ctxCaso = _renderContexto(caso?.caso?.contexto_evaluacion);
+  // ↑↑↑ B1a
 
   // — Rúbrica completa (generada dinámicamente desde el JSON) —
   const rubricaTexto = rubrica_evaluacion.criterios.map(c =>
@@ -370,6 +371,42 @@ ${JSON.stringify(caso, null, 2)}
 // ============================================================================
 // SECCIÓN F.bis — CARGA DEL PROMPT_TEMPLATE (TXT calibrado por caso)  ← NUEVO V5.2
 // ============================================================================
+
+// ↓↓↓ B1a — Helper genérico de renderizado de contexto del caso.
+/**
+ * Convierte un objeto clave-valor (caso.contexto_evaluacion) en texto plano
+ * con formato `CLAVE: valor`, una entrada por línea, precedido de un salto
+ * de línea para reproducir exactamente el formato del bloque ctxCaso V5.2.
+ *
+ * Decisiones de diseño:
+ *   - El motor NO conoce vocabulario de dominio. Solo sabe iterar pares y
+ *     formatearlos. Esto permite que un caso de Lengua declare claves como
+ *     "Texto", "Autor", "Época" sin tocar una línea de motor.
+ *   - Las claves se respetan tal cual las declara el JSON (no se transforman
+ *     a mayúsculas, no se trunca, no se ordena alfabeticamente). El orden
+ *     de declaración en el JSON = orden de renderizado.
+ *   - Las claves que empiezan por "_" se ignoran (convención para comentarios
+ *     internos del JSON). Esto permite documentar el JSON sin contaminar el
+ *     prompt de la IA.
+ *   - Si el caso no declara contexto_evaluacion, devolvemos string vacío
+ *     (no rompemos casos heredados ni futuros minimalistas).
+ *
+ * Equivalencia textual con V5.2 (verificada antes de B1a):
+ *   El texto producido es idéntico al del bloque ctxCaso hardcodeado siempre
+ *   que el JSON declare las mismas claves en el mismo orden con los mismos
+ *   valores. No introduce drift por sí solo.
+ */
+function _renderContexto(contextoEvaluacion) {
+  if (!contextoEvaluacion || typeof contextoEvaluacion !== 'object') {
+    return '';
+  }
+  const entradas = Object.entries(contextoEvaluacion)
+    .filter(([clave]) => !clave.startsWith('_')); // ignorar comentarios internos
+  if (entradas.length === 0) return '';
+  const lineas = entradas.map(([clave, valor]) => `${clave}: ${valor}`);
+  return '\n' + lineas.join('\n');
+}
+// ↑↑↑ B1a
 
 /**
  * Lee el archivo TXT cuyo nombre declara el JSON del caso en el campo
