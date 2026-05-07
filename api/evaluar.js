@@ -240,15 +240,21 @@ ${mapeoTexto}`;
 CRITERIOS KNOCKOUT TRANSVERSALES (no suman, solo restan si se fallan):
 ${knockoutsTexto}`;
 
-  // — Llaves desbloqueadas por el alumno —
-  const llavesTexto = payload.llaves_desbloqueadas?.length > 0
-    ? payload.llaves_desbloqueadas.join(', ')
-    : 'Ninguna llave desbloqueada.';
-
-  const llaves = `
-EVIDENCIAS DESBLOQUEADAS POR EL ALUMNO DURANTE LAS ENTREVISTAS:
-  ${llavesTexto}
-(Usa esto para contextualizar el dictamen — el alumno tuvo acceso a estas evidencias.)`;
+  // ↓↓↓ B1b — Recursos consultados por el alumno: textos extraídos al JSON.
+  //     Antes: las cadenas "EVIDENCIAS DESBLOQUEADAS...", "Ninguna llave..." y la
+  //            nota final viajaban hardcodeadas en el JS (vocabulario psicosocial
+  //            + simulador con NPCs).
+  //     Ahora: el JSON declara `caso.bloque_recursos_alumno` con encabezado,
+  //            texto_si_vacio y nota_final. El motor solo ensambla.
+  //     Compatibilidad: si el JSON no declara bloque_recursos_alumno (caso heredado
+  //            o futuro que no lo use), devolvemos string vacío. El payload sigue
+  //            llamandose llaves_desbloqueadas hasta Fase 4 (renombrado a
+  //            recursos_consultados con compatibilidad temporal).
+  const llaves = _renderRecursosAlumno(
+    caso?.caso?.bloque_recursos_alumno,
+    payload.llaves_desbloqueadas
+  );
+  // ↑↑↑ B1b
 
   // — Instrucciones de salida (JSON estricto) —
   // Detección dinámica: solo añadimos ra_status al esquema si el caso tiene ra_cubiertos
@@ -407,6 +413,44 @@ function _renderContexto(contextoEvaluacion) {
   return '\n' + lineas.join('\n');
 }
 // ↑↑↑ B1a
+
+// ↓↓↓ B1b — Helper genérico de renderizado de recursos consultados por el alumno.
+/**
+ * Ensambla el bloque del system prompt que informa a la IA de qué recursos
+ * tuvo disponibles el alumno cuando redactó su entrega. En el simulador
+ * psicosocial son "evidencias desbloqueadas en entrevistas con NPCs"; en
+ * otros casos podrian ser "fuentes consultadas", "fragmentos analizados", etc.
+ *
+ * Decisiones de diseño:
+ *   - El motor NO conoce vocabulario de dominio. El JSON declara encabezado,
+ *     texto_si_vacio y nota_final; el motor solo concatena.
+ *   - Recibe el array de IDs de recursos del payload (en V5.2 se llama
+ *     payload.llaves_desbloqueadas; en Fase 4 se renombrará a recursos_consultados
+ *     con compatibilidad). Aqui aceptamos cualquier array de strings.
+ *   - Si el JSON no declara bloque_recursos_alumno, devolvemos string vacio.
+ *     Esto permite que un caso futuro decida no incluir esta sección.
+ *   - Si el array de recursos viene vacio o ausente, usamos texto_si_vacio.
+ *
+ * Equivalencia textual con V5.2 (verificada antes de B1b):
+ *   El texto producido es idéntico al del bloque llaves hardcodeado siempre
+ *   que el JSON declare las mismas cadenas y el payload envie los mismos IDs.
+ *   No introduce drift por sí solo.
+ */
+function _renderRecursosAlumno(bloque, recursosArray) {
+  if (!bloque || typeof bloque !== 'object') {
+    return '';
+  }
+  const encabezado = bloque.encabezado || '';
+  const textoSiVacio = bloque.texto_si_vacio || '';
+  const notaFinal = bloque.nota_final || '';
+
+  const lista = (Array.isArray(recursosArray) && recursosArray.length > 0)
+    ? recursosArray.join(', ')
+    : textoSiVacio;
+
+  return `\n${encabezado}\n  ${lista}\n${notaFinal}`;
+}
+// ↑↑↑ B1b
 
 /**
  * Lee el archivo TXT cuyo nombre declara el JSON del caso en el campo
