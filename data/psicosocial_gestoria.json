@@ -17,6 +17,12 @@
       "EMPRESA": "Gestoria Moreno & Asociados S.L.",
       "PLANTILLA": "8 personas",
       "DATOS OBJETIVOS": "Absentismo 21.3% (sector: 9.8%), 2 bajas psicológicas en 12 meses (35 días), horas extra media marzo: 11.4h/trabajador, última evaluación psicosocial: 2019."
+    },
+    "bloque_recursos_alumno": {
+      "_comentario_b1b": "B1b · Cadenas que envuelven la lista de recursos consultados por el alumno (en este caso: llaves desbloqueadas en entrevistas). El motor renderiza encabezado + lista + nota_final como bloque del system prompt. Cada caso decide su vocabulario: aqui es 'evidencias desbloqueadas en entrevistas' porque hay simulador con NPCs. En un caso sin simulador, podria ser 'fuentes consultadas' o 'fragmentos analizados'. Pendiente Fase 4: renombrar payload.llaves_desbloqueadas a payload.recursos_consultados (con compatibilidad).",
+      "encabezado": "EVIDENCIAS DESBLOQUEADAS POR EL ALUMNO DURANTE LAS ENTREVISTAS:",
+      "texto_si_vacio": "Ninguna llave desbloqueada.",
+      "nota_final": "(Usa esto para contextualizar el dictamen — el alumno tuvo acceso a estas evidencias.)"
     }
   },
   "contexto": {
