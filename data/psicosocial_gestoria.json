@@ -7,7 +7,17 @@
     "instrumento": "ISTAS21 version corta",
     "prompt_template": "prompt_evaluacion_psico.txt",
     "puntuacion_maxima_automatica": 60,
-    "puntuacion_profesor": 40
+    "puntuacion_profesor": 40,
+    "contexto_evaluacion": {
+      "_comentario_b1a": "B1a · Pares clave-valor inyectados en el system prompt como contexto del caso. Cada caso declara aqui sus campos: el motor solo sabe renderizar pares, no conoce el dominio. Para un caso de Lengua, las claves serian distintas (Texto, Autor, Epoca...). Orden de declaracion = orden de renderizado.",
+      "CASO": "Caso 05 - Gestoria Moreno & Asociados",
+      "SECTOR": "Servicios profesionales - Gestoria fiscal",
+      "MODELOS TEÓRICOS DEL CASO": "Karasek-DCA, Siegrist-ERI",
+      "INSTRUMENTO": "ISTAS21 version corta",
+      "EMPRESA": "Gestoria Moreno & Asociados S.L.",
+      "PLANTILLA": "8 personas",
+      "DATOS OBJETIVOS": "Absentismo 21.3% (sector: 9.8%), 2 bajas psicológicas en 12 meses (35 días), horas extra media marzo: 11.4h/trabajador, última evaluación psicosocial: 2019."
+    }
   },
   "contexto": {
     "empresa": "Gestoria Moreno & Asociados S.L.",
